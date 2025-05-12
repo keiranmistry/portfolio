@@ -1,2 +1,2 @@
 # portfolio
-website and portfolio
+website
