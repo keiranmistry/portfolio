@@ -4,6 +4,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { useEffect, useRef, useState } from 'react';
+
+// Import Barlow font
+import { Barlow } from 'next/font/google';
+const barlow = Barlow({
+  subsets: ['latin'],
+  weight: ['400', '700'],
+});
 
 export default function Projects() {
   const projects = [
@@ -38,15 +46,54 @@ export default function Projects() {
     }
   ];
 
+  const headingRef = useRef(null);
+  const [waveKey, setWaveKey] = useState(0);
+  const hasAnimated = useRef(false);
+
+  useEffect(() => {
+    const observer = new window.IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasAnimated.current) {
+          setWaveKey(k => k + 1);
+          hasAnimated.current = true;
+        }
+      },
+      { threshold: 0.5 }
+    );
+    if (headingRef.current) {
+      observer.observe(headingRef.current);
+    }
+    return () => {
+      if (headingRef.current) observer.unobserve(headingRef.current);
+    };
+  }, []);
+
+  const word = 'projects';
+
   return (
     <section id="projects" className="py-20 bg-muted/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-4">Featured Projects</h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Here are some of the projects I've built. Each one represents different 
-            skills and technologies I've worked with.
-          </p>
+          <h2
+            ref={headingRef}
+            className={`text-6xl sm:text-8xl font-bold italic mb-4 ${barlow.className}`}
+            style={{ display: 'inline-block' }}
+          >
+            <em>
+              {word.split('').map((char, i) => (
+                <span
+                  key={waveKey + '-' + i}
+                  style={{
+                    display: 'inline-block',
+                    transition: 'transform 0.4s cubic-bezier(0.77,0,0.175,1)',
+                    animation: `waveUp 1.4s cubic-bezier(0.4,0,0.2,1) ${i * 0.19}s both`,
+                  }}
+                >
+                  {char}
+                </span>
+              ))}
+            </em>
+          </h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
@@ -97,6 +144,15 @@ export default function Projects() {
           </Button>
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes waveUp {
+          0% { transform: translateY(0); }
+          30% { transform: translateY(-0.19em); }
+          60% { transform: translateY(0.09em); }
+          100% { transform: translateY(0); }
+        }
+      `}</style>
     </section>
   );
 } 

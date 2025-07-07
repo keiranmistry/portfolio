@@ -48,7 +48,7 @@ export default function Hero() {
               display: 'inline-block',
             }}
           >
-            keiran
+            <em>keiran</em>
           </span>
           <span
             className="split-right"
@@ -60,7 +60,7 @@ export default function Hero() {
               display: 'inline-block',
             }}
           >
-            mistry
+            <em>mistry</em>
           </span>
         </h1>
         <p className="mt-6 text-lg sm:text-2xl text-white/90 text-center font-medium max-w-2xl slide-up-in">
@@ -126,7 +126,7 @@ export default function Hero() {
             height="36"
             fill="none"
             viewBox="0 0 24 24"
-            className="text-[#A2D6F9] group-hover:text-[#fbb13c] transition-colors duration-300 drop-shadow-lg"
+            className="text-[#A2D6F9] group-hover:text-[#FFFFFF] transition-colors duration-300 drop-shadow-lg"
           >
             <path
               stroke="currentColor"
