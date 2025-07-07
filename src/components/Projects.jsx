@@ -85,13 +85,6 @@ export default function Projects() {
                   >
                     GitHub
                   </Button>
-                  <Button 
-                    size="sm" 
-                    className="flex-1"
-                    onClick={() => window.open(project.live, '_blank')}
-                  >
-                    Live Demo
-                  </Button>
                 </div>
               </CardContent>
             </Card>
