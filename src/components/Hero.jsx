@@ -1,8 +1,8 @@
 "use client";
 
-import { Montserrat } from 'next/font/google';
+import { Barlow } from 'next/font/google';
 
-const montserrat = Montserrat({
+const montserrat = Barlow({
   subsets: ['latin'],
   weight: ['400', '700'], // or just '700' if you only want bold
 });
@@ -33,15 +33,10 @@ export default function Hero() {
           <span
             className="split-left"
             style={{
-              color: 'transparent',
-              backgroundClip: 'text',
-              WebkitBackgroundClip: 'text',
-              textShadow: `
-                -0.06em 0.06em 0 #009ADA,
-                0em 0.1em 0 #003264,
-                0.06em 0.12em 0 #EA0029,
-                0 0.18em 0.4em #0008
-              `,
+              color: '#fff',
+              backgroundClip: undefined,
+              WebkitBackgroundClip: undefined,
+              textShadow: undefined,
               display: 'inline-block',
             }}
           >
@@ -50,15 +45,10 @@ export default function Hero() {
           <span
             className="split-right"
             style={{
-              color: 'transparent',
-              backgroundClip: 'text',
-              WebkitBackgroundClip: 'text',
-              textShadow: `
-                -0.06em 0.06em 0 #009ADA,
-                0em 0.09em 0 #003264,
-                0.06em 0.12em 0 #EA0029,
-                0 0.18em 0.4em #0008
-              `,
+              color: '#fff',
+              backgroundClip: undefined,
+              WebkitBackgroundClip: undefined,
+              textShadow: undefined,
               display: 'inline-block',
             }}
           >
@@ -66,14 +56,49 @@ export default function Hero() {
           </span>
         </h1>
         <p className="mt-6 text-lg sm:text-2xl text-white/90 text-center font-medium max-w-2xl slide-up-in">
-          <strong>Data Science at the <a href="https://uwaterloo.ca/" target="_blank" rel="noopener noreferrer" className="hover:text-[#fbb13c] transition-colors">University of Waterloo</a></strong>
+          <strong style={{ color: '#A2D6F9' }}>
+            Data Science at the <a href="https://uwaterloo.ca/" target="_blank" rel="noopener noreferrer" className="hover:text-[#fbb13c] transition-colors">University of Waterloo</a>
+          </strong>
         </p>
-        <a
-          href="#projects"
-          className="mt-10 inline-block bg-white text-[#191A1A] font-bold px-8 py-3 rounded-full shadow-lg hover:bg-[#009ADA] hover:text-white transition-colors text-lg tracking-wide border-2 border-[#009ADA]"
-        >
-          View My Work
-        </a>
+        {/* Glassmorphism Social Buttons */}
+        <div className="mt-10 flex flex-row gap-4">
+          <a
+            href="https://www.linkedin.com/in/keiranmistry/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-8 py-3 rounded-lg backdrop-blur-md bg-white/10 border border-white/30 shadow-lg text-[#A2D6F9] font-bold text-lg transition-all duration-400 hover:bg-white/20 hover:text-white hover:border-white focus:outline-none focus:none focus:ring-[#A2D6F9]"
+          >
+            {/* LinkedIn SVG Icon */}
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24" className="inline-block align-middle">
+              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.028-3.037-1.852-3.037-1.853 0-2.136 1.446-2.136 2.939v5.667H9.353V9h3.413v1.561h.049c.476-.9 1.637-1.852 3.367-1.852 3.599 0 4.263 2.368 4.263 5.455v6.288zM5.337 7.433a2.062 2.062 0 1 1 0-4.124 2.062 2.062 0 0 1 0 4.124zm1.777 13.019H3.56V9h3.554v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.226.792 24 1.771 24h20.451C23.2 24 24 23.226 24 22.271V1.729C24 .774 23.2 0 22.222 0z"/>
+            </svg>
+            LinkedIn
+          </a>
+          <a
+            href="https://github.com/keiranmistry"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-8 py-3 rounded-lg backdrop-blur-md bg-white/10 border border-white/30 shadow-lg text-[#A2D6F9] font-bold text-lg transition-all duration-400 hover:bg-white/20 hover:text-white hover:border-white focus:outline-none focus:none focus:ring-[#A2D6F9]"
+          >
+            {/* GitHub SVG Icon */}
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24" className="inline-block align-middle">
+              <path d="M12 0C5.37 0 0 5.373 0 12c0 5.303 3.438 9.8 8.205 11.387.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.726-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.09-.745.083-.729.083-.729 1.205.084 1.84 1.237 1.84 1.237 1.07 1.834 2.807 1.304 3.492.997.108-.775.418-1.305.762-1.605-2.665-.305-5.466-1.334-5.466-5.931 0-1.31.468-2.381 1.236-3.221-.124-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.984-.399 3.003-.404 1.018.005 2.046.138 3.006.404 2.291-1.553 3.297-1.23 3.297-1.23.653 1.653.242 2.873.119 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.803 5.624-5.475 5.921.43.371.823 1.102.823 2.222 0 1.606-.014 2.898-.014 3.293 0 .322.218.694.825.576C20.565 21.796 24 17.299 24 12c0-6.627-5.373-12-12-12z"/>
+            </svg>
+            GitHub
+          </a>
+          <a
+            href="https://github.com/keiranmistry"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-8 py-3 rounded-lg backdrop-blur-md bg-white/10 border border-white/30 shadow-lg text-[#A2D6F9] font-bold text-lg transition-all duration-400 hover:bg-white/20 hover:text-white hover:border-white focus:outline-none focus:none focus:ring-[#A2D6F9]"
+          >
+            {/* GitHub SVG Icon */}
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24" className="inline-block align-middle">
+              <path d="M12 0C5.37 0 0 5.373 0 12c0 5.303 3.438 9.8 8.205 11.387.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.726-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.09-.745.083-.729.083-.729 1.205.084 1.84 1.237 1.84 1.237 1.07 1.834 2.807 1.304 3.492.997.108-.775.418-1.305.762-1.605-2.665-.305-5.466-1.334-5.466-5.931 0-1.31.468-2.381 1.236-3.221-.124-.303-.535-1.523.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.984-.399 3.003-.404 1.018.005 2.046.138 3.006.404 2.291-1.553 3.297-1.23 3.297-1.23.653 1.653.242 2.873.119 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.803 5.624-5.475 5.921.43.371.823 1.102.823 2.222 0 1.606-.014 2.898-.014 3.293 0 .322.218.694.825.576C20.565 21.796 24 17.299 24 12c0-6.627-5.373-12-12-12z"/>
+            </svg>
+            GitHub
+          </a>
+        </div>
       </div>
       {/* BMW M stripes CSS and split text animation */}
       <style>{`
