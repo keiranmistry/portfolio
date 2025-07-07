@@ -65,8 +65,8 @@ export default function Hero() {
             mistry
           </span>
         </h1>
-        <p className="mt-6 text-lg sm:text-2xl text-white/90 text-center font-medium max-w-2xl">
-          <bold>Data Science at the University of Waterloo</bold>
+        <p className="mt-6 text-lg sm:text-2xl text-white/90 text-center font-medium max-w-2xl slide-up-in">
+          <strong>Data Science at the <a href="https://uwaterloo.ca/" target="_blank" rel="noopener noreferrer" className="hover:text-[#fbb13c] transition-colors">University of Waterloo</a></strong>
         </p>
         <a
           href="#projects"
@@ -127,16 +127,25 @@ export default function Hero() {
           animation: splitRightIn 1s cubic-bezier(0.77,0,0.175,1) 0.2s both;
         }
         @keyframes splitLeftIn {
-          0% { opacity: 0; transform: translateX(-80%) scale(0.6); }
+          0% { opacity: 0; transform: translateX(-80%) scale(0.8); }
           60% { opacity: 1; }
-          80% { opacity: 1; transform: translateX(0) scale(1.2); }
+          80% { opacity: 1; transform: translateX(0) scale(1.04); }
           100% { opacity: 1; transform: translateX(0) scale(1); }
         }
         @keyframes splitRightIn {
-          0% { opacity: 0; transform: translateX(80%) scale(0.6); }
+          0% { opacity: 0; transform: translateX(80%) scale(0.8); }
           60% { opacity: 1; }
-          80% { opacity: 1; transform: translateX(0) scale(1.2); }
+          80% { opacity: 1; transform: translateX(0) scale(1.04); }
           100% { opacity: 1; transform: translateX(0) scale(1); }
+        }
+        .slide-up-in {
+          animation: slideUpIn 1s cubic-bezier(0.77,0,0.175,1) 1.3s both;
+        }
+        @keyframes slideUpIn {
+          0% { opacity: 0; transform: translateY(60%) scale(0.92); }
+          60% { opacity: 1; }
+          80% { opacity: 1; transform: translateY(0) scale(1.04); }
+          100% { opacity: 1; transform: translateY(0) scale(1); }
         }
       `}</style>
     </section>
