@@ -71,7 +71,10 @@ export default function Projects() {
   const word = 'projects';
 
   return (
-    <section id="projects" className="py-20 bg-muted/30">
+    <section
+      id="projects"
+      className="py-20 bg-[url('/newwallpaper.png')] bg-cover bg-center bg-no-repeat"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2
