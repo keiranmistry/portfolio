@@ -48,7 +48,7 @@ export default function Hero() {
               display: 'inline-block',
             }}
           >
-            <em>keiran</em>
+            <em>Keiran</em>
           </span>
           <span
             className="split-right"
@@ -60,7 +60,7 @@ export default function Hero() {
               display: 'inline-block',
             }}
           >
-            <em>mistry</em>
+            <em>Mistry</em>
           </span>
         </h1>
         <p className="mt-6 text-lg sm:text-2xl text-white/90 text-center font-medium max-w-2xl slide-up-in">
