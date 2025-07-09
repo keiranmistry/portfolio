@@ -33,7 +33,7 @@ export default function Hero() {
       {/* Hero Content */}
       <div className="relative z-10 flex flex-col items-center justify-center w-full px-4 py-24">
         <h1
-          className={`text-7xl sm:text-9xl font-extrabold tracking-tight text-center flex flex-wrap justify-center gap-x-4 ${barlow.className}`}
+          className={`text-7xl sm:text-9xl font-extrabold tracking-tight text-center flex flex-wrap justify-center gap-x-7 ${barlow.className}`}
           style={{
             letterSpacing: '-0.01em',
           }}
