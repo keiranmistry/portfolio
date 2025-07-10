@@ -12,8 +12,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Keiran's Portfolio",
-  description: "Full-stack developer portfolio showcasing projects, experience, and skills",
+  title: "Keiran Mistry",
+  description: "Data Science Student at UWaterloo",
 };
 
 export default function RootLayout({ children }) {

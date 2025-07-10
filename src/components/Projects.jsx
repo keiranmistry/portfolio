@@ -38,6 +38,7 @@ function GlassCard({ children, ...props }) {
 }
 
 export default function Projects() {
+
   const projects = [
     {
       title: "Stubook",
@@ -47,21 +48,29 @@ export default function Projects() {
       image: "/globe.svg"
     },
     {
-      title: "Project 2",
+      title: "HDI vs. Happiness Analysis",
       description: "e",
       technologies: ["tech1", "tech2", "tech3"],
       github: "github link",
       image: "/api/placeholder/400/250"
     },
     {
-      title: "Project 3",
+      title: "TrackSite",
       description: "e",
       technologies: ["tech1", "tech2", "tech3"],
       github: "github link",
       image: "/api/placeholder/400/250"
     },
     {
-      title: "Portfolio Website",
+      title: "Soccer Tiki Taka Toe",
+      description: "A modern, responsive portfolio website built with Next.js and Tailwind CSS, featuring smooth animations and optimal performance.",
+      technologies: ["Next.js", "Tailwind CSS", "Framer Motion", "shadcn/ui"],
+      github: "https://github.com/yourusername/portfolio",
+      live: "https://your-portfolio.vercel.app",
+      image: "/api/placeholder/400/250"
+    },
+    {
+      title: "Portfolio",
       description: "A modern, responsive portfolio website built with Next.js and Tailwind CSS, featuring smooth animations and optimal performance.",
       technologies: ["Next.js", "Tailwind CSS", "Framer Motion", "shadcn/ui"],
       github: "https://github.com/yourusername/portfolio",
@@ -140,16 +149,27 @@ export default function Projects() {
         </div>
 
         {/* Projects Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
+        <div className={`grid gap-10 ${projects.length % 2 === 1 ? 'sm:grid-cols-2 sm:justify-items-center' : 'grid-cols-1 sm:grid-cols-2'}`}>
           {projects.map((project, idx) => (
+            <div key={idx} className={`${projects.length % 2 === 1 && idx === projects.length - 1 ? 'sm:col-span-2 sm:w-1/2' : 'w-full'}`}>
             <GlassCard
               key={idx}
-              className="w-full min-h-[540px] group shadow-xl transition-all pt-4 pb-4 rounded-2xl relative overflow-hidden backdrop-blur-md"
+              className="w-full min-h-[540px] group shadow-xl transition-all pt-4 pb-4 rounded-2xl relative overflow-hidden backdrop-blur-md hover:scale-105 hover:shadow-2xl"
               style={{
                 background: 'linear-gradient(120deg, rgba(255,255,255,0.22) 60%, rgba(255,255,255,0.10) 100%)',
                 boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.18)',
                 backdropFilter: 'blur(16px)',
                 WebkitBackdropFilter: 'blur(16px)',
+                border: '1px solid transparent',
+                transition: 'all 0.3s ease-in-out',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.border = '1px solid rgba(147, 51, 234, 0.3)';
+                e.currentTarget.style.boxShadow = '0 8px 32px 0 rgba(31, 38, 135, 0.18), 0 0 20px rgba(147, 51, 234, 0.2), 0 0 40px rgba(59, 130, 246, 0.1)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.border = '1px solid transparent';
+                e.currentTarget.style.boxShadow = '0 8px 32px 0 rgba(31, 38, 135, 0.18)';
               }}
             >
               <div className="relative z-10">
@@ -204,6 +224,7 @@ export default function Projects() {
                 </CardContent>
               </div>
             </GlassCard>
+            </div>
           ))}
         </div>
       </div>
