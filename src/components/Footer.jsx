@@ -29,7 +29,7 @@ export default function Footer() {
               </svg>
             </a>
             <a
-              href="https://github.com/yourusername"
+              href="https://github.com/keiranmistry"
               target="_blank"
               rel="noopener noreferrer"
               className="text-[#033E7A] hover:text-[#033E7A] active:text-[#033E7A] transition-colors"
