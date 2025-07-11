@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import React from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Barlow } from 'next/font/google';
@@ -16,6 +16,76 @@ const barlow = Barlow({
 
 export default function Experience() {
   const [selectedExperience, setSelectedExperience] = useState(0);
+  const [typewriterText, setTypewriterText] = useState("");
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isTyping, setIsTyping] = useState(false);
+  const [showCursor, setShowCursor] = useState(true);
+  const [blinkCount, setBlinkCount] = useState(0);
+  const [hasAnimated, setHasAnimated] = useState(false);
+  const headingRef = useRef(null);
+
+  const fullText = "experience";
+
+  // Intersection Observer to detect when section is visited (same as Projects)
+  useEffect(() => {
+    const observer = new window.IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasAnimated) {
+          setHasAnimated(true);
+          setIsTyping(true);
+        }
+      },
+      { threshold: 0.5 }
+    );
+    if (headingRef.current) {
+      observer.observe(headingRef.current);
+    }
+    return () => {
+      if (headingRef.current) observer.unobserve(headingRef.current);
+    };
+  }, [hasAnimated]);
+
+  useEffect(() => {
+    if (isTyping && currentIndex < fullText.length) {
+      const timeout = setTimeout(() => {
+        setTypewriterText(prev => prev + fullText[currentIndex]);
+        setCurrentIndex(prev => prev + 1);
+      }, 250); // Slower typing speed
+
+      return () => clearTimeout(timeout);
+    } else if (isTyping && currentIndex >= fullText.length) {
+      setIsTyping(false);
+    }
+  }, [currentIndex, isTyping, fullText]);
+
+  // Separate useEffect for blinking after typing is complete
+  useEffect(() => {
+    if (!isTyping && currentIndex >= fullText.length && blinkCount === 0) {
+      console.log('Starting blink sequence');
+      
+      // Blink 1: Show
+      setTimeout(() => setShowCursor(true), 0);
+      
+      // Blink 1: Hide
+      setTimeout(() => setShowCursor(false), 500);
+      
+      // Blink 2: Show
+      setTimeout(() => setShowCursor(true), 1000);
+      
+      // Blink 2: Hide
+      setTimeout(() => setShowCursor(false), 1500);
+      
+      // Blink 3: Show
+      setTimeout(() => setShowCursor(true), 2000);
+      
+      // Blink 3: Hide and stay hidden
+      setTimeout(() => {
+        console.log('Final blink, hiding cursor permanently');
+        setShowCursor(false);
+        setBlinkCount(6); // Mark as complete
+      }, 2500);
+    }
+  }, [isTyping, currentIndex, fullText, blinkCount]);
 
   const experiences = [
     {
@@ -60,15 +130,16 @@ export default function Experience() {
     <section id="experience" className="py-20">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className={`text-6xl sm:text-8xl font-bold italic mb-4 ${barlow.className}`}
+          <h2 
+            ref={headingRef}
+            className={`text-6xl sm:text-8xl font-bold italic mb-4 ${barlow.className}`}
             style={{ display: 'inline-block' }}
           >
-            <em>experience</em>
+            <em>
+              {typewriterText}
+              <span className="italic" style={{ visibility: showCursor ? 'visible' : 'hidden' }}>|</span>
+            </em>
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            My professional journey in software development, showcasing growth 
-            and achievements across different roles and companies.
-          </p>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-6">
@@ -183,12 +254,6 @@ export default function Experience() {
               </Card>
             </motion.div>
           </AnimatePresence>
-        </div>
-
-        <div className="text-center mt-12">
-          <Button variant="outline" size="lg" onClick={() => window.open('/resume.pdf', '_blank')}>
-            Download Full Resume
-          </Button>
         </div>
       </div>
     </section>
