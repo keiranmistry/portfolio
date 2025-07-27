@@ -89,19 +89,20 @@ export default function Experience() {
 
   const experiences = [
     {
-      title: "sample",
-      company: "company",
-      period: "date",
-      location: "toronto",
-      description: "about",
-      technologies: ["tech1", "tech2", "tech3"],
+      title: "Data Science",
+      company: "University of Waterloo",
+      period: "2024 - 2029",
+      location: "Waterloo, ON",
+      description: "Bachelor of Mathematics",
+      technologies: ["C", "Linux/Unix", "Functional Programming"],
       achievements: [
-        "notes"
+        "4.0 GPA", "Dean's List", "Data Science Club", "Relevant Coursework: Algorithm Design, Software Developer Tools, Functional Programming, Linear Algebra, Calculus",
+        "Intramural Soccer"
       ],
       icon: "/icons/waterloo (2).png"
     },
     {
-        title: "e",
+        title: "Technical Analyst",
         company: "r",
         period: "r",
         location: "a",
@@ -113,7 +114,7 @@ export default function Experience() {
         icon: "/icons/tti (1).png"
       },
       {
-        title: "e",
+        title: "Academic Tutor",
         company: "r",
         period: "r",
         location: "a",
