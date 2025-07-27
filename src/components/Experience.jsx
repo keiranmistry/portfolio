@@ -151,15 +151,14 @@ export default function Experience() {
                   <div className={`relative ${index === 1 ? 'ml-8 lg:ml-0' : ''}`}>
                     <button
                       onClick={() => setSelectedExperience(index)}
-                      className={`w-16 h-16 rounded-lg transition-all duration-300 flex items-center justify-center relative z-10 overflow-hidden ${
-                        selectedExperience === index
-                          ? 'scale-125'
-                          : 'hover:scale-105'
-                      }`}
-                      style={{
+                      className={`w-16 h-16 rounded-lg transition-all duration-300 flex items-center cursor-pointer justify-center relative z-10 overflow-hidden ${
+                        selectedExperience === index ? 'scale-125' : 'hover:scale-105'
+                      }`}                      
+                      style={{                        
                         background: selectedExperience === index 
                           ? 'rgba(147, 51, 234, 0.1)' 
                           : 'rgba(255, 255, 255, 0.05)',
+                      
                         backdropFilter: 'blur(20px)',
                         WebkitBackdropFilter: 'blur(20px)',
                         boxShadow: selectedExperience === index 

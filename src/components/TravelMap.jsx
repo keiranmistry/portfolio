@@ -120,7 +120,12 @@ export default function TravelMap() {
           </p>
         </div>
         <div className="relative">
-          <div className="w-full h-[600px] rounded-lg border border-gray-700 overflow-hidden bg-[#181e2a] relative">
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, ease: "easeOut" }}
+            className="w-full h-[600px] rounded-lg border border-gray-700 overflow-hidden bg-[#181e2a] relative"
+          >
             <button
               className="absolute z-20 top-4 right-4 bg-[#23272f] text-white px-3 py-1 rounded shadow hover:bg-[#2d3748] transition"
               onClick={() => { setZoom(1); setCenter([0, 0]); }}
@@ -165,16 +170,17 @@ export default function TravelMap() {
                             default: {
                               fill: isVisited ? "#A2D6F9" : "#23272f",
                               outline: "none",
-                              stroke: "#222a36",
-                              strokeWidth: 0.5,
-                              transition: "fill 0.2s, transform 0.2s"
+                              stroke: isVisited ? "#4FC3F7" : "#222a36",
+                              strokeWidth: isVisited ? 1.2 : 0.5,
+                              filter: isVisited ? "drop-shadow(0 0 8px #4FC3F7)" : undefined,
+                              transition: "fill 0.2s, transform 0.2s, filter 0.2s"
                             },
                             hover: {
                               fill: isVisited ? "#4FC3F7" : "#23272f",
                               outline: "none",
                               cursor: isVisited ? "pointer" : "default",
-                              transform: isVisited ? "scale(1.08)" : undefined,
-                              filter: isVisited ? "drop-shadow(0 0 8px #4FC3F7)" : undefined,
+                              transform: isVisited ? "scale(1.10)" : undefined,
+                              filter: isVisited ? "drop-shadow(0 0 16px #4FC3F7)" : undefined,
                               zIndex: 10
                             },
                             pressed: {
@@ -200,32 +206,32 @@ export default function TravelMap() {
                     exit={{ opacity: 0, scale: 0.8, y: 10 }}
                     transition={{ duration: 0.2 }}
                   >
-                    {/* SVG-native tooltip for compatibility */}
+                    {/* Modern tooltip bubble */}
                     <g>
-                      <rect x={hoveredCentroid[0] - 90} y={hoveredCentroid[1] - 80} width={180} height={60} rx={12} fill="#fff" stroke="#e5e7eb" strokeWidth={1} />
-                      <text x={hoveredCentroid[0]} y={hoveredCentroid[1] - 60} textAnchor="middle" fontSize="22" fontFamily="sans-serif">
+                      <rect x={hoveredCentroid[0] - 90} y={hoveredCentroid[1] - 90} width={180} height={70} rx={16} fill="#181e2a" stroke="#4FC3F7" strokeWidth={2} />
+                      <text x={hoveredCentroid[0]} y={hoveredCentroid[1] - 68} textAnchor="middle" fontSize="28" fontFamily="sans-serif">
                         {visitedCountries[hoveredCountry].flag}
                       </text>
-                      <text x={hoveredCentroid[0]} y={hoveredCentroid[1] - 38} textAnchor="middle" fontSize="16" fontWeight="bold" fill="#222">
+                      <text x={hoveredCentroid[0]} y={hoveredCentroid[1] - 42} textAnchor="middle" fontSize="18" fontWeight="bold" fill="#A2D6F9">
                         {visitedCountries[hoveredCountry].name}
                       </text>
                       {visitedCountries[hoveredCountry].visits.map((visit, i) => (
-                        <text key={i} x={hoveredCentroid[0]} y={hoveredCentroid[1] - 18 + i * 16} textAnchor="middle" fontSize="13" fill="#555">
+                        <text key={i} x={hoveredCentroid[0]} y={hoveredCentroid[1] - 22 + i * 18} textAnchor="middle" fontSize="15" fill="#fff">
                           {visit.month} {visit.year}
                         </text>
                       ))}
                       {/* Speech bubble tail */}
                       <polygon points={
                         `${hoveredCentroid[0]},${hoveredCentroid[1]-20} ` +
-                        `${hoveredCentroid[0]-10},${hoveredCentroid[1]-8} ` +
-                        `${hoveredCentroid[0]+10},${hoveredCentroid[1]-8}`
-                      } fill="#fff" stroke="#e5e7eb" strokeWidth={1} />
+                        `${hoveredCentroid[0]-12},${hoveredCentroid[1]-2} ` +
+                        `${hoveredCentroid[0]+12},${hoveredCentroid[1]-2}`
+                      } fill="#181e2a" stroke="#4FC3F7" strokeWidth={2} />
                     </g>
                   </motion.g>
                 )}
               </AnimatePresence>
             </svg>
-          </div>
+          </motion.div>
         </div>
         {/* Animated Stats */}
         <motion.div
@@ -253,6 +259,17 @@ export default function TravelMap() {
             <div className="text-gray-400">Continents Explored</div>
           </div>
         </motion.div>
+        {/* Add a legend below the map */}
+        <div className="flex justify-center mt-4 mb-8 gap-6">
+          <div className="flex items-center gap-2">
+            <span className="inline-block w-6 h-4 rounded bg-[#A2D6F9] border border-[#4FC3F7]"></span>
+            <span className="text-gray-300 text-sm">Visited</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="inline-block w-6 h-4 rounded bg-[#23272f] border border-[#222a36]"></span>
+            <span className="text-gray-500 text-sm">Not Visited</span>
+          </div>
+        </div>
       </div>
     </section>
   );
