@@ -121,7 +121,7 @@ export default function Experience() {
           "achievement 3"
         ],
         icon: "/icons/tti (1).png",
-        mono: "/icons/ttimono.png",
+        mono: "/icons/ttimono (1).png",
         url: "https://www.ttigroup.com/"
       },
       {
@@ -137,7 +137,7 @@ export default function Experience() {
           "achievement 3"
         ],
         icon: "/icons/tdss (1).png",
-        mono: "/icons/tdssmono.png",
+        mono: "/icons/tdssmono (1).png",
         url: "http://www.yrdsb.ca/schools/tommydouglas.ss/Pages/default.aspx"
       }
   ];
