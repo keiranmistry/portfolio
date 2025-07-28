@@ -99,7 +99,8 @@ export default function Experience() {
         "4.0 GPA", "Dean's List", "Data Science Club", "Relevant Coursework: Algorithm Design, Software Developer Tools, Functional Programming, Linear Algebra, Calculus",
         "Intramural Soccer"
       ],
-      icon: "/icons/waterloo (2).png"
+      icon: "/icons/waterloo (2).png",
+      mono: "/icons/waterloomono.png"
     },
     {
         title: "Technical Analyst",
@@ -111,7 +112,8 @@ export default function Experience() {
         achievements: [
           "fdsfdsnotes"
         ],
-        icon: "/icons/tti (1).png"
+        icon: "/icons/tti (1).png",
+        mono: "/icons/ttimono.png"
       },
       {
         title: "Academic Tutor",
@@ -123,7 +125,8 @@ export default function Experience() {
         achievements: [
           "fdsfdsnotes"
         ],
-        icon: "/icons/tdss (1).png"
+        icon: "/icons/tdss (1).png",
+        mono: "/icons/tdssmono.png"
       }
   ];
 
@@ -209,7 +212,7 @@ export default function Experience() {
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
                         <img 
-                          src={experiences[selectedExperience].icon} 
+                          src={experiences[selectedExperience].mono} 
                           alt={`${experiences[selectedExperience].company} logo`}
                           className="w-full h-full object-cover"
                         />
