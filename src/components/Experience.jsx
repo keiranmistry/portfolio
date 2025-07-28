@@ -206,13 +206,22 @@ export default function Experience() {
               <Card className="group hover:shadow-lg transition-all duration-300 min-h-[600px]">
                 <CardHeader>
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                    <div>
-                      <CardTitle className="text-xl group-hover:text-primary transition-colors">
-                        {experiences[selectedExperience].title}
-                      </CardTitle>
-                      <CardDescription className="text-base font-medium">
-                        {experiences[selectedExperience].company}
-                      </CardDescription>
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+                        <img 
+                          src={experiences[selectedExperience].icon} 
+                          alt={`${experiences[selectedExperience].company} logo`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div>
+                        <CardTitle className="text-xl group-hover:text-primary transition-colors">
+                          {experiences[selectedExperience].title}
+                        </CardTitle>
+                        <CardDescription className="text-base font-medium">
+                          {experiences[selectedExperience].company}
+                        </CardDescription>
+                      </div>
                     </div>
                     <div className="text-right">
                       <Badge variant="secondary" className="text-sm">
