@@ -148,7 +148,7 @@ export default function Experience() {
         <div className="text-center mb-16">
           <h2 
             ref={headingRef}
-            className={`text-6xl sm:text-8xl font-bold italic mb-4`}
+            className={`text-6xl sm:text-8xl font-bold italic mb-4 ${barlow.className}`}
             style={{ display: 'inline-block' }}
           >
             <em>
@@ -237,19 +237,19 @@ export default function Experience() {
                         </a>
                       </div>
                       <div>
-                        <CardTitle className={`text-xl transition-colors ${exo2.className} ${barlow.className}`} style={{ color: '#033E7A' }}>
+                        <CardTitle className={`text-xl transition-colors ${barlow.className}`} style={{ color: '#033E7A', fontWeight: 'bold' }}>
                           {experiences[selectedExperience].title}
                         </CardTitle>
-                        <CardDescription className="text-base font-medium transition-colors" style={{ color: '#0266B1' }}>
+                        <CardDescription className={`font-semibold text-base transition-colors ${exo2.className}`} style={{ color: '#0266B1' }}>
                           {experiences[selectedExperience].company}
                         </CardDescription>
                       </div>
                     </div>
                     <div className="text-right">
-                      <Badge variant="secondary" className="text-sm transition-colors" style={{ color: '#E22716' }}>
-                        {experiences[selectedExperience].period}
-                      </Badge>
-                      <p className="text-sm text-muted-foreground mt-1 transition-colors" style={{ color: '#FF6456' }}>
+                        <Badge variant="secondary" className={`font-bold text-sm transition-colors ${exo2.className}`} style={{ color: '#E22716' }}>
+                          {experiences[selectedExperience].period}
+                        </Badge>
+                      <p className={`font-semibold text-sm text-muted-foreground mt-1 transition-colors ${exo2.className}`} style={{ color: '#FF6456' }}>
                         {experiences[selectedExperience].location}
                       </p>
                     </div>
@@ -271,10 +271,10 @@ export default function Experience() {
                   <Separator />
 
                   <div>
-                    <h4 className="font-semibold mb-2" style={{ color: '#0266B1' }}>Key Achievements:</h4>
+                    <h4 className={`font-semibold mb-2 ${exo2.className}`} style={{ color: '#0266B1' }}>Key Achievements:</h4>
                     <ul className="space-y-1">
                       {experiences[selectedExperience].achievements.map((achievement, achievementIndex) => (
-                        <li key={achievementIndex} className="text-medium text-muted-foreground flex items-center gap-2``">
+                        <li key={achievementIndex} className="text-medium text-muted-foreground flex items-center gap-4">
                           <span className="text-primary">•</span>
                           {achievement}
                         </li>
