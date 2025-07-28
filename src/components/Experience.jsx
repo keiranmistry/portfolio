@@ -7,9 +7,14 @@ import { Button } from "@/components/ui/button";
 import { useState, useEffect, useRef } from "react";
 import React from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Barlow } from 'next/font/google';
+import { Barlow, Exo_2 } from 'next/font/google';
 
 const barlow = Barlow({
+  subsets: ['latin'],
+  weight: ['400', '700'],
+});
+
+const exo2 = Exo_2({
   subsets: ['latin'],
   weight: ['400', '700'],
 });
@@ -91,7 +96,7 @@ export default function Experience() {
     {
       title: "Data Science",
       company: "University of Waterloo",
-      period: "2024 - 2029",
+      period: "Sep. 2024 - Apr. 2029",
       location: "Waterloo, ON",
       description: "Bachelor of Mathematics",
       technologies: ["C", "Linux/Unix", "Functional Programming"],
@@ -100,33 +105,40 @@ export default function Experience() {
         "Intramural Soccer"
       ],
       icon: "/icons/waterloo (2).png",
-      mono: "/icons/waterloomono.png"
+      mono: "/icons/waterloomono (1).png",
+      url: "https://uwaterloo.ca/future-students/programs/data-science"
     },
     {
         title: "Technical Analyst",
-        company: "r",
-        period: "r",
-        location: "a",
-        description: "abosut",
-        technologies: ["tec213h1", "tecwdfwch2", "twqeech3"],
+        company: "Techtronic Industries",
+        period: "May 2025 - Aug. 2025",
+        location: "Toronto, ON",
+        description: "description placeholder",
+        technologies: ["tech1", "tech2", "tech3"],
         achievements: [
-          "fdsfdsnotes"
+          "achievement 1",
+          "achievement 2",
+          "achievement 3"
         ],
         icon: "/icons/tti (1).png",
-        mono: "/icons/ttimono.png"
+        mono: "/icons/ttimono.png",
+        url: "https://www.ttigroup.com/"
       },
       {
         title: "Academic Tutor",
-        company: "r",
-        period: "r",
-        location: "a",
-        description: "abosut",
-        technologies: ["tec213h1", "tecwdfwch2", "twqeech3"],
+        company: "Tommy Douglas Secondary School",
+        period: "Sep. 2022 - Jun. 2024",
+        location: "Vaughan, ON",
+        description: "description placeholder",
+        technologies: ["tech1", "tech2", "tech3"],
         achievements: [
-          "fdsfdsnotes"
+          "achievement 1",
+          "achievement 2",
+          "achievement 3"
         ],
         icon: "/icons/tdss (1).png",
-        mono: "/icons/tdssmono.png"
+        mono: "/icons/tdssmono.png",
+        url: "http://www.yrdsb.ca/schools/tommydouglas.ss/Pages/default.aspx"
       }
   ];
 
@@ -136,7 +148,7 @@ export default function Experience() {
         <div className="text-center mb-16">
           <h2 
             ref={headingRef}
-            className={`text-6xl sm:text-8xl font-bold italic mb-4 ${barlow.className}`}
+            className={`text-6xl sm:text-8xl font-bold italic mb-4`}
             style={{ display: 'inline-block' }}
           >
             <em>
@@ -211,33 +223,40 @@ export default function Experience() {
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
-                        <img 
-                          src={experiences[selectedExperience].mono} 
-                          alt={`${experiences[selectedExperience].company} logo`}
-                          className="w-full h-full object-cover"
-                        />
+                        <a 
+                          href={experiences[selectedExperience].url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="block w-full h-full hover:opacity-80 transition-opacity cursor-pointer"
+                        >
+                          <img 
+                            src={experiences[selectedExperience].mono} 
+                            alt={`${experiences[selectedExperience].company} logo`}
+                            className="w-full h-full object-cover"
+                          />
+                        </a>
                       </div>
                       <div>
-                        <CardTitle className="text-xl group-hover:text-primary transition-colors">
+                        <CardTitle className={`text-xl transition-colors ${exo2.className} ${barlow.className}`} style={{ color: '#033E7A' }}>
                           {experiences[selectedExperience].title}
                         </CardTitle>
-                        <CardDescription className="text-base font-medium">
+                        <CardDescription className="text-base font-medium transition-colors" style={{ color: '#0266B1' }}>
                           {experiences[selectedExperience].company}
                         </CardDescription>
                       </div>
                     </div>
                     <div className="text-right">
-                      <Badge variant="secondary" className="text-sm">
+                      <Badge variant="secondary" className="text-sm transition-colors" style={{ color: '#E22716' }}>
                         {experiences[selectedExperience].period}
                       </Badge>
-                      <p className="text-sm text-muted-foreground mt-1">
+                      <p className="text-sm text-muted-foreground mt-1 transition-colors" style={{ color: '#FF6456' }}>
                         {experiences[selectedExperience].location}
                       </p>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <p className="text-muted-foreground leading-relaxed">
+                  <p className="text-muted-foreground leading-relaxed" style={{ color: '#000000' }}>
                     {experiences[selectedExperience].description}
                   </p>
 
@@ -252,11 +271,11 @@ export default function Experience() {
                   <Separator />
 
                   <div>
-                    <h4 className="font-semibold mb-2">Key Achievements:</h4>
+                    <h4 className="font-semibold mb-2" style={{ color: '#0266B1' }}>Key Achievements:</h4>
                     <ul className="space-y-1">
                       {experiences[selectedExperience].achievements.map((achievement, achievementIndex) => (
-                        <li key={achievementIndex} className="text-sm text-muted-foreground flex items-start gap-2">
-                          <span className="text-primary mt-1">•</span>
+                        <li key={achievementIndex} className="text-medium text-muted-foreground flex items-center gap-2``">
+                          <span className="text-primary">•</span>
                           {achievement}
                         </li>
                       ))}
