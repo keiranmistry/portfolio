@@ -240,9 +240,9 @@ export default function TravelMap() {
         </div>
         <div className="relative">
           <div className="w-full h-[600px] rounded-lg border border-gray-700 overflow-hidden bg-[#181e2a] relative">
-            <div className="absolute z-20 top-4 right-4 flex flex-col gap-2">
+            <div className="absolute z-20 top-4 right-2 flex flex-col gap-2">
               <button
-                className="bg-[#23272f] text-white w-8 h-8 rounded shadow hover:bg-[#2d3748] transition-all duration-300 ease-out flex items-center justify-center"
+                className="bg-[#23272f] text-white px-3 py-1 rounded shadow hover:bg-[#2d3748] transition-all duration-300 ease-out flex items-center justify-center"
                 onClick={() => {
                   const newZoom = Math.min(zoom * 1.5, 8);
                   setZoom(newZoom);
@@ -255,7 +255,7 @@ export default function TravelMap() {
                 </svg>
               </button>
               <button
-                className="bg-[#23272f] text-white w-8 h-8 rounded shadow hover:bg-[#2d3748] transition-all duration-300 ease-out flex items-center justify-center"
+                className="bg-[#23272f] text-white px-3 py-1 rounded shadow hover:bg-[#2d3748] transition-all duration-300 ease-out flex items-center justify-center"
                 onClick={() => {
                   const newZoom = Math.max(zoom / 1.5, 1);
                   setZoom(newZoom);
@@ -268,7 +268,7 @@ export default function TravelMap() {
                 </svg>
               </button>
               <button
-                className="bg-[#23272f] text-white px-3 py-1 rounded shadow hover:bg-[#2d3748] transition-all duration-300 ease-out text-xs"
+                className={`bg-[#23272f] text-white px-3 py-1 rounded shadow hover:bg-[#2d3748] transition-all duration-300 ease-out text-xs ${exo2.className}`}
                 onClick={() => { 
                   setZoom(1); 
                   setCenter([0, 0]); 
