@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useMotionValue, useTransform } from "framer-motion";
 import { ComposableMap, Geographies, Geography, ZoomableGroup } from "react-simple-maps";
 import { geoMercator, geoPath } from "d3-geo";
 import { Barlow, Exo_2 } from 'next/font/google';
@@ -17,6 +17,46 @@ const exo2 = Exo_2({
 });
 
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
+
+// Animated Counter Component
+const AnimatedCounter = ({ value, color, className }) => {
+  const [displayValue, setDisplayValue] = useState(0);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const startTime = Date.now();
+      const duration = 2000; // 2 seconds
+      
+      const updateValue = () => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const currentValue = Math.round(progress * value);
+        
+        setDisplayValue(currentValue);
+        
+        if (progress < 1) {
+          requestAnimationFrame(updateValue);
+        }
+      };
+      
+      updateValue();
+    }, 1200); // 1.2 second delay
+    
+    return () => clearTimeout(timer);
+  }, [value]);
+
+  return (
+    <motion.div 
+      className={className} 
+      style={{ color }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5, delay: 1.2 }}
+    >
+      {displayValue}
+    </motion.div>
+  );
+};
 
 const visitedCountries = {
   "USA": {
@@ -67,6 +107,212 @@ const visitedCountries = {
   }
 };
 
+// Country mapping for all countries
+const countryData = {
+  "USA": { name: "United States", flag: "🇺🇸" },
+  "CAN": { name: "Canada", flag: "🇨🇦" },
+  "NZL": { name: "New Zealand", flag: "🇳🇿" },
+  "MEX": { name: "Mexico", flag: "🇲🇽" },
+  "BRA": { name: "Brazil", flag: "🇧🇷" },
+  "ARG": { name: "Argentina", flag: "🇦🇷" },
+  "CHL": { name: "Chile", flag: "🇨🇱" },
+  "COL": { name: "Colombia", flag: "🇨🇴" },
+  "PER": { name: "Peru", flag: "🇵🇪" },
+  "VEN": { name: "Venezuela", flag: "🇻🇪" },
+  "ECU": { name: "Ecuador", flag: "🇪🇨" },
+  "URY": { name: "Uruguay", flag: "🇺🇾" },
+  "PRY": { name: "Paraguay", flag: "🇵🇾" },
+  "BOL": { name: "Bolivia", flag: "🇧🇴" },
+  "GUY": { name: "Guyana", flag: "🇬🇾" },
+  "SUR": { name: "Suriname", flag: "🇸🇷" },
+  "FRA": { name: "France", flag: "🇫🇷" },
+  "DEU": { name: "Germany", flag: "🇩🇪" },
+  "GBR": { name: "United Kingdom", flag: "🇬🇧" },
+  "ITA": { name: "Italy", flag: "🇮🇹" },
+  "ESP": { name: "Spain", flag: "🇪🇸" },
+  "NLD": { name: "Netherlands", flag: "🇳🇱" },
+  "BEL": { name: "Belgium", flag: "🇧🇪" },
+  "CHE": { name: "Switzerland", flag: "🇨🇭" },
+  "AUT": { name: "Austria", flag: "🇦🇹" },
+  "SWE": { name: "Sweden", flag: "🇸🇪" },
+  "NOR": { name: "Norway", flag: "🇳🇴" },
+  "DNK": { name: "Denmark", flag: "🇩🇰" },
+  "FIN": { name: "Finland", flag: "🇫🇮" },
+  "POL": { name: "Poland", flag: "🇵🇱" },
+  "CZE": { name: "Czech Republic", flag: "🇨🇿" },
+  "HUN": { name: "Hungary", flag: "🇭🇺" },
+  "ROU": { name: "Romania", flag: "🇷🇴" },
+  "BGR": { name: "Bulgaria", flag: "🇧🇬" },
+  "HRV": { name: "Croatia", flag: "🇭🇷" },
+  "SRB": { name: "Serbia", flag: "🇷🇸" },
+  "SVN": { name: "Slovenia", flag: "🇸🇮" },
+  "SVK": { name: "Slovakia", flag: "🇸🇰" },
+  "LTU": { name: "Lithuania", flag: "🇱🇹" },
+  "LVA": { name: "Latvia", flag: "🇱🇻" },
+  "EST": { name: "Estonia", flag: "🇪🇪" },
+  "IRL": { name: "Ireland", flag: "🇮🇪" },
+  "PRT": { name: "Portugal", flag: "🇵🇹" },
+  "GRC": { name: "Greece", flag: "🇬🇷" },
+  "TUR": { name: "Turkey", flag: "🇹🇷" },
+  "RUS": { name: "Russia", flag: "🇷🇺" },
+  "UKR": { name: "Ukraine", flag: "🇺🇦" },
+  "BLR": { name: "Belarus", flag: "🇧🇾" },
+  "MDA": { name: "Moldova", flag: "🇲🇩" },
+  "GEO": { name: "Georgia", flag: "🇬🇪" },
+  "ARM": { name: "Armenia", flag: "🇦🇲" },
+  "AZE": { name: "Azerbaijan", flag: "🇦🇿" },
+  "KAZ": { name: "Kazakhstan", flag: "🇰🇿" },
+  "UZB": { name: "Uzbekistan", flag: "🇺🇿" },
+  "TKM": { name: "Turkmenistan", flag: "🇹🇲" },
+  "TJK": { name: "Tajikistan", flag: "🇹🇯" },
+  "KGZ": { name: "Kyrgyzstan", flag: "🇰🇬" },
+  "MNG": { name: "Mongolia", flag: "🇲🇳" },
+  "CHN": { name: "China", flag: "🇨🇳" },
+  "JPN": { name: "Japan", flag: "🇯🇵" },
+  "KOR": { name: "South Korea", flag: "🇰🇷" },
+  "PRK": { name: "North Korea", flag: "🇰🇵" },
+  "TWN": { name: "Taiwan", flag: "🇹🇼" },
+  "HKG": { name: "Hong Kong", flag: "🇭🇰" },
+  "MAC": { name: "Macau", flag: "🇲🇴" },
+  "VNM": { name: "Vietnam", flag: "🇻🇳" },
+  "THA": { name: "Thailand", flag: "🇹🇭" },
+  "MYS": { name: "Malaysia", flag: "🇲🇾" },
+  "SGP": { name: "Singapore", flag: "🇸🇬" },
+  "IDN": { name: "Indonesia", flag: "🇮🇩" },
+  "PHL": { name: "Philippines", flag: "🇵🇭" },
+  "MMR": { name: "Myanmar", flag: "🇲🇲" },
+  "LAO": { name: "Laos", flag: "🇱🇦" },
+  "KHM": { name: "Cambodia", flag: "🇰🇭" },
+  "BRN": { name: "Brunei", flag: "🇧🇳" },
+  "IND": { name: "India", flag: "🇮🇳" },
+  "PAK": { name: "Pakistan", flag: "🇵🇰" },
+  "BGD": { name: "Bangladesh", flag: "🇧🇩" },
+  "LKA": { name: "Sri Lanka", flag: "🇱🇰" },
+  "NPL": { name: "Nepal", flag: "🇳🇵" },
+  "BTN": { name: "Bhutan", flag: "🇧🇹" },
+  "MDV": { name: "Maldives", flag: "🇲🇻" },
+  "AFG": { name: "Afghanistan", flag: "🇦🇫" },
+  "IRN": { name: "Iran", flag: "🇮🇷" },
+  "IRQ": { name: "Iraq", flag: "🇮🇶" },
+  "SYR": { name: "Syria", flag: "🇸🇾" },
+  "LBN": { name: "Lebanon", flag: "🇱🇧" },
+  "JOR": { name: "Jordan", flag: "🇯🇴" },
+  "ISR": { name: "Israel", flag: "🇮🇱" },
+  "PSE": { name: "Palestine", flag: "🇵🇸" },
+  "SAU": { name: "Saudi Arabia", flag: "🇸🇦" },
+  "YEM": { name: "Yemen", flag: "🇾🇪" },
+  "OMN": { name: "Oman", flag: "🇴🇲" },
+  "ARE": { name: "United Arab Emirates", flag: "🇦🇪" },
+  "QAT": { name: "Qatar", flag: "🇶🇦" },
+  "BHR": { name: "Bahrain", flag: "🇧🇭" },
+  "KWT": { name: "Kuwait", flag: "🇰🇼" },
+  "EGY": { name: "Egypt", flag: "🇪🇬" },
+  "LBY": { name: "Libya", flag: "🇱🇾" },
+  "TUN": { name: "Tunisia", flag: "🇹🇳" },
+  "DZA": { name: "Algeria", flag: "🇩🇿" },
+  "MAR": { name: "Morocco", flag: "🇲🇦" },
+  "SDN": { name: "Sudan", flag: "🇸🇩" },
+  "SSD": { name: "South Sudan", flag: "🇸🇸" },
+  "ETH": { name: "Ethiopia", flag: "🇪🇹" },
+  "ERI": { name: "Eritrea", flag: "🇪🇷" },
+  "DJI": { name: "Djibouti", flag: "🇩🇯" },
+  "SOM": { name: "Somalia", flag: "🇸🇴" },
+  "KEN": { name: "Kenya", flag: "🇰🇪" },
+  "TZA": { name: "Tanzania", flag: "🇹🇿" },
+  "UGA": { name: "Uganda", flag: "🇺🇬" },
+  "RWA": { name: "Rwanda", flag: "🇷🇼" },
+  "BDI": { name: "Burundi", flag: "🇧🇮" },
+  "COD": { name: "DR Congo", flag: "🇨🇩" },
+  "COG": { name: "Congo", flag: "🇨🇬" },
+  "GAB": { name: "Gabon", flag: "🇬🇦" },
+  "GNQ": { name: "Equatorial Guinea", flag: "🇬🇶" },
+  "CMR": { name: "Cameroon", flag: "🇨🇲" },
+  "CAF": { name: "Central African Republic", flag: "🇨🇫" },
+  "TCD": { name: "Chad", flag: "🇹🇩" },
+  "NER": { name: "Niger", flag: "🇳🇪" },
+  "MLI": { name: "Mali", flag: "🇲🇱" },
+  "BFA": { name: "Burkina Faso", flag: "🇧🇫" },
+  "SEN": { name: "Senegal", flag: "🇸🇳" },
+  "GMB": { name: "Gambia", flag: "🇬🇲" },
+  "GNB": { name: "Guinea-Bissau", flag: "🇬🇼" },
+  "GIN": { name: "Guinea", flag: "🇬🇳" },
+  "SLE": { name: "Sierra Leone", flag: "🇸🇱" },
+  "LBR": { name: "Liberia", flag: "🇱🇷" },
+  "CIV": { name: "Ivory Coast", flag: "🇨🇮" },
+  "GHA": { name: "Ghana", flag: "🇬🇭" },
+  "TGO": { name: "Togo", flag: "🇹🇬" },
+  "BEN": { name: "Benin", flag: "🇧🇯" },
+  "NGA": { name: "Nigeria", flag: "🇳🇬" },
+  "CMR": { name: "Cameroon", flag: "🇨🇲" },
+  "CAF": { name: "Central African Republic", flag: "🇨🇫" },
+  "TCD": { name: "Chad", flag: "🇹🇩" },
+  "NER": { name: "Niger", flag: "🇳🇪" },
+  "MLI": { name: "Mali", flag: "🇲🇱" },
+  "BFA": { name: "Burkina Faso", flag: "🇧🇫" },
+  "SEN": { name: "Senegal", flag: "🇸🇳" },
+  "GMB": { name: "Gambia", flag: "🇬🇲" },
+  "GNB": { name: "Guinea-Bissau", flag: "🇬🇼" },
+  "GIN": { name: "Guinea", flag: "🇬🇳" },
+  "SLE": { name: "Sierra Leone", flag: "🇸🇱" },
+  "LBR": { name: "Liberia", flag: "🇱🇷" },
+  "CIV": { name: "Ivory Coast", flag: "🇨🇮" },
+  "GHA": { name: "Ghana", flag: "🇬🇭" },
+  "TGO": { name: "Togo", flag: "🇹🇬" },
+  "BEN": { name: "Benin", flag: "🇧🇯" },
+  "NGA": { name: "Nigeria", flag: "🇳🇬" },
+  "AUS": { name: "Australia", flag: "🇦🇺" },
+  "PNG": { name: "Papua New Guinea", flag: "🇵🇬" },
+  "FJI": { name: "Fiji", flag: "🇫🇯" },
+  "VUT": { name: "Vanuatu", flag: "🇻🇺" },
+  "NCL": { name: "New Caledonia", flag: "🇳🇨" },
+  "SLB": { name: "Solomon Islands", flag: "🇸🇧" },
+  "KIR": { name: "Kiribati", flag: "🇰🇮" },
+  "TUV": { name: "Tuvalu", flag: "🇹🇻" },
+  "WSM": { name: "Samoa", flag: "🇼🇸" },
+  "TON": { name: "Tonga", flag: "🇹🇴" },
+  "COK": { name: "Cook Islands", flag: "🇨🇰" },
+  "NIU": { name: "Niue", flag: "🇳🇺" },
+  "TKL": { name: "Tokelau", flag: "🇹🇰" },
+  "PLW": { name: "Palau", flag: "🇵🇼" },
+  "MHL": { name: "Marshall Islands", flag: "🇲🇭" },
+  "FSM": { name: "Micronesia", flag: "🇫🇲" },
+  "NRU": { name: "Nauru", flag: "🇳🇷" },
+  "ISL": { name: "Iceland", flag: "🇮🇸" },
+  "GRL": { name: "Greenland", flag: "🇬🇱" },
+  "FRO": { name: "Faroe Islands", flag: "🇫🇴" },
+  "SJM": { name: "Svalbard and Jan Mayen", flag: "🇳🇴" },
+  "BVT": { name: "Bouvet Island", flag: "🇳🇴" },
+  "ATF": { name: "French Southern Territories", flag: "🇫🇷" },
+  "HMD": { name: "Heard Island and McDonald Islands", flag: "🇦🇺" },
+  "IOT": { name: "British Indian Ocean Territory", flag: "🇬🇧" },
+  "SHN": { name: "Saint Helena", flag: "🇬🇧" },
+  "PCN": { name: "Pitcairn Islands", flag: "🇬🇧" },
+  "BMU": { name: "Bermuda", flag: "🇧🇲" },
+  "CYM": { name: "Cayman Islands", flag: "🇰🇾" },
+  "VGB": { name: "British Virgin Islands", flag: "🇻🇬" },
+  "AIA": { name: "Anguilla", flag: "🇦🇮" },
+  "MSR": { name: "Montserrat", flag: "🇲🇸" },
+  "TCA": { name: "Turks and Caicos Islands", flag: "🇹🇨" },
+  "GIB": { name: "Gibraltar", flag: "🇬🇮" },
+  "IMN": { name: "Isle of Man", flag: "🇮🇲" },
+  "GGY": { name: "Guernsey", flag: "🇬🇬" },
+  "JEY": { name: "Jersey", flag: "🇯🇪" },
+  "ALA": { name: "Åland Islands", flag: "🇫🇮" },
+  "SMR": { name: "San Marino", flag: "🇸🇲" },
+  "VAT": { name: "Vatican City", flag: "🇻🇦" },
+  "MCO": { name: "Monaco", flag: "🇲🇨" },
+  "LIE": { name: "Liechtenstein", flag: "🇱🇮" },
+  "AND": { name: "Andorra", flag: "🇦🇩" },
+  "MKD": { name: "North Macedonia", flag: "🇲🇰" },
+  "ALB": { name: "Albania", flag: "🇦🇱" },
+  "MNE": { name: "Montenegro", flag: "🇲🇪" },
+  "BIH": { name: "Bosnia and Herzegovina", flag: "🇧🇦" },
+  "KOS": { name: "Kosovo", flag: "🇽🇰" },
+  "MNE": { name: "Montenegro", flag: "🇲🇪" },
+  "BIH": { name: "Bosnia and Herzegovina", flag: "🇧🇦" },
+  "KOS": { name: "Kosovo", flag: "🇽🇰" }
+};
+
 export default function TravelMap() {
   const [hoveredCountry, setHoveredCountry] = useState(null);
   const [hoveredCentroid, setHoveredCentroid] = useState(null);
@@ -74,6 +320,7 @@ export default function TravelMap() {
   const [center, setCenter] = useState([0, 0]);
   const [isCitiesExpanded, setIsCitiesExpanded] = useState(true);
   const [defaultCountry, setDefaultCountry] = useState("CAN");
+  const [highlightedCountries, setHighlightedCountries] = useState(new Set());
   const mapContainerRef = useRef(null);
   const [dimensions, setDimensions] = useState({ width: 1000, height: 600 });
 
@@ -91,6 +338,20 @@ export default function TravelMap() {
   const handleCountryClick = (countryCode) => {
     setDefaultCountry(countryCode);
   };
+
+  // Animate countries in random order
+  useEffect(() => {
+    const countryCodes = Object.keys(visitedCountries);
+    const shuffledCountries = [...countryCodes].sort(() => Math.random() - 0.5);
+    
+    setHighlightedCountries(new Set());
+    
+    shuffledCountries.forEach((countryCode, index) => {
+      setTimeout(() => {
+        setHighlightedCountries(prev => new Set([...prev, countryCode]));
+      }, index * 300); // 300ms delay between each country
+    });
+  }, []); // Run once on mount
 
   // Responsive handler
   useEffect(() => {
@@ -407,9 +668,9 @@ export default function TravelMap() {
                             setHoveredCountry(null);
                             setHoveredCentroid(null);
                           } : undefined}
-                          onClick={isVisited ? () => {
+                          onClick={() => {
                             handleCountryClick(code);
-                          } : undefined}
+                          }}
                           style={{
                             default: {
                               fill: isVisited ? "#3B82F6" : "#1F2937",
@@ -421,7 +682,7 @@ export default function TravelMap() {
                             hover: {
                               fill: isVisited ? "#60A5FA" : "#1F2937",
                               outline: "none",
-                              cursor: isVisited ? "pointer" : "default",
+                              cursor: "pointer",
                               stroke: isVisited ? "#60A5FA" : "#374151",
                               strokeWidth: isVisited ? 1 : 0.5,
                               transition: "fill 0.2s ease-out, stroke 0.2s ease-out"
@@ -464,7 +725,7 @@ export default function TravelMap() {
                   transition={{ duration: 0.3, ease: "easeOut" }}
                   className="text-3xl"
                 >
-                  {visitedCountries[currentCountry].flag}
+                  {visitedCountries[currentCountry] ? visitedCountries[currentCountry].flag : (countryData[currentCountry] ? countryData[currentCountry].flag : "🏳️")}
                 </motion.span>
                 <motion.h3
                   key={`name-${currentCountry}`}
@@ -474,81 +735,94 @@ export default function TravelMap() {
                   className={`text-xl font-bold text-white ${barlow.className}`}
                   style={{ fontFamily: 'Barlow, sans-serif' }}
                 >
-                  {visitedCountries[currentCountry].name}
+                  {visitedCountries[currentCountry] ? visitedCountries[currentCountry].name : (countryData[currentCountry] ? countryData[currentCountry].name : "Unknown Country")}
                 </motion.h3>
               </div>
               
               {/* Cities Section Header */}
               <div className="flex items-center justify-between mb-3">
-                <h4 className={`text-sm font-semibold text-white/80 ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>
-                  Cities Visited
+                <h4 className={`text-base font-semibold text-white/80 ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>
+                  {visitedCountries[currentCountry] ? "Cities Visited" : "Not Visited Yet"}
                 </h4>
-                <button
-                  onClick={() => setIsCitiesExpanded(!isCitiesExpanded)}
-                  className="text-white/60 hover:text-white transition-colors cursor-pointer"
-                >
-                  <motion.div
-                    animate={{ rotate: isCitiesExpanded ? 0 : -90 }}
-                    transition={{ duration: 0.2 }}
+                {visitedCountries[currentCountry] && (
+                  <button
+                    onClick={() => setIsCitiesExpanded(!isCitiesExpanded)}
+                    className="text-white/60 hover:text-white transition-colors cursor-pointer"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </motion.div>
-                </button>
+                    <motion.div
+                      animate={{ rotate: isCitiesExpanded ? 0 : -90 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </motion.div>
+                  </button>
+                )}
               </div>
               
-              {/* Cities */}
+              {/* Cities or Not Visited Message */}
               <AnimatePresence>
-                {isCitiesExpanded && (
-                                    <motion.div
-                    key={currentCountry}
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
+                {visitedCountries[currentCountry] ? (
+                  isCitiesExpanded && (
+                    <motion.div
+                      key={currentCountry}
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.3, ease: "easeOut" }}
+                      className="space-y-4 overflow-hidden"
+                    >
+                      {Object.entries(visitedCountries[currentCountry].cities).map(([cityName, dates], cityIndex) => (
+                        <motion.div
+                          key={cityIndex}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ 
+                            duration: 0.3, 
+                            delay: cityIndex * 0.2,
+                            ease: "easeOut"
+                          }}
+                          className="space-y-2"
+                        >
+                          {/* City Name */}
+                          <div className={`text-base font-semibold text-white ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>
+                            {cityName}
+                          </div>
+                          
+                          {/* Dates */}
+                          <div className="ml-4 space-y-1">
+                            {dates.map((date, dateIndex) => (
+                              <motion.div
+                                key={dateIndex}
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ 
+                                  duration: 0.3, 
+                                  delay: cityIndex * 0.2 + (dateIndex + 1) * 0.1,
+                                  ease: "easeOut"
+                                }}
+                                className="flex items-center gap-2"
+                              >
+                                <div className="w-1.5 h-1.5 bg-white/60 rounded-full flex-shrink-0"></div>
+                                <span className={`text-sm text-white/70 ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>
+                                  {date.month} {date.year}
+                                </span>
+                              </motion.div>
+                            ))}
+                          </div>
+                        </motion.div>
+                      ))}
+                    </motion.div>
+                  )
+                ) : (
+                  <motion.div
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
                     transition={{ duration: 0.3, ease: "easeOut" }}
-                    className="space-y-4 overflow-hidden"
+                    className="flex items-center gap-2"
                   >
-                    {Object.entries(visitedCountries[currentCountry].cities).map(([cityName, dates], cityIndex) => (
-                      <motion.div
-                        key={cityIndex}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ 
-                          duration: 0.3, 
-                          delay: cityIndex * 0.2,
-                          ease: "easeOut"
-                        }}
-                        className="space-y-2"
-                      >
-                        {/* City Name */}
-                        <div className={`text-base font-semibold text-white ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>
-                          {cityName}
-                        </div>
-                        
-                        {/* Dates */}
-                        <div className="ml-4 space-y-1">
-                          {dates.map((date, dateIndex) => (
-                            <motion.div
-                              key={dateIndex}
-                              initial={{ opacity: 0, x: -10 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{ 
-                                duration: 0.3, 
-                                delay: cityIndex * 0.2 + (dateIndex + 1) * 0.1,
-                                ease: "easeOut"
-                              }}
-                              className="flex items-center gap-2"
-                            >
-                              <div className="w-1.5 h-1.5 bg-white/60 rounded-full flex-shrink-0"></div>
-                              <span className={`text-sm text-white/70 ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>
-                                {date.month} {date.year}
-                              </span>
-                            </motion.div>
-                          ))}
-                        </div>
-                      </motion.div>
-                    ))}
+                    
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -577,12 +851,14 @@ export default function TravelMap() {
               }}
               className="backdrop-blur-md bg-white/10 border border-white/30 shadow-lg rounded-2xl p-6 flex-1"
             >
-              <div className="text-center flex flex-col justify-center items-center h-full">
-                <div className={`text-6xl font-bold text-[#0266B1] mb-4 ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>
-                  {Object.keys(visitedCountries).length}
+                              <div className="text-center flex flex-col justify-center items-center h-full">
+                  <AnimatedCounter 
+                    value={Object.keys(visitedCountries).length}
+                    color="#0266B1"
+                    className={`text-7xl font-bold mb-4 ${exo2.className}`}
+                  />
+                  <div className={`text-white/70 text-2xl ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>Countries</div>
                 </div>
-                <div className={`text-white/70 text-xl ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>Countries</div>
-              </div>
             </motion.div>
 
             {/* Trips Stat Card */}
@@ -600,14 +876,16 @@ export default function TravelMap() {
               }}
               className="backdrop-blur-md bg-white/10 border border-white/30 shadow-lg rounded-2xl p-6 flex-1"
             >
-              <div className="text-center flex flex-col justify-center items-center h-full">
-                <div className={`text-6xl font-bold text-[#033E7A] mb-4 ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>
-                  {Object.values(visitedCountries).reduce((total, country) => 
-                    total + Object.values(country.cities).reduce((cityTotal, dates) => cityTotal + dates.length, 0), 0
-                  )}
+                              <div className="text-center flex flex-col justify-center items-center h-full">
+                  <AnimatedCounter 
+                    value={Object.values(visitedCountries).reduce((total, country) => 
+                      total + Object.values(country.cities).reduce((cityTotal, dates) => cityTotal + dates.length, 0), 0
+                    )}
+                    color="#033E7A"
+                    className={`text-7xl font-bold mb-4 ${exo2.className}`}
+                  />
+                  <div className={`text-white/70 text-2xl ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>Trips</div>
                 </div>
-                <div className={`text-white/70 text-xl ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>Trips</div>
-              </div>
             </motion.div>
 
             {/* Continents Stat Card */}
@@ -625,12 +903,14 @@ export default function TravelMap() {
               }}
               className="backdrop-blur-md bg-white/10 border border-white/30 shadow-lg rounded-2xl p-6 flex-1"
             >
-              <div className="text-center flex flex-col justify-center items-center h-full">
-                <div className={`text-6xl font-bold text-[#E22716] mb-4 ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>
-                  2
+                              <div className="text-center flex flex-col justify-center items-center h-full">
+                  <AnimatedCounter 
+                    value={2}
+                    color="#E22716"
+                    className={`text-7xl font-bold mb-4 ${exo2.className}`}
+                  />
+                  <div className={`text-white/70 text-2xl ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>Continents</div>
                 </div>
-                <div className={`text-white/70 text-xl ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>Continents</div>
-              </div>
             </motion.div>
           </motion.div>
         </div>
