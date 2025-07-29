@@ -72,8 +72,25 @@ export default function TravelMap() {
   const [hoveredCentroid, setHoveredCentroid] = useState(null);
   const [zoom, setZoom] = useState(1);
   const [center, setCenter] = useState([0, 0]);
+  const [isCitiesExpanded, setIsCitiesExpanded] = useState(true);
+  const [defaultCountry, setDefaultCountry] = useState("CAN");
   const mapContainerRef = useRef(null);
   const [dimensions, setDimensions] = useState({ width: 1000, height: 600 });
+
+  // Set a random default country on component mount
+  useEffect(() => {
+    const countryCodes = Object.keys(visitedCountries);
+    const randomCountry = countryCodes[Math.floor(Math.random() * countryCodes.length)];
+    setDefaultCountry(randomCountry);
+  }, []);
+
+  // Use the default country when no country is hovered
+  const currentCountry = hoveredCountry || defaultCountry;
+
+  // Handle country click to set as default
+  const handleCountryClick = (countryCode) => {
+    setDefaultCountry(countryCode);
+  };
 
   // Responsive handler
   useEffect(() => {
@@ -123,66 +140,74 @@ export default function TravelMap() {
   function getTooltipTransform(x, y, currentZoom, currentCenter) {
     const mapWidth = 1000;
     const mapHeight = 600;
-    const tooltipWidth = 280;
-    const tooltipHeight = 120;
+    const tooltipWidth = 320;
+    const tooltipHeight = 200;
     
-    // Adjust for zoom level - tooltip should scale with zoom
-    const zoomFactor = Math.max(0.5, Math.min(2, 1 / currentZoom));
-    const adjustedTooltipWidth = tooltipWidth * zoomFactor;
-    const adjustedTooltipHeight = tooltipHeight * zoomFactor;
+    // Always position tooltip in the bottom-right corner, away from countries
+    const tooltipX = mapWidth - tooltipWidth - 30;
+    const tooltipY = mapHeight - tooltipHeight - 30;
     
-    // Calculate available space considering zoom and pan
-    const spaceOnRight = x + adjustedTooltipWidth / 2 < mapWidth;
-    const spaceOnLeft = x - adjustedTooltipWidth / 2 > 0;
-    const spaceAbove = y - adjustedTooltipHeight / 2 > 0;
-    const spaceBelow = y + adjustedTooltipHeight / 2 < mapHeight;
-    
-    let translateX = '-50%';
-    let translateY = '-50%';
-    
-    // Always prefer side positioning to avoid covering the country
-    if (spaceOnRight) {
-      // Position to the right of the country
-      translateX = `${30 * zoomFactor}px`;
-      translateY = '-50%';
-    } else if (spaceOnLeft) {
-      // Position to the left of the country
-      translateX = `-${adjustedTooltipWidth + 10 * zoomFactor}px`;
-      translateY = '-50%';
-    } else if (spaceAbove) {
-      // Position above the country
-      translateX = '-50%';
-      translateY = `-${adjustedTooltipHeight + 10 * zoomFactor}px`;
-    } else if (spaceBelow) {
-      // Position below the country
-      translateX = '-50%';
-      translateY = `${30 * zoomFactor}px`;
-    } else {
-      // Fallback to center if no space available
-      translateX = '-50%';
-      translateY = '-50%';
-    }
-    
-    return `translate(${translateX}, ${translateY})`;
+    return `translate(${tooltipX - x}px, ${tooltipY - y}px)`;
   }
 
   function getArrowPosition(x, y, currentZoom) {
     const mapWidth = 1000;
-    const tooltipWidth = 280;
+    const mapHeight = 600;
+    const tooltipWidth = 320;
+    const tooltipHeight = 200;
     
     // Adjust for zoom level
     const zoomFactor = Math.max(0.5, Math.min(2, 1 / currentZoom));
     const adjustedTooltipWidth = tooltipWidth * zoomFactor;
+    const adjustedTooltipHeight = tooltipHeight * zoomFactor;
+    
+    // Calculate available space (same logic as getTooltipTransform)
+    const spaceOnRight = x + adjustedTooltipWidth / 2 + 120 < mapWidth;
+    const spaceOnLeft = x - adjustedTooltipWidth / 2 - 120 > 0;
+    const spaceAbove = y - adjustedTooltipHeight / 2 - 120 > 0;
+    const spaceBelow = y + adjustedTooltipHeight / 2 + 120 < mapHeight;
     
     // Determine arrow position based on tooltip placement
-    const spaceOnRight = x + adjustedTooltipWidth / 2 < mapWidth;
-    const spaceOnLeft = x - adjustedTooltipWidth / 2 > 0;
-    
-    if (spaceOnRight) {
+    if (spaceOnRight && spaceOnLeft) {
+      // If both sides have space, choose the one with more room
+      const rightSpace = mapWidth - x;
+      const leftSpace = x;
+      if (rightSpace > leftSpace) {
+        // Tooltip is to the right, arrow points left
+        return {
+          top: '50%',
+          left: '-20px',
+          transform: 'translateY(-50%)',
+          borderTopColor: 'transparent',
+          borderBottomColor: 'transparent',
+          borderLeftColor: 'rgba(255,255,255,0.95)',
+          borderRightColor: 'transparent',
+          borderBottomWidth: '0px',
+          borderTopWidth: '0px',
+          borderLeftWidth: '20px',
+          borderRightWidth: '0px'
+        };
+      } else {
+        // Tooltip is to the left, arrow points right
+        return {
+          top: '50%',
+          left: '100%',
+          transform: 'translateY(-50%)',
+          borderTopColor: 'transparent',
+          borderBottomColor: 'transparent',
+          borderLeftColor: 'transparent',
+          borderRightColor: 'rgba(255,255,255,0.95)',
+          borderBottomWidth: '0px',
+          borderTopWidth: '0px',
+          borderLeftWidth: '0px',
+          borderRightWidth: '20px'
+        };
+      }
+    } else if (spaceOnRight) {
       // Tooltip is to the right, arrow points left
       return {
         top: '50%',
-        left: '-8px',
+        left: '-20px',
         transform: 'translateY(-50%)',
         borderTopColor: 'transparent',
         borderBottomColor: 'transparent',
@@ -190,7 +215,7 @@ export default function TravelMap() {
         borderRightColor: 'transparent',
         borderBottomWidth: '0px',
         borderTopWidth: '0px',
-        borderLeftWidth: '8px',
+        borderLeftWidth: '20px',
         borderRightWidth: '0px'
       };
     } else if (spaceOnLeft) {
@@ -206,21 +231,85 @@ export default function TravelMap() {
         borderBottomWidth: '0px',
         borderTopWidth: '0px',
         borderLeftWidth: '0px',
-        borderRightWidth: '8px'
+        borderRightWidth: '20px'
       };
+          } else if (spaceAbove && spaceBelow) {
+        // If both above and below have space, choose the one with more room
+        const aboveSpace = y;
+        const belowSpace = mapHeight - y;
+        if (aboveSpace > belowSpace) {
+          // Tooltip is above, arrow points down
+          return {
+            top: '100%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            borderTopColor: 'transparent',
+            borderBottomColor: 'rgba(255,255,255,0.95)',
+            borderLeftColor: 'transparent',
+            borderRightColor: 'transparent',
+            borderBottomWidth: '12px',
+            borderTopWidth: '0px',
+            borderLeftWidth: '0px',
+            borderRightWidth: '0px'
+          };
+        } else {
+          // Tooltip is below, arrow points up
+          return {
+            top: '-20px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            borderTopColor: 'rgba(255,255,255,0.95)',
+            borderBottomColor: 'transparent',
+            borderLeftColor: 'transparent',
+            borderRightColor: 'transparent',
+            borderBottomWidth: '0px',
+            borderTopWidth: '20px',
+            borderLeftWidth: '0px',
+            borderRightWidth: '0px'
+          };
+        }
+      } else if (spaceAbove) {
+        // Tooltip is above, arrow points down
+        return {
+          top: '100%',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          borderTopColor: 'transparent',
+          borderBottomColor: 'rgba(255,255,255,0.95)',
+          borderLeftColor: 'transparent',
+          borderRightColor: 'transparent',
+          borderBottomWidth: '20px',
+          borderTopWidth: '0px',
+          borderLeftWidth: '0px',
+          borderRightWidth: '0px'
+        };
+      } else if (spaceBelow) {
+        // Tooltip is below, arrow points up
+        return {
+          top: '-20px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          borderTopColor: 'rgba(255,255,255,0.95)',
+          borderBottomColor: 'transparent',
+          borderLeftColor: 'transparent',
+          borderRightColor: 'transparent',
+          borderBottomWidth: '0px',
+          borderTopWidth: '20px',
+          borderLeftWidth: '0px',
+          borderRightWidth: '0px'
+        };
     } else {
-      // Tooltip is above/below, arrow points up/down
-      const isAbove = getTooltipTransform(x, y).includes('-100%');
+      // Fallback: no arrow for corner positioning
       return {
-        top: isAbove ? '100%' : '-8px',
+        top: '50%',
         left: '50%',
-        transform: 'translateX(-50%)',
-        borderTopColor: isAbove ? 'transparent' : 'rgba(255,255,255,0.95)',
-        borderBottomColor: isAbove ? 'rgba(255,255,255,0.95)' : 'transparent',
+        transform: 'translate(-50%, -50%)',
+        borderTopColor: 'transparent',
+        borderBottomColor: 'transparent',
         borderLeftColor: 'transparent',
         borderRightColor: 'transparent',
-        borderBottomWidth: isAbove ? '8px' : '0px',
-        borderTopWidth: isAbove ? '0px' : '8px',
+        borderBottomWidth: '0px',
+        borderTopWidth: '0px',
         borderLeftWidth: '0px',
         borderRightWidth: '0px'
       };
@@ -234,9 +323,6 @@ export default function TravelMap() {
           <h2 className="text-6xl sm:text-8xl font-bold italic mb-4" style={{ color: '#fff' }}>
             <em>travel</em>
           </h2>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-            Exploring the world, one country at a time
-          </p>
         </div>
         <div className="relative">
           <div className="w-full h-[600px] rounded-lg border border-gray-700 overflow-hidden bg-[#181e2a] relative">
@@ -321,6 +407,9 @@ export default function TravelMap() {
                             setHoveredCountry(null);
                             setHoveredCentroid(null);
                           } : undefined}
+                          onClick={isVisited ? () => {
+                            handleCountryClick(code);
+                          } : undefined}
                           style={{
                             default: {
                               fill: isVisited ? "#3B82F6" : "#1F2937",
@@ -350,137 +439,201 @@ export default function TravelMap() {
                 </Geographies>
               </ZoomableGroup>
             </ComposableMap>
-            {/* Modern Tooltip */}
-            <AnimatePresence>
-              {hoveredCountry && hoveredCentroid && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9, y: 10 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.9, y: 10 }}
-                  transition={{ 
-                    duration: 0.2,
-                    ease: "easeOut",
-                    type: "spring",
-                    stiffness: 400,
-                    damping: 30
-                  }}
-                  className="absolute pointer-events-none z-50"
-                  style={{
-                    left: hoveredCentroid[0],
-                    top: hoveredCentroid[1],
-                    transform: getTooltipTransform(hoveredCentroid[0], hoveredCentroid[1], zoom, center)
-                  }}
-                >
-                  <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-200/50 p-4 min-w-[280px]">
-                    {/* Header */}
-                    <div className="flex items-center gap-3 mb-3">
-                      <span className="text-2xl">{visitedCountries[hoveredCountry].flag}</span>
-                      <h3 className={`text-lg font-bold text-gray-900 ${barlow.className}`} style={{ fontFamily: 'Barlow, sans-serif' }}>
-                        {visitedCountries[hoveredCountry].name}
-                      </h3>
-                    </div>
-                    
-                    {/* Cities */}
-                    <div className="space-y-3">
-                      {Object.entries(visitedCountries[hoveredCountry].cities).map(([cityName, dates], cityIndex) => (
-                        <motion.div
-                          key={cityIndex}
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ 
-                            duration: 0.3, 
-                            delay: cityIndex * 0.3,
-                            ease: "easeOut"
-                          }}
-                          className="space-y-1"
-                        >
-                          {/* City Name */}
-                          <div className={`text-sm font-semibold text-gray-800 ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>
-                            {cityName}
-                          </div>
-                          
-                          {/* Dates */}
-                          <div className="ml-3 space-y-1">
-                            {dates.map((date, dateIndex) => (
-                              <motion.div
-                                key={dateIndex}
-                                initial={{ opacity: 0, x: -10 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ 
-                                  duration: 0.3, 
-                                  delay: cityIndex * 0.3 + (dateIndex + 1) * 0.1,
-                                  ease: "easeOut"
-                                }}
-                                className="flex items-center gap-2"
-                              >
-                                <div className="w-1 h-1 bg-gray-400 rounded-full flex-shrink-0"></div>
-                                <span className={`text-xs text-gray-600 ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>
-                                  {date.month} {date.year}
-                                </span>
-                              </motion.div>
-                            ))}
-                          </div>
-                        </motion.div>
-                      ))}
-                    </div>
-                    
-                    {/* Dynamic Arrow */}
-                    <div 
-                      className="absolute"
-                      style={{
-                        top: getArrowPosition(hoveredCentroid[0], hoveredCentroid[1], zoom).top,
-                        left: getArrowPosition(hoveredCentroid[0], hoveredCentroid[1], zoom).left,
-                        transform: getArrowPosition(hoveredCentroid[0], hoveredCentroid[1], zoom).transform
-                      }}
-                    >
-                      <div 
-                        className="w-0 h-0 border-l-8 border-r-8 border-t-8 border-transparent"
-                        style={{
-                          borderTopColor: getArrowPosition(hoveredCentroid[0], hoveredCentroid[1], zoom).borderTopColor,
-                          borderBottomColor: getArrowPosition(hoveredCentroid[0], hoveredCentroid[1], zoom).borderBottomColor,
-                          borderLeftColor: getArrowPosition(hoveredCentroid[0], hoveredCentroid[1], zoom).borderLeftColor,
-                          borderRightColor: getArrowPosition(hoveredCentroid[0], hoveredCentroid[1], zoom).borderRightColor,
-                          borderBottomWidth: getArrowPosition(hoveredCentroid[0], hoveredCentroid[1], zoom).borderBottomWidth,
-                          borderTopWidth: getArrowPosition(hoveredCentroid[0], hoveredCentroid[1], zoom).borderTopWidth,
-                          borderLeftWidth: getArrowPosition(hoveredCentroid[0], hoveredCentroid[1], zoom).borderLeftWidth,
-                          borderRightWidth: getArrowPosition(hoveredCentroid[0], hoveredCentroid[1], zoom).borderRightWidth
-                        }}
-                      ></div>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+
           </div>
         </div>
-        {/* Animated Stats */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.8, ease: "easeOut" }}
-          className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8"
-        >
-          <div className="text-center">
-            <div className="text-4xl font-bold text-[#3B82F6] mb-2">
-              {Object.keys(visitedCountries).length}
+        {/* Stats and Tooltip Section */}
+        <div className="mt-12 flex flex-col lg:flex-row gap-8 items-start">
+          {/* Country Tooltip */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ 
+              duration: 0.3,
+              ease: "easeOut"
+            }}
+            className="lg:w-80 flex-shrink-0 order-1 lg:order-1"
+          >
+            <div className="backdrop-blur-md bg-white/10 border border-white/30 shadow-lg rounded-2xl p-6">
+              {/* Header */}
+              <div className="flex items-center gap-3 mb-4">
+                <motion.span
+                  key={`flag-${currentCountry}`}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                  className="text-3xl"
+                >
+                  {visitedCountries[currentCountry].flag}
+                </motion.span>
+                <motion.h3
+                  key={`name-${currentCountry}`}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                  className={`text-xl font-bold text-white ${barlow.className}`}
+                  style={{ fontFamily: 'Barlow, sans-serif' }}
+                >
+                  {visitedCountries[currentCountry].name}
+                </motion.h3>
+              </div>
+              
+              {/* Cities Section Header */}
+              <div className="flex items-center justify-between mb-3">
+                <h4 className={`text-sm font-semibold text-white/80 ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>
+                  Cities Visited
+                </h4>
+                <button
+                  onClick={() => setIsCitiesExpanded(!isCitiesExpanded)}
+                  className="text-white/60 hover:text-white transition-colors cursor-pointer"
+                >
+                  <motion.div
+                    animate={{ rotate: isCitiesExpanded ? 0 : -90 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </motion.div>
+                </button>
+              </div>
+              
+              {/* Cities */}
+              <AnimatePresence>
+                {isCitiesExpanded && (
+                                    <motion.div
+                    key={currentCountry}
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                    className="space-y-4 overflow-hidden"
+                  >
+                    {Object.entries(visitedCountries[currentCountry].cities).map(([cityName, dates], cityIndex) => (
+                      <motion.div
+                        key={cityIndex}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ 
+                          duration: 0.3, 
+                          delay: cityIndex * 0.2,
+                          ease: "easeOut"
+                        }}
+                        className="space-y-2"
+                      >
+                        {/* City Name */}
+                        <div className={`text-base font-semibold text-white ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>
+                          {cityName}
+                        </div>
+                        
+                        {/* Dates */}
+                        <div className="ml-4 space-y-1">
+                          {dates.map((date, dateIndex) => (
+                            <motion.div
+                              key={dateIndex}
+                              initial={{ opacity: 0, x: -10 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ 
+                                duration: 0.3, 
+                                delay: cityIndex * 0.2 + (dateIndex + 1) * 0.1,
+                                ease: "easeOut"
+                              }}
+                              className="flex items-center gap-2"
+                            >
+                              <div className="w-1.5 h-1.5 bg-white/60 rounded-full flex-shrink-0"></div>
+                              <span className={`text-sm text-white/70 ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>
+                                {date.month} {date.year}
+                              </span>
+                            </motion.div>
+                          ))}
+                        </div>
+                      </motion.div>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
-            <div className="text-gray-400">Countries Visited</div>
-          </div>
-          <div className="text-center">
-            <div className="text-4xl font-bold text-[#3B82F6] mb-2">
-              {Object.values(visitedCountries).reduce((total, country) => 
-                total + Object.values(country.cities).reduce((cityTotal, dates) => cityTotal + dates.length, 0), 0
-              )}
-            </div>
-            <div className="text-gray-400">Total Visits</div>
-          </div>
-          <div className="text-center">
-            <div className="text-4xl font-bold text-[#3B82F6] mb-2">
-              2
-            </div>
-            <div className="text-gray-400">Continents Explored</div>
-          </div>
-        </motion.div>
+          </motion.div>
+
+          {/* Animated Stats */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.8, ease: "easeOut" }}
+            className="flex flex-row gap-4 order-2 lg:order-2 w-full"
+          >
+            {/* Countries Stat Card */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ 
+                opacity: 1, 
+                x: 0,
+                height: isCitiesExpanded ? "320px" : "140px"
+              }}
+              transition={{ 
+                opacity: { duration: 0.6, delay: 0.8, ease: "easeOut" },
+                x: { duration: 0.6, delay: 0.8, ease: "easeOut" },
+                height: { duration: 0.3, ease: "easeOut" }
+              }}
+              className="backdrop-blur-md bg-white/10 border border-white/30 shadow-lg rounded-2xl p-6 flex-1"
+            >
+              <div className="text-center flex flex-col justify-center items-center h-full">
+                <div className={`text-6xl font-bold text-[#0266B1] mb-4 ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>
+                  {Object.keys(visitedCountries).length}
+                </div>
+                <div className={`text-white/70 text-xl ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>Countries</div>
+              </div>
+            </motion.div>
+
+            {/* Trips Stat Card */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ 
+                opacity: 1, 
+                x: 0,
+                height: isCitiesExpanded ? "320px" : "140px"
+              }}
+              transition={{ 
+                opacity: { duration: 0.6, delay: 0.9, ease: "easeOut" },
+                x: { duration: 0.6, delay: 0.9, ease: "easeOut" },
+                height: { duration: 0.3, ease: "easeOut" }
+              }}
+              className="backdrop-blur-md bg-white/10 border border-white/30 shadow-lg rounded-2xl p-6 flex-1"
+            >
+              <div className="text-center flex flex-col justify-center items-center h-full">
+                <div className={`text-6xl font-bold text-[#033E7A] mb-4 ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>
+                  {Object.values(visitedCountries).reduce((total, country) => 
+                    total + Object.values(country.cities).reduce((cityTotal, dates) => cityTotal + dates.length, 0), 0
+                  )}
+                </div>
+                <div className={`text-white/70 text-xl ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>Trips</div>
+              </div>
+            </motion.div>
+
+            {/* Continents Stat Card */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ 
+                opacity: 1, 
+                x: 0,
+                height: isCitiesExpanded ? "320px" : "140px"
+              }}
+              transition={{ 
+                opacity: { duration: 0.6, delay: 1.0, ease: "easeOut" },
+                x: { duration: 0.6, delay: 1.0, ease: "easeOut" },
+                height: { duration: 0.3, ease: "easeOut" }
+              }}
+              className="backdrop-blur-md bg-white/10 border border-white/30 shadow-lg rounded-2xl p-6 flex-1"
+            >
+              <div className="text-center flex flex-col justify-center items-center h-full">
+                <div className={`text-6xl font-bold text-[#E22716] mb-4 ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>
+                  2
+                </div>
+                <div className={`text-white/70 text-xl ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>Continents</div>
+              </div>
+            </motion.div>
+          </motion.div>
+        </div>
       </div>
     </section>
   );
