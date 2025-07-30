@@ -5,6 +5,7 @@ import { AnimatePresence, motion, useMotionValue, useTransform } from "framer-mo
 import { ComposableMap, Geographies, Geography, ZoomableGroup } from "react-simple-maps";
 import { geoMercator, geoPath } from "d3-geo";
 import { Barlow, Exo_2 } from 'next/font/google';
+import { countryData, nameToCodeMap, idToCodeMap } from '../lib/fixed_countryData';
 
 const barlow = Barlow({
   subsets: ['latin'],
@@ -104,214 +105,19 @@ const visitedCountries = {
         { month: "Jan", year: "2023" }
       ]
     }
+  },
+  "SLB": {
+    name: "Solomon Islands",
+    flag: "🇸🇧",
+    cities: {
+      "Honiara": [
+        { month: "Jan", year: "2023" }
+      ]
+    }
   }
 };
 
-// Country mapping for all countries
-const countryData = {
-  "USA": { name: "United States", flag: "🇺🇸" },
-  "CAN": { name: "Canada", flag: "🇨🇦" },
-  "NZL": { name: "New Zealand", flag: "🇳🇿" },
-  "MEX": { name: "Mexico", flag: "🇲🇽" },
-  "BRA": { name: "Brazil", flag: "🇧🇷" },
-  "ARG": { name: "Argentina", flag: "🇦🇷" },
-  "CHL": { name: "Chile", flag: "🇨🇱" },
-  "COL": { name: "Colombia", flag: "🇨🇴" },
-  "PER": { name: "Peru", flag: "🇵🇪" },
-  "VEN": { name: "Venezuela", flag: "🇻🇪" },
-  "ECU": { name: "Ecuador", flag: "🇪🇨" },
-  "URY": { name: "Uruguay", flag: "🇺🇾" },
-  "PRY": { name: "Paraguay", flag: "🇵🇾" },
-  "BOL": { name: "Bolivia", flag: "🇧🇴" },
-  "GUY": { name: "Guyana", flag: "🇬🇾" },
-  "SUR": { name: "Suriname", flag: "🇸🇷" },
-  "FRA": { name: "France", flag: "🇫🇷" },
-  "DEU": { name: "Germany", flag: "🇩🇪" },
-  "GBR": { name: "United Kingdom", flag: "🇬🇧" },
-  "ITA": { name: "Italy", flag: "🇮🇹" },
-  "ESP": { name: "Spain", flag: "🇪🇸" },
-  "NLD": { name: "Netherlands", flag: "🇳🇱" },
-  "BEL": { name: "Belgium", flag: "🇧🇪" },
-  "CHE": { name: "Switzerland", flag: "🇨🇭" },
-  "AUT": { name: "Austria", flag: "🇦🇹" },
-  "SWE": { name: "Sweden", flag: "🇸🇪" },
-  "NOR": { name: "Norway", flag: "🇳🇴" },
-  "DNK": { name: "Denmark", flag: "🇩🇰" },
-  "FIN": { name: "Finland", flag: "🇫🇮" },
-  "POL": { name: "Poland", flag: "🇵🇱" },
-  "CZE": { name: "Czech Republic", flag: "🇨🇿" },
-  "HUN": { name: "Hungary", flag: "🇭🇺" },
-  "ROU": { name: "Romania", flag: "🇷🇴" },
-  "BGR": { name: "Bulgaria", flag: "🇧🇬" },
-  "HRV": { name: "Croatia", flag: "🇭🇷" },
-  "SRB": { name: "Serbia", flag: "🇷🇸" },
-  "SVN": { name: "Slovenia", flag: "🇸🇮" },
-  "SVK": { name: "Slovakia", flag: "🇸🇰" },
-  "LTU": { name: "Lithuania", flag: "🇱🇹" },
-  "LVA": { name: "Latvia", flag: "🇱🇻" },
-  "EST": { name: "Estonia", flag: "🇪🇪" },
-  "IRL": { name: "Ireland", flag: "🇮🇪" },
-  "PRT": { name: "Portugal", flag: "🇵🇹" },
-  "GRC": { name: "Greece", flag: "🇬🇷" },
-  "TUR": { name: "Turkey", flag: "🇹🇷" },
-  "RUS": { name: "Russia", flag: "🇷🇺" },
-  "UKR": { name: "Ukraine", flag: "🇺🇦" },
-  "BLR": { name: "Belarus", flag: "🇧🇾" },
-  "MDA": { name: "Moldova", flag: "🇲🇩" },
-  "GEO": { name: "Georgia", flag: "🇬🇪" },
-  "ARM": { name: "Armenia", flag: "🇦🇲" },
-  "AZE": { name: "Azerbaijan", flag: "🇦🇿" },
-  "KAZ": { name: "Kazakhstan", flag: "🇰🇿" },
-  "UZB": { name: "Uzbekistan", flag: "🇺🇿" },
-  "TKM": { name: "Turkmenistan", flag: "🇹🇲" },
-  "TJK": { name: "Tajikistan", flag: "🇹🇯" },
-  "KGZ": { name: "Kyrgyzstan", flag: "🇰🇬" },
-  "MNG": { name: "Mongolia", flag: "🇲🇳" },
-  "CHN": { name: "China", flag: "🇨🇳" },
-  "JPN": { name: "Japan", flag: "🇯🇵" },
-  "KOR": { name: "South Korea", flag: "🇰🇷" },
-  "PRK": { name: "North Korea", flag: "🇰🇵" },
-  "TWN": { name: "Taiwan", flag: "🇹🇼" },
-  "HKG": { name: "Hong Kong", flag: "🇭🇰" },
-  "MAC": { name: "Macau", flag: "🇲🇴" },
-  "VNM": { name: "Vietnam", flag: "🇻🇳" },
-  "THA": { name: "Thailand", flag: "🇹🇭" },
-  "MYS": { name: "Malaysia", flag: "🇲🇾" },
-  "SGP": { name: "Singapore", flag: "🇸🇬" },
-  "IDN": { name: "Indonesia", flag: "🇮🇩" },
-  "PHL": { name: "Philippines", flag: "🇵🇭" },
-  "MMR": { name: "Myanmar", flag: "🇲🇲" },
-  "LAO": { name: "Laos", flag: "🇱🇦" },
-  "KHM": { name: "Cambodia", flag: "🇰🇭" },
-  "BRN": { name: "Brunei", flag: "🇧🇳" },
-  "IND": { name: "India", flag: "🇮🇳" },
-  "PAK": { name: "Pakistan", flag: "🇵🇰" },
-  "BGD": { name: "Bangladesh", flag: "🇧🇩" },
-  "LKA": { name: "Sri Lanka", flag: "🇱🇰" },
-  "NPL": { name: "Nepal", flag: "🇳🇵" },
-  "BTN": { name: "Bhutan", flag: "🇧🇹" },
-  "MDV": { name: "Maldives", flag: "🇲🇻" },
-  "AFG": { name: "Afghanistan", flag: "🇦🇫" },
-  "IRN": { name: "Iran", flag: "🇮🇷" },
-  "IRQ": { name: "Iraq", flag: "🇮🇶" },
-  "SYR": { name: "Syria", flag: "🇸🇾" },
-  "LBN": { name: "Lebanon", flag: "🇱🇧" },
-  "JOR": { name: "Jordan", flag: "🇯🇴" },
-  "ISR": { name: "Israel", flag: "🇮🇱" },
-  "PSE": { name: "Palestine", flag: "🇵🇸" },
-  "SAU": { name: "Saudi Arabia", flag: "🇸🇦" },
-  "YEM": { name: "Yemen", flag: "🇾🇪" },
-  "OMN": { name: "Oman", flag: "🇴🇲" },
-  "ARE": { name: "United Arab Emirates", flag: "🇦🇪" },
-  "QAT": { name: "Qatar", flag: "🇶🇦" },
-  "BHR": { name: "Bahrain", flag: "🇧🇭" },
-  "KWT": { name: "Kuwait", flag: "🇰🇼" },
-  "EGY": { name: "Egypt", flag: "🇪🇬" },
-  "LBY": { name: "Libya", flag: "🇱🇾" },
-  "TUN": { name: "Tunisia", flag: "🇹🇳" },
-  "DZA": { name: "Algeria", flag: "🇩🇿" },
-  "MAR": { name: "Morocco", flag: "🇲🇦" },
-  "SDN": { name: "Sudan", flag: "🇸🇩" },
-  "SSD": { name: "South Sudan", flag: "🇸🇸" },
-  "ETH": { name: "Ethiopia", flag: "🇪🇹" },
-  "ERI": { name: "Eritrea", flag: "🇪🇷" },
-  "DJI": { name: "Djibouti", flag: "🇩🇯" },
-  "SOM": { name: "Somalia", flag: "🇸🇴" },
-  "KEN": { name: "Kenya", flag: "🇰🇪" },
-  "TZA": { name: "Tanzania", flag: "🇹🇿" },
-  "UGA": { name: "Uganda", flag: "🇺🇬" },
-  "RWA": { name: "Rwanda", flag: "🇷🇼" },
-  "BDI": { name: "Burundi", flag: "🇧🇮" },
-  "COD": { name: "DR Congo", flag: "🇨🇩" },
-  "COG": { name: "Congo", flag: "🇨🇬" },
-  "GAB": { name: "Gabon", flag: "🇬🇦" },
-  "GNQ": { name: "Equatorial Guinea", flag: "🇬🇶" },
-  "CMR": { name: "Cameroon", flag: "🇨🇲" },
-  "CAF": { name: "Central African Republic", flag: "🇨🇫" },
-  "TCD": { name: "Chad", flag: "🇹🇩" },
-  "NER": { name: "Niger", flag: "🇳🇪" },
-  "MLI": { name: "Mali", flag: "🇲🇱" },
-  "BFA": { name: "Burkina Faso", flag: "🇧🇫" },
-  "SEN": { name: "Senegal", flag: "🇸🇳" },
-  "GMB": { name: "Gambia", flag: "🇬🇲" },
-  "GNB": { name: "Guinea-Bissau", flag: "🇬🇼" },
-  "GIN": { name: "Guinea", flag: "🇬🇳" },
-  "SLE": { name: "Sierra Leone", flag: "🇸🇱" },
-  "LBR": { name: "Liberia", flag: "🇱🇷" },
-  "CIV": { name: "Ivory Coast", flag: "🇨🇮" },
-  "GHA": { name: "Ghana", flag: "🇬🇭" },
-  "TGO": { name: "Togo", flag: "🇹🇬" },
-  "BEN": { name: "Benin", flag: "🇧🇯" },
-  "NGA": { name: "Nigeria", flag: "🇳🇬" },
-  "CMR": { name: "Cameroon", flag: "🇨🇲" },
-  "CAF": { name: "Central African Republic", flag: "🇨🇫" },
-  "TCD": { name: "Chad", flag: "🇹🇩" },
-  "NER": { name: "Niger", flag: "🇳🇪" },
-  "MLI": { name: "Mali", flag: "🇲🇱" },
-  "BFA": { name: "Burkina Faso", flag: "🇧🇫" },
-  "SEN": { name: "Senegal", flag: "🇸🇳" },
-  "GMB": { name: "Gambia", flag: "🇬🇲" },
-  "GNB": { name: "Guinea-Bissau", flag: "🇬🇼" },
-  "GIN": { name: "Guinea", flag: "🇬🇳" },
-  "SLE": { name: "Sierra Leone", flag: "🇸🇱" },
-  "LBR": { name: "Liberia", flag: "🇱🇷" },
-  "CIV": { name: "Ivory Coast", flag: "🇨🇮" },
-  "GHA": { name: "Ghana", flag: "🇬🇭" },
-  "TGO": { name: "Togo", flag: "🇹🇬" },
-  "BEN": { name: "Benin", flag: "🇧🇯" },
-  "NGA": { name: "Nigeria", flag: "🇳🇬" },
-  "AUS": { name: "Australia", flag: "🇦🇺" },
-  "PNG": { name: "Papua New Guinea", flag: "🇵🇬" },
-  "FJI": { name: "Fiji", flag: "🇫🇯" },
-  "VUT": { name: "Vanuatu", flag: "🇻🇺" },
-  "NCL": { name: "New Caledonia", flag: "🇳🇨" },
-  "SLB": { name: "Solomon Islands", flag: "🇸🇧" },
-  "KIR": { name: "Kiribati", flag: "🇰🇮" },
-  "TUV": { name: "Tuvalu", flag: "🇹🇻" },
-  "WSM": { name: "Samoa", flag: "🇼🇸" },
-  "TON": { name: "Tonga", flag: "🇹🇴" },
-  "COK": { name: "Cook Islands", flag: "🇨🇰" },
-  "NIU": { name: "Niue", flag: "🇳🇺" },
-  "TKL": { name: "Tokelau", flag: "🇹🇰" },
-  "PLW": { name: "Palau", flag: "🇵🇼" },
-  "MHL": { name: "Marshall Islands", flag: "🇲🇭" },
-  "FSM": { name: "Micronesia", flag: "🇫🇲" },
-  "NRU": { name: "Nauru", flag: "🇳🇷" },
-  "ISL": { name: "Iceland", flag: "🇮🇸" },
-  "GRL": { name: "Greenland", flag: "🇬🇱" },
-  "FRO": { name: "Faroe Islands", flag: "🇫🇴" },
-  "SJM": { name: "Svalbard and Jan Mayen", flag: "🇳🇴" },
-  "BVT": { name: "Bouvet Island", flag: "🇳🇴" },
-  "ATF": { name: "French Southern Territories", flag: "🇫🇷" },
-  "HMD": { name: "Heard Island and McDonald Islands", flag: "🇦🇺" },
-  "IOT": { name: "British Indian Ocean Territory", flag: "🇬🇧" },
-  "SHN": { name: "Saint Helena", flag: "🇬🇧" },
-  "PCN": { name: "Pitcairn Islands", flag: "🇬🇧" },
-  "BMU": { name: "Bermuda", flag: "🇧🇲" },
-  "CYM": { name: "Cayman Islands", flag: "🇰🇾" },
-  "VGB": { name: "British Virgin Islands", flag: "🇻🇬" },
-  "AIA": { name: "Anguilla", flag: "🇦🇮" },
-  "MSR": { name: "Montserrat", flag: "🇲🇸" },
-  "TCA": { name: "Turks and Caicos Islands", flag: "🇹🇨" },
-  "GIB": { name: "Gibraltar", flag: "🇬🇮" },
-  "IMN": { name: "Isle of Man", flag: "🇮🇲" },
-  "GGY": { name: "Guernsey", flag: "🇬🇬" },
-  "JEY": { name: "Jersey", flag: "🇯🇪" },
-  "ALA": { name: "Åland Islands", flag: "🇫🇮" },
-  "SMR": { name: "San Marino", flag: "🇸🇲" },
-  "VAT": { name: "Vatican City", flag: "🇻🇦" },
-  "MCO": { name: "Monaco", flag: "🇲🇨" },
-  "LIE": { name: "Liechtenstein", flag: "🇱🇮" },
-  "AND": { name: "Andorra", flag: "🇦🇩" },
-  "MKD": { name: "North Macedonia", flag: "🇲🇰" },
-  "ALB": { name: "Albania", flag: "🇦🇱" },
-  "MNE": { name: "Montenegro", flag: "🇲🇪" },
-  "BIH": { name: "Bosnia and Herzegovina", flag: "🇧🇦" },
-  "KOS": { name: "Kosovo", flag: "🇽🇰" },
-  "MNE": { name: "Montenegro", flag: "🇲🇪" },
-  "BIH": { name: "Bosnia and Herzegovina", flag: "🇧🇦" },
-  "KOS": { name: "Kosovo", flag: "🇽🇰" }
-};
+
 
 export default function TravelMap() {
   const [hoveredCountry, setHoveredCountry] = useState(null);
@@ -375,15 +181,32 @@ export default function TravelMap() {
   function getCountryCode(geo) {
     // The geography data uses numeric IDs, not ISO codes
     const countryId = geo.id;
+    const countryName = geo.properties.name || geo.properties.NAME || geo.properties.ADMIN || geo.properties.ADMIN0 || 'Unknown';
     
-    // Map numeric IDs to our country codes
-    const idToCodeMap = {
-      "840": "USA", // United States
-      "124": "CAN", // Canada  
-      "554": "NZL"  // New Zealand
-    };
+    // Debug: log all country IDs to see what we're working with
+    console.log(`Country ID: ${countryId}, Name: ${countryName}`);
     
-    const finalCode = idToCodeMap[countryId];
+    // Special debugging for South Sudan, Bosnia, and Malawi
+    if (countryName.toLowerCase().includes('south sudan') || countryName.toLowerCase().includes('bosnia') || countryName.toLowerCase().includes('malawi')) {
+      console.log(`🔍 SPECIAL DEBUG - Country ID: ${countryId}, Name: "${countryName}"`);
+      console.log(`🔍 Available mappings for this name:`, nameToCodeMap[countryName]);
+      console.log(`🔍 Available mappings for this ID:`, idToCodeMap[countryId]);
+    }
+    
+    // Try to match by name first (more reliable)
+    let finalCode = nameToCodeMap[countryName];
+    
+    if (!finalCode) {
+      // Fallback to numeric ID mapping
+      finalCode = idToCodeMap[countryId];
+    }
+    
+    // Debug: log the result
+    if (finalCode) {
+      console.log(`Mapped "${countryName}" (ID: ${countryId}) to ${finalCode}`);
+    } else {
+      console.log(`No mapping found for "${countryName}" (ID: ${countryId})`);
+    }
     
     // Debug: only log for countries we're interested in
     if (visitedCountries.hasOwnProperty(finalCode)) {

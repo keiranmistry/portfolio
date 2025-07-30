@@ -83,20 +83,20 @@ export default function WorldMap({ visitedCountries, onCountryHover, onCountryLe
           filter={isVisited("GB") ? "url(#glow)" : "none"}
         />
         
-        {/* France */}
+        {/* French Guiana */}
         <motion.path
           d="M 490 180 L 520 180 L 530 190 L 530 210 L 520 220 L 490 220 L 480 210 L 480 190 Z"
-          fill={isVisited("FR") ? "#A2D6F9" : "#2a2a2a"}
+          fill={isVisited("GUF") ? "#A2D6F9" : "#2a2a2a"}
           stroke="#404040"
           strokeWidth="0.5"
           className="cursor-pointer transition-all duration-300"
           whileHover={{ 
-            scale: isVisited("FR") ? 1.05 : 1.02,
-            fill: isVisited("FR") ? "#4FC3F7" : "#404040"
+            scale: isVisited("GUF") ? 1.05 : 1.02,
+            fill: isVisited("GUF") ? "#4FC3F7" : "#404040"
           }}
-          onMouseEnter={(e) => isVisited("FR") && onCountryHover(e, "FR")}
+          onMouseEnter={(e) => isVisited("GUF") && onCountryHover(e, "GUF")}
           onMouseLeave={onCountryLeave}
-          filter={isVisited("FR") ? "url(#glow)" : "none"}
+          filter={isVisited("GUF") ? "url(#glow)" : "none"}
         />
         
         {/* Germany */}
