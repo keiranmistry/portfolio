@@ -63,18 +63,12 @@ const visitedCountries = {
   "USA": {
     name: "United States",
     flag: "🇺🇸",
-    cities: {
-      "New York": [
-        { month: "Jan", year: "2025" }
-      ],
-      "Boston": [
-        { month: "Dec", year: "2021" },
-        { month: "Jun", year: "2022" }
-      ],
-      "San Francisco": [
-        { month: "Mar", year: "2023" }
-      ]
-    }
+    cities: {}
+  },
+  "FRA": {
+    name: "France",
+    flag: "🇫🇷",
+    cities: {}
   },
   "CAN": {
     name: "Canada",
@@ -84,6 +78,12 @@ const visitedCountries = {
         { month: "Present", year: "2024" }
       ],
       "Vancouver": [
+        { month: "Present", year: "2024" }
+      ],
+      "Calgary": [
+        { month: "Present", year: "2024" }
+      ],
+      "Edmonton": [
         { month: "Present", year: "2024" }
       ],
       "Montreal": [
@@ -106,15 +106,62 @@ const visitedCountries = {
       ]
     }
   },
-  "SLB": {
-    name: "Solomon Islands",
-    flag: "🇸🇧",
-    cities: {
-      "Honiara": [
-        { month: "Jan", year: "2023" }
-      ]
-    }
-  }
+  "MEX": {
+    name: "Mexico",
+    flag: "🇲🇽",
+    cities: {}
+  },
+  "CUW": {
+    name: "Curaçao",
+    flag: "🇨🇼",
+    cities: {}
+  },
+  "ABW": {
+    name: "Aruba",
+    flag: "🇦🇼",
+    cities: {}
+  },
+  "DOM": {
+    name: "Dominican Republic",
+    flag: "🇩🇴",
+    cities: {}
+  },
+  "PRI": {
+    name: "Puerto Rico",
+    flag: "🇵🇷",
+    cities: {}
+  },
+  "JAM": {
+    name: "Jamaica",
+    flag: "🇯🇲",
+    cities: {}
+  },
+  "GBR": {
+    name: "United Kingdom",
+    flag: "🇬🇧",
+    cities: {}
+  },
+  "ESP": {
+    name: "Spain",
+    flag: "🇪🇸",
+    cities: {}
+  },
+  "DEU": {
+    name: "Germany",
+    flag: "🇩🇪",
+    cities: {}
+  },
+  "ARE": {
+    name: "United Arab Emirates",
+    flag: "🇦🇪",
+    cities: {}
+  },
+  "HTI": {
+    name: "Haiti",
+    flag: "🇭🇹",
+    cities: {}
+  },
+
 };
 
 
@@ -187,7 +234,7 @@ export default function TravelMap() {
     console.log(`Country ID: ${countryId}, Name: ${countryName}`);
     
     // Special debugging for South Sudan, Bosnia, Malawi, and French Guiana
-    if (countryName.toLowerCase().includes('south sudan') || countryName.toLowerCase().includes('bosnia') || countryName.toLowerCase().includes('malawi') || countryName.toLowerCase().includes('french guiana') || countryName.toLowerCase().includes('france')) {
+    if (countryName.toLowerCase().includes('south sudan') || countryName.toLowerCase().includes('bosnia') || countryName.toLowerCase().includes('malawi') || countryName.toLowerCase().includes('french guiana') || countryName.toLowerCase().includes('france') || countryName.toLowerCase().includes('guyane')) {
       console.log(`🔍 SPECIAL DEBUG - Country ID: ${countryId}, Name: "${countryName}"`);
       console.log(`🔍 Available mappings for this name:`, nameToCodeMap[countryName]);
       console.log(`🔍 Available mappings for this ID:`, idToCodeMap[countryId]);
@@ -200,6 +247,8 @@ export default function TravelMap() {
       // Fallback to numeric ID mapping
       finalCode = idToCodeMap[countryId];
     }
+    
+
     
     // Debug: log the result
     if (finalCode) {
@@ -545,7 +594,7 @@ export default function TravelMap() {
                   key={`flag-${currentCountry}`}
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.3, ease: "easeOut" }}
+                  transition={{ duration: 0.6, ease: "easeOut" }}
                   className="text-3xl"
                 >
                   {visitedCountries[currentCountry] ? visitedCountries[currentCountry].flag : (countryData[currentCountry] ? countryData[currentCountry].flag : "🏳️")}
@@ -554,7 +603,7 @@ export default function TravelMap() {
                   key={`name-${currentCountry}`}
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.3, ease: "easeOut" }}
+                  transition={{ duration: 0.6, ease: "easeOut" }}
                   className={`text-xl font-bold text-white ${barlow.className}`}
                   style={{ fontFamily: 'Barlow, sans-serif' }}
                 >
@@ -593,8 +642,8 @@ export default function TravelMap() {
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: "auto" }}
                       exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.3, ease: "easeOut" }}
-                      className="space-y-4 overflow-hidden"
+                      transition={{ duration: 0.6, ease: "easeOut" }}
+                      className="space-y-4 overflow-hidden max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent"
                     >
                       {Object.entries(visitedCountries[currentCountry].cities).map(([cityName, dates], cityIndex) => (
                         <motion.div
@@ -602,8 +651,8 @@ export default function TravelMap() {
                           initial={{ opacity: 0, x: -10 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ 
-                            duration: 0.3, 
-                            delay: cityIndex * 0.2,
+                            duration: 0.6, 
+                            delay: cityIndex * 0.3,
                             ease: "easeOut"
                           }}
                           className="space-y-2"
@@ -621,8 +670,8 @@ export default function TravelMap() {
                                 initial={{ opacity: 0, x: -10 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ 
-                                  duration: 0.3, 
-                                  delay: cityIndex * 0.2 + (dateIndex + 1) * 0.1,
+                                  duration: 0.6, 
+                                  delay: cityIndex * 0.3 + (dateIndex + 1) * 0.15,
                                   ease: "easeOut"
                                 }}
                                 className="flex items-center gap-2"
@@ -665,7 +714,7 @@ export default function TravelMap() {
               animate={{ 
                 opacity: 1, 
                 x: 0,
-                height: isCitiesExpanded ? "320px" : "140px"
+                height: isCitiesExpanded ? "330px" : "140px"
               }}
               transition={{ 
                 opacity: { duration: 0.6, delay: 0.8, ease: "easeOut" },
@@ -690,7 +739,7 @@ export default function TravelMap() {
               animate={{ 
                 opacity: 1, 
                 x: 0,
-                height: isCitiesExpanded ? "320px" : "140px"
+                height: isCitiesExpanded ? "330px" : "140px"
               }}
               transition={{ 
                 opacity: { duration: 0.6, delay: 0.9, ease: "easeOut" },
@@ -717,7 +766,7 @@ export default function TravelMap() {
               animate={{ 
                 opacity: 1, 
                 x: 0,
-                height: isCitiesExpanded ? "320px" : "140px"
+                height: isCitiesExpanded ? "330px" : "140px"
               }}
               transition={{ 
                 opacity: { duration: 0.6, delay: 1.0, ease: "easeOut" },
