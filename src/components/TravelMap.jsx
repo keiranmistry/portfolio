@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { AnimatePresence, motion, useMotionValue, useTransform } from "framer-motion";
+import { AnimatePresence, motion, useMotionValue, useTransform, useAnimation } from "framer-motion";
 import { ComposableMap, Geographies, Geography, ZoomableGroup } from "react-simple-maps";
 import { geoMercator, geoPath } from "d3-geo";
 import { Barlow, Exo_2 } from 'next/font/google';
@@ -20,10 +20,12 @@ const exo2 = Exo_2({
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
 // Animated Counter Component
-const AnimatedCounter = ({ value, color, className }) => {
+const AnimatedCounter = ({ value, color, className, isVisible }) => {
   const [displayValue, setDisplayValue] = useState(0);
 
   useEffect(() => {
+    if (!isVisible) return;
+    
     const timer = setTimeout(() => {
       const startTime = Date.now();
       const duration = 2000; // 2 seconds
@@ -44,22 +46,22 @@ const AnimatedCounter = ({ value, color, className }) => {
     }, 1200); // 1.2 second delay
     
     return () => clearTimeout(timer);
-  }, [value]);
+  }, [value, isVisible]);
 
   return (
     <motion.div 
       className={className} 
       style={{ color }}
       initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5, delay: 1.2 }}
+      animate={{ opacity: isVisible ? 1 : 0 }}
+      transition={{ duration: 0.5, delay: isVisible ? 1.2 : 0 }}
     >
       {displayValue}
     </motion.div>
   );
 };
 
-const visitedCountries = {
+const baseCountries = {
   "USA": {
     name: "United States",
     flag: "🇺🇸",
@@ -161,7 +163,14 @@ const visitedCountries = {
     flag: "🇭🇹",
     cities: {}
   },
+};
 
+// Color options
+const colorOptions = ["#0266B1", "#033E7A", "#E22716"];
+
+// Function to get random color
+const getRandomColor = () => {
+  return colorOptions[Math.floor(Math.random() * colorOptions.length)];
 };
 
 
@@ -171,11 +180,55 @@ export default function TravelMap() {
   const [hoveredCentroid, setHoveredCentroid] = useState(null);
   const [zoom, setZoom] = useState(1);
   const [center, setCenter] = useState([0, 0]);
-  const [isCitiesExpanded, setIsCitiesExpanded] = useState(true);
+  const [isCitiesExpanded, setIsCitiesExpanded] = useState(false);
   const [defaultCountry, setDefaultCountry] = useState("CAN");
   const [highlightedCountries, setHighlightedCountries] = useState(new Set());
   const mapContainerRef = useRef(null);
   const [dimensions, setDimensions] = useState({ width: 1000, height: 600 });
+  const sectionRef = useRef(null);
+  const controls = useAnimation();
+  const [isInView, setIsInView] = useState(false);
+  const [hasAnimated, setHasAnimated] = useState(false);
+  const [visitedCountries, setVisitedCountries] = useState({});
+
+  // Initialize visited countries with random colors
+  useEffect(() => {
+    const countriesWithColors = {};
+    Object.keys(baseCountries).forEach(countryCode => {
+      countriesWithColors[countryCode] = {
+        ...baseCountries[countryCode],
+        color: getRandomColor()
+      };
+    });
+    setVisitedCountries(countriesWithColors);
+  }, []);
+
+  // Intersection Observer for smooth animation trigger
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasAnimated) {
+          setIsInView(true);
+          setHasAnimated(true);
+          controls.start('visible');
+        }
+      },
+      {
+        threshold: 0.3, // Trigger when 30% of the component is visible
+        rootMargin: '0px 0px -100px 0px' // Trigger slightly before fully in view
+      }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
+    return () => {
+      if (sectionRef.current) {
+        observer.unobserve(sectionRef.current);
+      }
+    };
+  }, [controls, hasAnimated]);
 
   // Set a random default country on component mount
   useEffect(() => {
@@ -192,19 +245,24 @@ export default function TravelMap() {
     setDefaultCountry(countryCode);
   };
 
-  // Animate countries in random order
+  // Animate countries in random order when component comes into view
   useEffect(() => {
+    if (!isInView) return;
+    
     const countryCodes = Object.keys(visitedCountries);
     const shuffledCountries = [...countryCodes].sort(() => Math.random() - 0.5);
     
     setHighlightedCountries(new Set());
     
-    shuffledCountries.forEach((countryCode, index) => {
-      setTimeout(() => {
-        setHighlightedCountries(prev => new Set([...prev, countryCode]));
-      }, index * 300); // 300ms delay between each country
-    });
-  }, []); // Run once on mount
+    // Start country animation after title animation
+    setTimeout(() => {
+      shuffledCountries.forEach((countryCode, index) => {
+        setTimeout(() => {
+          setHighlightedCountries(prev => new Set([...prev, countryCode]));
+        }, index * 200); // Faster animation - 200ms delay between each country
+      });
+    }, 800); // Delay after title animation
+  }, [isInView]);
 
   // Responsive handler
   useEffect(() => {
@@ -450,15 +508,40 @@ export default function TravelMap() {
   }
 
   return (
-    <section id="travel" className="py-20 bg-gradient-to-b from-[#191A1A] to-[#0F0F0F]">
+    <section ref={sectionRef} id="travel" className="py-20 bg-gradient-to-b from-[#191A1A] to-[#0F0F0F]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-6xl sm:text-8xl font-bold italic mb-4" style={{ color: '#fff' }}>
+          <motion.h2 
+            className="text-6xl sm:text-8xl font-bold italic mb-4" 
+            style={{ color: '#fff' }}
+            initial={{ x: -1000, opacity: 0 }}
+            animate={controls}
+            variants={{
+              visible: { x: 0, opacity: 1 }
+            }}
+            transition={{ 
+              duration: 0.8, 
+              ease: "easeOut",
+              delay: 0.1
+            }}
+          >
             <em>travel</em>
-          </h2>
+          </motion.h2>
         </div>
         <div className="relative">
-          <div className="w-full h-[600px] rounded-lg border border-gray-700 overflow-hidden bg-[#181e2a] relative">
+          <motion.div 
+            className="w-full h-[600px] rounded-lg border border-gray-700 overflow-hidden bg-[#181e2a] relative"
+            initial={{ opacity: 0, y: 50 }}
+            animate={controls}
+            variants={{
+              visible: { opacity: 1, y: 0 }
+            }}
+            transition={{ 
+              duration: 0.6, 
+              ease: "easeOut",
+              delay: 0.3
+            }}
+          >
             <div className="absolute z-20 top-4 right-2 flex flex-col gap-2">
               <button
                 className="bg-[#23272f] text-white px-3 py-1 rounded shadow hover:bg-[#2d3748] transition-all duration-300 ease-out flex items-center justify-center"
@@ -545,22 +628,22 @@ export default function TravelMap() {
                           }}
                           style={{
                             default: {
-                              fill: isVisited ? "#3B82F6" : "#1F2937",
+                              fill: isVisited ? visitedCountries[code].color : "#1F2937",
                               outline: "none",
                               stroke: "#374151",
                               strokeWidth: 0.5,
                               transition: "fill 0.2s ease-out"
                             },
                             hover: {
-                              fill: isVisited ? "#60A5FA" : "#1F2937",
+                              fill: isVisited ? visitedCountries[code].color : "#1F2937",
                               outline: "none",
                               cursor: "pointer",
-                              stroke: isVisited ? "#60A5FA" : "#374151",
+                              stroke: isVisited ? visitedCountries[code].color : "#374151",
                               strokeWidth: isVisited ? 1 : 0.5,
                               transition: "fill 0.2s ease-out, stroke 0.2s ease-out"
                             },
                             pressed: {
-                              fill: isVisited ? "#60A5FA" : "#1F2937",
+                              fill: isVisited ? visitedCountries[code].color : "#1F2937",
                               outline: "none"
                             }
                           }}
@@ -573,10 +656,22 @@ export default function TravelMap() {
               </ZoomableGroup>
             </ComposableMap>
 
-          </div>
+          </motion.div>
         </div>
         {/* Stats and Tooltip Section */}
-        <div className="mt-12 flex flex-col lg:flex-row gap-8 items-start">
+        <motion.div 
+          className="mt-12 flex flex-col lg:flex-row gap-8 items-start"
+          initial={{ opacity: 0, y: 30 }}
+          animate={controls}
+          variants={{
+            visible: { opacity: 1, y: 0 }
+          }}
+          transition={{ 
+            duration: 0.6, 
+            ease: "easeOut",
+            delay: 0.5
+          }}
+        >
           {/* Country Tooltip */}
           <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -728,6 +823,7 @@ export default function TravelMap() {
                     value={Object.keys(visitedCountries).length}
                     color="#0266B1"
                     className={`text-7xl font-bold mb-4 ${exo2.className}`}
+                    isVisible={isInView}
                   />
                   <div className={`text-white/70 text-2xl ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>Countries</div>
                 </div>
@@ -755,6 +851,7 @@ export default function TravelMap() {
                     )}
                     color="#033E7A"
                     className={`text-7xl font-bold mb-4 ${exo2.className}`}
+                    isVisible={isInView}
                   />
                   <div className={`text-white/70 text-2xl ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>Trips</div>
                 </div>
@@ -780,12 +877,13 @@ export default function TravelMap() {
                     value={2}
                     color="#E22716"
                     className={`text-7xl font-bold mb-4 ${exo2.className}`}
+                    isVisible={isInView}
                   />
                   <div className={`text-white/70 text-2xl ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>Continents</div>
                 </div>
             </motion.div>
           </motion.div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
