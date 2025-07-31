@@ -26,7 +26,11 @@ export const metadata = {
     locale: "en_US",
     siteName: "Keiran Mistry's Portfolio",
   },
-  viewport: "width=device-width, initial-scale=1",
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
   themeColor: "#3B82F6",
 };
 

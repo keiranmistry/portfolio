@@ -66,7 +66,7 @@ export default function Experience() {
   // Separate useEffect for blinking after typing is complete
   useEffect(() => {
     if (!isTyping && currentIndex >= fullText.length && blinkCount === 0) {
-      console.log('Starting blink sequence');
+      
       
       // Blink 1: Show
       setTimeout(() => setShowCursor(true), 0);
@@ -85,7 +85,7 @@ export default function Experience() {
       
       // Blink 3: Hide and stay hidden
       setTimeout(() => {
-        console.log('Final blink, hiding cursor permanently');
+
         setShowCursor(false);
         setBlinkCount(6); // Mark as complete
       }, 2500);

@@ -288,36 +288,12 @@ export default function TravelMap() {
     const countryId = geo.id;
     const countryName = geo.properties.name || geo.properties.NAME || geo.properties.ADMIN || geo.properties.ADMIN0 || 'Unknown';
     
-    // Debug: log all country IDs to see what we're working with
-    console.log(`Country ID: ${countryId}, Name: ${countryName}`);
-    
-    // Special debugging for South Sudan, Bosnia, Malawi, and French Guiana
-    if (countryName.toLowerCase().includes('south sudan') || countryName.toLowerCase().includes('bosnia') || countryName.toLowerCase().includes('malawi') || countryName.toLowerCase().includes('french guiana') || countryName.toLowerCase().includes('france') || countryName.toLowerCase().includes('guyane')) {
-      console.log(`🔍 SPECIAL DEBUG - Country ID: ${countryId}, Name: "${countryName}"`);
-      console.log(`🔍 Available mappings for this name:`, nameToCodeMap[countryName]);
-      console.log(`🔍 Available mappings for this ID:`, idToCodeMap[countryId]);
-    }
-    
     // Try to match by name first (more reliable)
     let finalCode = nameToCodeMap[countryName];
     
     if (!finalCode) {
       // Fallback to numeric ID mapping
       finalCode = idToCodeMap[countryId];
-    }
-    
-
-    
-    // Debug: log the result
-    if (finalCode) {
-      console.log(`Mapped "${countryName}" (ID: ${countryId}) to ${finalCode}`);
-    } else {
-      console.log(`No mapping found for "${countryName}" (ID: ${countryId})`);
-    }
-    
-    // Debug: only log for countries we're interested in
-    if (visitedCountries.hasOwnProperty(finalCode)) {
-      console.log(`Found visited country: ${finalCode} - ${visitedCountries[finalCode].name} (ID: ${countryId})`);
     }
     
     return finalCode;
@@ -605,11 +581,6 @@ export default function TravelMap() {
                     geographies.map((geo) => {
                       const code = getCountryCode(geo);
                       const isVisited = visitedCountries.hasOwnProperty(code);
-                      
-                      // Debug: log visited countries
-                      if (isVisited) {
-                        console.log(`Rendering visited country: ${code} - ${visitedCountries[code].name}`);
-                      }
                       
                       return (
                         <Geography
