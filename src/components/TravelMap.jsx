@@ -409,16 +409,12 @@ export default function TravelMap() {
           </h2>
         </div>
         <div className="relative">
-          <div 
-            ref={mapContainerRef}
-            className="w-full h-[600px] rounded-lg border border-gray-700 overflow-hidden bg-[#181e2a] relative"
-            style={{ cursor: 'grab' }}
-          >
+          <div className="w-full h-[600px] rounded-lg border border-gray-700 overflow-hidden bg-[#181e2a] relative">
             <div className="absolute z-20 top-4 right-2 flex flex-col gap-2">
               <button
                 className="bg-[#23272f] text-white px-3 py-1 rounded shadow hover:bg-[#2d3748] transition-all duration-300 ease-out flex items-center justify-center"
                 onClick={() => {
-                  const newZoom = Math.min(zoom * 1.5, 15);
+                  const newZoom = Math.min(zoom * 1.5, 8);
                   setZoom(newZoom);
                 }}
                 style={{ pointerEvents: 'auto' }}
@@ -431,7 +427,7 @@ export default function TravelMap() {
               <button
                 className="bg-[#23272f] text-white px-3 py-1 rounded shadow hover:bg-[#2d3748] transition-all duration-300 ease-out flex items-center justify-center"
                 onClick={() => {
-                  const newZoom = Math.max(zoom / 1.5, 0.5);
+                  const newZoom = Math.max(zoom / 1.5, 1);
                   setZoom(newZoom);
                 }}
                 style={{ pointerEvents: 'auto' }}
@@ -459,40 +455,18 @@ export default function TravelMap() {
               height={600}
               style={{ 
                 width: "100%", 
-                height: "100%",
-                cursor: "grab",
-                filter: "drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3))"
+                height: "100%"
               }}
             >
               <ZoomableGroup
                 zoom={zoom}
                 center={center}
-                minZoom={0.5}
-                maxZoom={15}
-                onMoveStart={() => {
-                  // Add grabbing cursor during pan
-                  if (mapContainerRef.current) {
-                    mapContainerRef.current.style.cursor = 'grabbing';
-                  }
-                }}
+                minZoom={1}
+                maxZoom={8}
                 onMoveEnd={({ zoom, coordinates }) => {
                   setZoom(zoom);
                   setCenter(coordinates);
-                  // Reset cursor after pan
-                  if (mapContainerRef.current) {
-                    mapContainerRef.current.style.cursor = 'grab';
-                  }
                 }}
-                style={{
-                  transition: 'transform 0.1s ease-out'
-                }}
-                translateExtent={[[-200, -200], [1200, 800]]}
-                zoomSensitivity={1.2}
-                panOnDrag={true}
-                panOnScroll={false}
-                wheelZoom={true}
-                doubleClickZoom={true}
-                doubleClickZoomFactor={2}
               >
                 <Geographies geography={geoUrl}>
                   {({ geographies }) =>
