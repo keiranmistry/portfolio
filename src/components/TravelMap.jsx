@@ -6,6 +6,7 @@ import { ComposableMap, Geographies, Geography, ZoomableGroup } from "react-simp
 import { geoMercator, geoPath } from "d3-geo";
 import { Barlow, Exo_2 } from 'next/font/google';
 import { countryData, nameToCodeMap, idToCodeMap } from '../lib/countryData';
+import Flag from 'react-flagkit';
 
 const barlow = Barlow({
   subsets: ['latin'],
@@ -64,17 +65,17 @@ const AnimatedCounter = ({ value, color, className, isVisible }) => {
 const baseCountries = {
   "USA": {
     name: "United States",
-    flag: "🇺🇸",
+    flag: "US",
     cities: {}
   },
   "FRA": {
     name: "France",
-    flag: "🇫🇷",
+    flag: "FR",
     cities: {}
   },
   "CAN": {
     name: "Canada",
-    flag: "🇨🇦",
+    flag: "CA",
     cities: {
       "Toronto": [
         { month: "Present", year: "2024" }
@@ -95,7 +96,7 @@ const baseCountries = {
   },
   "NZL": {
     name: "New Zealand",
-    flag: "🇳🇿",
+    flag: "NZ",
     cities: {
       "Auckland": [
         { month: "Jan", year: "2023" }
@@ -110,57 +111,57 @@ const baseCountries = {
   },
   "MEX": {
     name: "Mexico",
-    flag: "🇲🇽",
+    flag: "MX",
     cities: {}
   },
   "CUW": {
     name: "Curaçao",
-    flag: "🇨🇼",
+    flag: "CW",
     cities: {}
   },
   "ABW": {
     name: "Aruba",
-    flag: "🇦🇼",
+    flag: "AW",
     cities: {}
   },
   "DOM": {
     name: "Dominican Republic",
-    flag: "🇩🇴",
+    flag: "DO",
     cities: {}
   },
   "PRI": {
     name: "Puerto Rico",
-    flag: "🇵🇷",
+    flag: "PR",
     cities: {}
   },
   "JAM": {
     name: "Jamaica",
-    flag: "🇯🇲",
+    flag: "JM",
     cities: {}
   },
   "GBR": {
     name: "United Kingdom",
-    flag: "🇬🇧",
+    flag: "GB",
     cities: {}
   },
   "ESP": {
     name: "Spain",
-    flag: "🇪🇸",
+    flag: "ES",
     cities: {}
   },
   "DEU": {
     name: "Germany",
-    flag: "🇩🇪",
+    flag: "DE",
     cities: {}
   },
   "ARE": {
     name: "United Arab Emirates",
-    flag: "🇦🇪",
+    flag: "AE",
     cities: {}
   },
   "HTI": {
     name: "Haiti",
-    flag: "🇭🇹",
+    flag: "HT",
     cities: {}
   },
 };
@@ -656,15 +657,23 @@ export default function TravelMap() {
             <div className="backdrop-blur-md bg-white/10 border border-white/30 shadow-lg rounded-2xl p-6">
               {/* Header */}
               <div className="flex items-center gap-3 mb-4">
-                <motion.span
+                <motion.div
                   key={`flag-${currentCountry}`}
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.6, ease: "easeOut" }}
                   className="text-3xl"
                 >
-                  {visitedCountries[currentCountry] ? visitedCountries[currentCountry].flag : (countryData[currentCountry] ? countryData[currentCountry].flag : "🏳️")}
-                </motion.span>
+                  {visitedCountries[currentCountry] ? (
+                    <Flag country={visitedCountries[currentCountry].flag} size={32} />
+                  ) : (
+                    countryData[currentCountry] ? (
+                      <Flag country={countryData[currentCountry].flag} size={32} />
+                    ) : (
+                      <span className="text-3xl">🏳️</span>
+                    )
+                  )}
+                </motion.div>
                 <motion.h3
                   key={`name-${currentCountry}`}
                   initial={{ opacity: 0, x: -10 }}
