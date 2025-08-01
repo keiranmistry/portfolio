@@ -169,10 +169,24 @@ const baseCountries = {
 // Color options
 const colorOptions = ["#0266B1", "#033E7A", "#E22716"];
 
-// Function to get random color
-const getRandomColor = () => {
-  return colorOptions[Math.floor(Math.random() * colorOptions.length)];
-};
+  // Function to get random color
+  const getRandomColor = () => {
+    return colorOptions[Math.floor(Math.random() * colorOptions.length)];
+  };
+
+  // Function to get flag emoji for unsupported countries
+  const getFlagEmoji = (countryCode) => {
+    const flagEmojis = {
+      "AZE": "🇦🇿", // Azerbaijan
+      "AZ": "🇦🇿", // Azerbaijan (flag code)
+      "KOS": "🇽🇰", // Kosovo
+      "PSE": "🇵🇸", // Palestine
+      "ESH": "🇪🇭", // Western Sahara
+      "TMP": "🇹🇱", // East Timor
+      "ATA": "🏔️", // Antarctica
+    };
+    return flagEmojis[countryCode] || "🏳️";
+  };
 
 
 
@@ -231,12 +245,14 @@ export default function TravelMap() {
     };
   }, [controls, hasAnimated]);
 
-  // Set a random default country on component mount
+  // Set a random default country after visitedCountries is initialized
   useEffect(() => {
-    const countryCodes = Object.keys(visitedCountries);
-    const randomCountry = countryCodes[Math.floor(Math.random() * countryCodes.length)];
-    setDefaultCountry(randomCountry);
-  }, []);
+    if (Object.keys(visitedCountries).length > 0) {
+      const countryCodes = Object.keys(visitedCountries);
+      const randomCountry = countryCodes[Math.floor(Math.random() * countryCodes.length)];
+      setDefaultCountry(randomCountry);
+    }
+  }, [visitedCountries]);
 
   // Use the default country when no country is hovered
   const currentCountry = hoveredCountry || defaultCountry;
@@ -288,6 +304,14 @@ export default function TravelMap() {
     // The geography data uses numeric IDs, not ISO codes
     const countryId = geo.id;
     const countryName = geo.properties.name || geo.properties.NAME || geo.properties.ADMIN || geo.properties.ADMIN0 || 'Unknown';
+    
+         // Debug: Log the country name to see what's being returned
+     if (countryName.includes('Solomon') || countryName.includes('solomon')) {
+       console.log('Found Solomon Islands with name:', countryName);
+     }
+     if (countryName.includes('Azerbaijan') || countryName.includes('azerbaijan')) {
+       console.log('Found Azerbaijan with name:', countryName);
+     }
     
     // Try to match by name first (more reliable)
     let finalCode = nameToCodeMap[countryName];
@@ -595,9 +619,13 @@ export default function TravelMap() {
                             setHoveredCountry(null);
                             setHoveredCentroid(null);
                           } : undefined}
-                          onClick={() => {
-                            handleCountryClick(code);
-                          }}
+                                                                                onClick={() => {
+                              console.log('Clicked country:', code, 'Name:', geo.properties.name);
+                              if (geo.properties.name && (geo.properties.name.includes('Azerbaijan') || geo.properties.name.includes('azerbaijan'))) {
+                                console.log('Azerbaijan clicked - Full properties:', geo.properties);
+                              }
+                              handleCountryClick(code);
+                            }}
                           style={{
                             default: {
                               fill: isVisited ? visitedCountries[code].color : "#1F2937",
@@ -657,23 +685,33 @@ export default function TravelMap() {
             <div className="backdrop-blur-md bg-white/10 border border-white/30 shadow-lg rounded-2xl p-6">
               {/* Header */}
               <div className="flex items-center gap-3 mb-4">
-                <motion.div
-                  key={`flag-${currentCountry}`}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.6, ease: "easeOut" }}
-                  className="text-3xl"
-                >
-                  {visitedCountries[currentCountry] ? (
-                    <Flag country={visitedCountries[currentCountry].flag} size={32} />
-                  ) : (
-                    countryData[currentCountry] ? (
-                      <Flag country={countryData[currentCountry].flag} size={32} />
-                    ) : (
-                      <span className="text-3xl">🏳️</span>
-                    )
-                  )}
-                </motion.div>
+                                 <motion.div
+                   key={`flag-${currentCountry}`}
+                   initial={{ opacity: 0, scale: 0.8 }}
+                   animate={{ opacity: 1, scale: 1 }}
+                   transition={{ duration: 0.6, ease: "easeOut" }}
+                   className="text-3xl"
+                 >
+                   {visitedCountries[currentCountry] ? (
+                     // For visited countries, try react-flagkit first, fallback to emoji for problematic flags
+                     (visitedCountries[currentCountry].flag === "AZ" || visitedCountries[currentCountry].flag === "AZE") ? (
+                       <span className="text-3xl">{getFlagEmoji("AZE")}</span>
+                     ) : (
+                       <Flag country={visitedCountries[currentCountry].flag} size={32} />
+                     )
+                   ) : (
+                     countryData[currentCountry] ? (
+                       // For country data, try react-flagkit first, fallback to emoji for problematic flags
+                       (countryData[currentCountry].flag === "AZ" || countryData[currentCountry].flag === "AZE") ? (
+                         <span className="text-3xl">{getFlagEmoji("AZE")}</span>
+                       ) : (
+                         <Flag country={countryData[currentCountry].flag} size={32} />
+                       )
+                     ) : (
+                       <span className="text-3xl">{getFlagEmoji(currentCountry)}</span>
+                     )
+                   )}
+                 </motion.div>
                 <motion.h3
                   key={`name-${currentCountry}`}
                   initial={{ opacity: 0, x: -10 }}

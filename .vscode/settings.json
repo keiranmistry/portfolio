@@ -13,5 +13,11 @@
   "tailwindCSS.experimental.classRegex": [
     ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"],
     ["cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
-  ]
+  ],
+  "zenMode.fullScreen": false,
+  "zenMode.hideStatusBar": false,
+  "zenMode.hideLineNumbers": false,
+  "zenMode.hideActivityBar": false,
+  "zenMode.restore": false,
+  "zenMode.silentNotifications": false
 } 
