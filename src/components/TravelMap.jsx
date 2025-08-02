@@ -174,19 +174,7 @@ const colorOptions = ["#0266B1", "#033E7A", "#E22716"];
     return colorOptions[Math.floor(Math.random() * colorOptions.length)];
   };
 
-  // Function to get flag emoji for unsupported countries
-  const getFlagEmoji = (countryCode) => {
-    const flagEmojis = {
-      "AZE": "🇦🇿", // Azerbaijan
-      "AZ": "🇦🇿", // Azerbaijan (flag code)
-      "KOS": "🇽🇰", // Kosovo
-      "PSE": "🇵🇸", // Palestine
-      "ESH": "🇪🇭", // Western Sahara
-      "TMP": "🇹🇱", // East Timor
-      "ATA": "🏔️", // Antarctica
-    };
-    return flagEmojis[countryCode] || "🏳️";
-  };
+
 
 
 
@@ -693,22 +681,12 @@ export default function TravelMap() {
                    className="text-3xl"
                  >
                    {visitedCountries[currentCountry] ? (
-                     // For visited countries, try react-flagkit first, fallback to emoji for problematic flags
-                     (visitedCountries[currentCountry].flag === "AZ" || visitedCountries[currentCountry].flag === "AZE") ? (
-                       <span className="text-3xl">{getFlagEmoji("AZE")}</span>
-                     ) : (
-                       <Flag country={visitedCountries[currentCountry].flag} size={32} />
-                     )
+                     <Flag country={visitedCountries[currentCountry].flag} size={32} />
                    ) : (
                      countryData[currentCountry] ? (
-                       // For country data, try react-flagkit first, fallback to emoji for problematic flags
-                       (countryData[currentCountry].flag === "AZ" || countryData[currentCountry].flag === "AZE") ? (
-                         <span className="text-3xl">{getFlagEmoji("AZE")}</span>
-                       ) : (
-                         <Flag country={countryData[currentCountry].flag} size={32} />
-                       )
+                       <Flag country={countryData[currentCountry].flag} size={32} />
                      ) : (
-                       <span className="text-3xl">{getFlagEmoji(currentCountry)}</span>
+                       <span className="text-3xl">🏳️</span>
                      )
                    )}
                  </motion.div>
