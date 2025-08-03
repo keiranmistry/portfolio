@@ -104,7 +104,7 @@ export default function Experience() {
         "4.0 GPA", "Dean's List", "Data Science Club", "Relevant Coursework: Algorithm Design, Software Developer Tools, Functional Programming, Linear Algebra, Calculus",
         "Intramural Soccer"
       ],
-      icon: "/icons/waterloo (5).png",
+      icon: "/icons/waterloo.png",
       mono: "/icons/waterloomono.png",
       url: "https://uwaterloo.ca/future-students/programs/data-science"
     },
@@ -160,27 +160,27 @@ export default function Experience() {
 
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Icon List on the Left */}
-          <div className="lg:w-1/6 lg:mt-8">
+          <div className="lg:w-1/6 lg:mt-8 relative z-0">
             <div className="flex flex-row lg:flex-col space-x-4 lg:space-x-0 lg:space-y-16 relative">
               {experiences.map((experience, index) => (
                 <React.Fragment key={index}>
                   <div className={`relative ${index === 1 ? 'ml-8 lg:ml-0' : ''}`}>
                     <button
                       onClick={() => setSelectedExperience(index)}
-                      className={`w-16 h-16 rounded-lg transition-all duration-300 flex items-center cursor-pointer justify-center relative z-10 overflow-hidden ${
+                      className={`w-16 h-16 rounded-lg transition-all duration-300 flex items-center cursor-pointer justify-center relative z-1 overflow-hidden ${
                         selectedExperience === index ? 'scale-125' : 'hover:scale-105'
                       }`}                      
                       style={{                        
                         background: selectedExperience === index 
-                          ? 'rgba(147, 51, 234, 0.2)' 
-                          : 'rgba(255, 255, 255, 0.15)',
+                          ? 'rgba(147, 51, 234, 0.05)' 
+                          : 'rgba(255, 255, 255, 0.05)',
                       
-                        backdropFilter: 'blur(30px)',
-                        WebkitBackdropFilter: 'blur(30px)',
-                        border: '1px solid rgba(255, 255, 255, 0.2)',
+                        backdropFilter: 'blur(20px)',
+                        WebkitBackdropFilter: 'blur(20px)',
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
                         boxShadow: selectedExperience === index 
-                          ? '0 8px 32px 0 rgba(31, 38, 135, 0.4), 0 0 20px rgba(147, 51, 234, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3)' 
-                          : '0 8px 32px 0 rgba(31, 38, 135, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
+                          ? '0 8px 32px 0 rgba(31, 38, 135, 0.2), 0 0 20px rgba(147, 51, 234, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)' 
+                          : '0 8px 32px 0 rgba(31, 38, 135, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.05)'
                       }}
                     >
                       <div className="w-full h-full flex items-center justify-center bg-transparent">
@@ -278,12 +278,12 @@ export default function Experience() {
                   <Separator />
 
                   <div>
-                    <h4 className={`font-semibold mb-2 ${exo2.className}`} style={{ color: '#0266B1' }}>Key Achievements:</h4>
+                    <h4 className={`font-semibold mb-2 ${exo2.className}`} style={{ color: '#033E7A' }}>Key Achievements:</h4>
                     <ul className="space-y-1">
                       {experiences[selectedExperience].achievements.map((achievement, achievementIndex) => (
                         <li key={achievementIndex} className="text-medium flex items-center gap-4">
                           <span className="text-primary">•</span>
-                          <span style={{ color: '#4f6575' }}>{achievement}</span>
+                          <span style={{ color: '#465561' }}>{achievement}</span>
                         </li>
                       ))}
                     </ul>
