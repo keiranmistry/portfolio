@@ -121,7 +121,7 @@ export default function Projects() {
   return (
     <section
       id="projects"
-      className="py-20 bg-[url('/newwallpaper.png')] bg-cover bg-center bg-no-repeat"
+      className="py-20 bg-[url('/emirates.png')] bg-cover bg-center bg-no-repeat"
       ref={sectionRef}
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">

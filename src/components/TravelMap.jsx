@@ -27,24 +27,24 @@ const AnimatedCounter = ({ value, color, className, isVisible }) => {
   useEffect(() => {
     if (!isVisible) return;
     
-    const timer = setTimeout(() => {
-      const startTime = Date.now();
-      const duration = 2000; // 2 seconds
+          const timer = setTimeout(() => {
+        const startTime = Date.now();
+        const duration = 2000; // 2 seconds - slower animation
       
-      const updateValue = () => {
-        const elapsed = Date.now() - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        const currentValue = Math.round(progress * value);
+        const updateValue = () => {
+          const elapsed = Date.now() - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          const currentValue = Math.round(progress * value);
         
-        setDisplayValue(currentValue);
+          setDisplayValue(currentValue);
         
-        if (progress < 1) {
-          requestAnimationFrame(updateValue);
-        }
-      };
+          if (progress < 1) {
+            requestAnimationFrame(updateValue);
+          }
+        };
       
-      updateValue();
-    }, 1200); // 1.2 second delay
+        updateValue();
+      }, 800); // 0.8 second delay - slower
     
     return () => clearTimeout(timer);
   }, [value, isVisible]);
@@ -55,7 +55,7 @@ const AnimatedCounter = ({ value, color, className, isVisible }) => {
       style={{ color }}
       initial={{ opacity: 0 }}
       animate={{ opacity: isVisible ? 1 : 0 }}
-      transition={{ duration: 0.5, delay: isVisible ? 1.2 : 0 }}
+      transition={{ duration: 0.7, delay: isVisible ? 0.8 : 0 }}
     >
       {displayValue}
     </motion.div>
@@ -217,18 +217,20 @@ export default function TravelMap() {
         }
       },
       {
-        threshold: 0.3, // Trigger when 30% of the component is visible
-        rootMargin: '0px 0px -100px 0px' // Trigger slightly before fully in view
+        threshold: 0.1, // Trigger when just 10% of the title is visible
+        rootMargin: '0px 0px -200px 0px' // Trigger much earlier
       }
     );
 
-    if (sectionRef.current) {
-      observer.observe(sectionRef.current);
+    // Create a ref for the title specifically
+    const titleRef = document.querySelector('#travel-title');
+    if (titleRef) {
+      observer.observe(titleRef);
     }
 
     return () => {
-      if (sectionRef.current) {
-        observer.unobserve(sectionRef.current);
+      if (titleRef) {
+        observer.unobserve(titleRef);
       }
     };
   }, [controls, hasAnimated]);
@@ -264,9 +266,9 @@ export default function TravelMap() {
       shuffledCountries.forEach((countryCode, index) => {
         setTimeout(() => {
           setHighlightedCountries(prev => new Set([...prev, countryCode]));
-        }, index * 200); // Faster animation - 200ms delay between each country
+        }, index * 150); // Slower animation - 150ms delay between each country
       });
-    }, 800); // Delay after title animation
+    }, 600); // Slower delay after title animation
   }, [isInView]);
 
   // Responsive handler
@@ -501,6 +503,7 @@ export default function TravelMap() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <motion.h2 
+            id="travel-title"
             className="text-6xl sm:text-8xl font-bold italic mb-4" 
             style={{ color: '#fff' }}
             initial={{ x: -1000, opacity: 0 }}
@@ -526,9 +529,9 @@ export default function TravelMap() {
               visible: { opacity: 1, y: 0 }
             }}
             transition={{ 
-              duration: 0.6, 
+              duration: 0.7, 
               ease: "easeOut",
-              delay: 0.3
+              delay: 0.25
             }}
           >
             <div className="absolute z-20 top-4 right-2 flex flex-col gap-2">
@@ -655,9 +658,9 @@ export default function TravelMap() {
             visible: { opacity: 1, y: 0 }
           }}
           transition={{ 
-            duration: 0.6, 
+            duration: 0.7, 
             ease: "easeOut",
-            delay: 0.5
+            delay: 0.4
           }}
         >
           {/* Country Tooltip */}
@@ -670,7 +673,7 @@ export default function TravelMap() {
             }}
             className="lg:w-80 flex-shrink-0 order-1 lg:order-1"
           >
-            <div className="backdrop-blur-md bg-white/10 border border-white/30 shadow-lg rounded-2xl p-6">
+            <div className="backdrop-blur-md bg-white/10 border border-white/30 shadow-lg rounded-2xl p-6 h-[140px] flex flex-col justify-center">
               {/* Header */}
               <div className="flex items-center gap-3 mb-4">
                                  <motion.div
@@ -805,13 +808,12 @@ export default function TravelMap() {
               animate={{ 
                 opacity: 1, 
                 x: 0,
-                height: isCitiesExpanded ? "330px" : "140px"
+                height: "140px"
               }}
-              transition={{ 
-                opacity: { duration: 0.6, delay: 0.8, ease: "easeOut" },
-                x: { duration: 0.6, delay: 0.8, ease: "easeOut" },
-                height: { duration: 0.3, ease: "easeOut" }
-              }}
+                          transition={{ 
+              opacity: { duration: 0.7, delay: 0.6, ease: "easeOut" },
+              x: { duration: 0.7, delay: 0.6, ease: "easeOut" }
+            }}
               className="backdrop-blur-md bg-white/10 border border-white/30 shadow-lg rounded-2xl p-6 flex-1"
             >
                               <div className="text-center flex flex-col justify-center items-center h-full">
@@ -831,13 +833,12 @@ export default function TravelMap() {
               animate={{ 
                 opacity: 1, 
                 x: 0,
-                height: isCitiesExpanded ? "330px" : "140px"
+                height: "140px"
               }}
-              transition={{ 
-                opacity: { duration: 0.6, delay: 0.9, ease: "easeOut" },
-                x: { duration: 0.6, delay: 0.9, ease: "easeOut" },
-                height: { duration: 0.3, ease: "easeOut" }
-              }}
+                          transition={{ 
+              opacity: { duration: 0.7, delay: 0.7, ease: "easeOut" },
+              x: { duration: 0.7, delay: 0.7, ease: "easeOut" }
+            }}
               className="backdrop-blur-md bg-white/10 border border-white/30 shadow-lg rounded-2xl p-6 flex-1"
             >
                               <div className="text-center flex flex-col justify-center items-center h-full">
@@ -859,13 +860,12 @@ export default function TravelMap() {
               animate={{ 
                 opacity: 1, 
                 x: 0,
-                height: isCitiesExpanded ? "330px" : "140px"
+                height: "140px"
               }}
-              transition={{ 
-                opacity: { duration: 0.6, delay: 1.0, ease: "easeOut" },
-                x: { duration: 0.6, delay: 1.0, ease: "easeOut" },
-                height: { duration: 0.3, ease: "easeOut" }
-              }}
+                          transition={{ 
+              opacity: { duration: 0.7, delay: 0.8, ease: "easeOut" },
+              x: { duration: 0.7, delay: 0.8, ease: "easeOut" }
+            }}
               className="backdrop-blur-md bg-white/10 border border-white/30 shadow-lg rounded-2xl p-6 flex-1"
             >
                               <div className="text-center flex flex-col justify-center items-center h-full">

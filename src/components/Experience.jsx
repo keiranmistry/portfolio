@@ -104,8 +104,8 @@ export default function Experience() {
         "4.0 GPA", "Dean's List", "Data Science Club", "Relevant Coursework: Algorithm Design, Software Developer Tools, Functional Programming, Linear Algebra, Calculus",
         "Intramural Soccer"
       ],
-      icon: "/icons/waterloo (2).png",
-      mono: "/icons/waterloomono (1).png",
+      icon: "/icons/waterloo (5).png",
+      mono: "/icons/waterloomono.png",
       url: "https://uwaterloo.ca/future-students/programs/data-science"
     },
     {
@@ -120,8 +120,8 @@ export default function Experience() {
           "achievement 2",
           "achievement 3"
         ],
-        icon: "/icons/tti (1).png",
-        mono: "/icons/ttimono (1).png",
+        icon: "/icons/tti.png",
+        mono: "/icons/ttimono.png",
         url: "https://www.ttigroup.com/"
       },
       {
@@ -136,14 +136,14 @@ export default function Experience() {
           "achievement 2",
           "achievement 3"
         ],
-        icon: "/icons/tdss (1).png",
-        mono: "/icons/tdssmono (1).png",
+        icon: "/icons/tdss.png",
+        mono: "/icons/tdssmono.png",
         url: "http://www.yrdsb.ca/schools/tommydouglas.ss/Pages/default.aspx"
       }
   ];
 
   return (
-    <section id="experience" className="py-20">
+    <section id="experience" className="py-20 bg-[url('/newest.jpg')] bg-cover bg-center bg-no-repeat">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 
@@ -172,26 +172,33 @@ export default function Experience() {
                       }`}                      
                       style={{                        
                         background: selectedExperience === index 
-                          ? 'rgba(147, 51, 234, 0.1)' 
-                          : 'rgba(255, 255, 255, 0.05)',
+                          ? 'rgba(147, 51, 234, 0.2)' 
+                          : 'rgba(255, 255, 255, 0.15)',
                       
-                        backdropFilter: 'blur(20px)',
-                        WebkitBackdropFilter: 'blur(20px)',
+                        backdropFilter: 'blur(30px)',
+                        WebkitBackdropFilter: 'blur(30px)',
+                        border: '1px solid rgba(255, 255, 255, 0.2)',
                         boxShadow: selectedExperience === index 
-                          ? '0 8px 32px 0 rgba(31, 38, 135, 0.2), 0 0 20px rgba(147, 51, 234, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)' 
-                          : '0 8px 32px 0 rgba(31, 38, 135, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1)'
+                          ? '0 8px 32px 0 rgba(31, 38, 135, 0.4), 0 0 20px rgba(147, 51, 234, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.3)' 
+                          : '0 8px 32px 0 rgba(31, 38, 135, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)'
                       }}
                     >
-                      <img 
-                        src={experience.icon} 
-                        alt={`${experience.company} logo`}
-                        className="w-full h-full object-cover"
-                      />
+                      <div className="w-full h-full flex items-center justify-center bg-transparent">
+                        <img 
+                          src={experience.icon} 
+                          alt={`${experience.company} logo`}
+                          className="w-14 h-14 object-contain"
+                          style={{ 
+                            filter: 'contrast(1.2) brightness(1.1)',
+                            mixBlendMode: 'multiply'
+                          }}
+                        />
+                      </div>
                     </button>
                     {/* Vertical line for desktop */}
                     {index === 1 && (
                       <div
-                        className="hidden lg:block absolute left-8 top-16 w-0.5 h-16"
+                        className="hidden lg:block absolute left-8 top-16 w-1 h-16"
                         style={{ backgroundColor: '#0266B1' }}
                       ></div>
                     )}
@@ -199,7 +206,7 @@ export default function Experience() {
                   {/* Horizontal line for mobile */}
                   {index === 1 && (
                     <div
-                      className="block lg:hidden self-center w-8 h-0.5"
+                      className="block lg:hidden self-center w-12 h-0.5"
                       style={{ backgroundColor: '#0266B1' }}
                     ></div>
                   )}
@@ -218,11 +225,11 @@ export default function Experience() {
               transition={{ duration: 0.4, ease: "easeInOut" }}
               className="lg:w-5/6"
             >
-              <Card className="group hover:shadow-lg transition-all duration-300 min-h-[600px]">
+              <Card className="group hover:shadow-lg transition-all duration-300 min-h-[600px] backdrop-blur-md bg-white/10 border border-white/20 shadow-xl">
                 <CardHeader>
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+                      <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 backdrop-blur-sm bg-white/5 border border-white/10">
                         <a 
                           href={experiences[selectedExperience].url} 
                           target="_blank" 
@@ -246,10 +253,10 @@ export default function Experience() {
                       </div>
                     </div>
                     <div className="text-right">
-                        <Badge variant="secondary" className={`font-bold text-sm transition-colors ${exo2.className}`} style={{ color: '#E22716' }}>
+                        <Badge variant="secondary" className={`font-bold text-sm transition-colors backdrop-blur-sm bg-white/5 border border-white/10 ${exo2.className}`} style={{ color: '#E22716' }}>
                           {experiences[selectedExperience].period}
                         </Badge>
-                      <p className={`font-semibold text-sm text-muted-foreground mt-1 transition-colors ${exo2.className}`} style={{ color: '#FF6456' }}>
+                      <p className={`font-semibold text-sm text-muted-foreground mt-1 transition-colors ${exo2.className}`} style={{ color: '#E22716' }}>
                         {experiences[selectedExperience].location}
                       </p>
                     </div>
@@ -262,7 +269,7 @@ export default function Experience() {
 
                   <div className="flex flex-wrap gap-2">
                     {experiences[selectedExperience].technologies.map((tech, techIndex) => (
-                      <Badge key={techIndex} variant="outline" className="text-xs">
+                      <Badge key={techIndex} variant="outline" className="text-xs backdrop-blur-sm bg-white/5 border border-white/10">
                         {tech}
                       </Badge>
                     ))}
@@ -274,9 +281,9 @@ export default function Experience() {
                     <h4 className={`font-semibold mb-2 ${exo2.className}`} style={{ color: '#0266B1' }}>Key Achievements:</h4>
                     <ul className="space-y-1">
                       {experiences[selectedExperience].achievements.map((achievement, achievementIndex) => (
-                        <li key={achievementIndex} className="text-medium text-muted-foreground flex items-center gap-4">
+                        <li key={achievementIndex} className="text-medium flex items-center gap-4">
                           <span className="text-primary">•</span>
-                          {achievement}
+                          <span style={{ color: '#4f6575' }}>{achievement}</span>
                         </li>
                       ))}
                     </ul>
