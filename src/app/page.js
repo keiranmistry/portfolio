@@ -5,6 +5,7 @@ import Projects from "@/components/Projects";
 import Experience from "@/components/Experience";
 import TravelMap from "@/components/TravelMap";
 import Footer from "@/components/Footer";
+import PerformanceOptimizer from "@/components/PerformanceOptimizer";
 
 export default function Home() {
   useEffect(() => {
@@ -15,6 +16,7 @@ export default function Home() {
   }, []);
   return (
     <div className="min-h-screen">
+      <PerformanceOptimizer />
       <main>
         <Hero />
         <Projects />

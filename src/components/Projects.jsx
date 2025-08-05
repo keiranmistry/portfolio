@@ -21,15 +21,11 @@ const exo2 = Exo_2({
 });
 
 function GlassCard({ children, ...props }) {
-  const [isClient, setIsClient] = useState(false);
-  useEffect(() => setIsClient(true), []);
   return (
     <div
       {...props}
       style={{
         ...(props.style || {}),
-        backdropFilter: isClient ? 'blur(8px)' : undefined,
-        WebkitBackdropFilter: isClient ? 'blur(8px)' : undefined,
       }}
     >
       {children}
@@ -93,9 +89,9 @@ export default function Projects() {
         controls.start('visible');
       }
     };
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
     handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, [controls]);
 
   useEffect(() => {
@@ -154,12 +150,10 @@ export default function Projects() {
             <div key={idx} className={`${projects.length % 2 === 1 && idx === projects.length - 1 ? 'sm:col-span-2 sm:w-1/2' : 'w-full'}`}>
             <GlassCard
               key={idx}
-              className="w-full min-h-[540px] group shadow-xl transition-all pt-4 pb-4 rounded-2xl relative overflow-hidden backdrop-blur-md hover:scale-105 hover:shadow-2xl"
+              className="w-full min-h-[540px] group shadow-xl transition-all pt-4 pb-4 rounded-2xl relative overflow-hidden bg-white/10 hover:scale-105 hover:shadow-2xl"
               style={{
                 background: 'linear-gradient(120deg, rgba(255,255,255,0.22) 60%, rgba(255,255,255,0.10) 100%)',
                 boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.18)',
-                backdropFilter: 'blur(16px)',
-                WebkitBackdropFilter: 'blur(16px)',
                 border: '1px solid transparent',
                 transition: 'all 0.3s ease-in-out',
               }}

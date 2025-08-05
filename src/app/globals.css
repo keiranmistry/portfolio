@@ -129,6 +129,42 @@
   }
 }
 
+/* Performance optimizations */
+* {
+  box-sizing: border-box;
+}
+
+/* Optimize GPU usage for transforms */
+.transform-gpu {
+  transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Reduce repaints during animations */
+.animate-smooth {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
+/* Optimize backdrop filters */
+.backdrop-optimized {
+  will-change: backdrop-filter;
+  transform: translateZ(0);
+}
+
+/* Reduce layout thrashing */
+.layout-stable {
+  contain: layout style paint;
+}
+
+/* Optimize images */
+img {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
 /* Custom 3D Glass Effects */
 .perspective-1000 {
   perspective: 1000px;
@@ -221,4 +257,38 @@
 .scrollbar-thin {
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+/* Performance optimizations for zoom operations */
+.zoom-optimized {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Reduce GPU usage for complex backgrounds */
+.bg-optimized {
+  background-attachment: scroll;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Optimize animations during zoom */
+@media (prefers-reduced-motion: no-preference) {
+  .animate-optimized {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+/* Disable animations for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

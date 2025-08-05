@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import React from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Barlow, Exo_2 } from 'next/font/google';
@@ -25,13 +25,12 @@ export default function Experience() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isTyping, setIsTyping] = useState(false);
   const [showCursor, setShowCursor] = useState(true);
-  const [blinkCount, setBlinkCount] = useState(0);
   const [hasAnimated, setHasAnimated] = useState(false);
   const headingRef = useRef(null);
 
   const fullText = "experience";
 
-  // Intersection Observer to detect when section is visited (same as Projects)
+  // Intersection Observer to detect when section is visited
   useEffect(() => {
     const observer = new window.IntersectionObserver(
       ([entry]) => {
@@ -50,12 +49,13 @@ export default function Experience() {
     };
   }, [hasAnimated]);
 
+  // Optimized typewriter effect
   useEffect(() => {
     if (isTyping && currentIndex < fullText.length) {
       const timeout = setTimeout(() => {
         setTypewriterText(prev => prev + fullText[currentIndex]);
         setCurrentIndex(prev => prev + 1);
-      }, 250); // Slower typing speed
+      }, 250);
 
       return () => clearTimeout(timeout);
     } else if (isTyping && currentIndex >= fullText.length) {
@@ -63,34 +63,24 @@ export default function Experience() {
     }
   }, [currentIndex, isTyping, fullText]);
 
-  // Separate useEffect for blinking after typing is complete
+  // Simplified cursor blinking
   useEffect(() => {
-    if (!isTyping && currentIndex >= fullText.length && blinkCount === 0) {
-      
-      
-      // Blink 1: Show
-      setTimeout(() => setShowCursor(true), 0);
-      
-      // Blink 1: Hide
-      setTimeout(() => setShowCursor(false), 500);
-      
-      // Blink 2: Show
-      setTimeout(() => setShowCursor(true), 1000);
-      
-      // Blink 2: Hide
-      setTimeout(() => setShowCursor(false), 1500);
-      
-      // Blink 3: Show
-      setTimeout(() => setShowCursor(true), 2000);
-      
-      // Blink 3: Hide and stay hidden
-      setTimeout(() => {
+    if (!isTyping && currentIndex >= fullText.length) {
+      const blinkInterval = setInterval(() => {
+        setShowCursor(prev => !prev);
+      }, 500);
 
+      const stopBlinking = setTimeout(() => {
+        clearInterval(blinkInterval);
         setShowCursor(false);
-        setBlinkCount(6); // Mark as complete
       }, 2500);
+
+      return () => {
+        clearInterval(blinkInterval);
+        clearTimeout(stopBlinking);
+      };
     }
-  }, [isTyping, currentIndex, fullText, blinkCount]);
+  }, [isTyping, currentIndex, fullText]);
 
   const experiences = [
     {
@@ -142,6 +132,10 @@ export default function Experience() {
       }
   ];
 
+  const handleExperienceSelect = useCallback((index) => {
+    setSelectedExperience(index);
+  }, []);
+
   return (
     <section id="experience" className="py-20 bg-[url('/newest.jpg')] bg-cover bg-center bg-no-repeat">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -166,7 +160,7 @@ export default function Experience() {
                 <React.Fragment key={index}>
                   <div className={`relative ${index === 1 ? 'ml-8 lg:ml-0' : ''}`}>
                     <button
-                      onClick={() => setSelectedExperience(index)}
+                      onClick={() => handleExperienceSelect(index)}
                       className={`w-16 h-16 rounded-lg transition-all duration-300 flex items-center cursor-pointer justify-center relative z-1 overflow-hidden ${
                         selectedExperience === index ? 'scale-125' : 'hover:scale-105'
                       }`}                      
@@ -174,9 +168,6 @@ export default function Experience() {
                         background: selectedExperience === index 
                           ? 'rgba(147, 51, 234, 0.05)' 
                           : 'rgba(255, 255, 255, 0.05)',
-                      
-                        backdropFilter: 'blur(20px)',
-                        WebkitBackdropFilter: 'blur(20px)',
                         border: '1px solid rgba(255, 255, 255, 0.1)',
                         boxShadow: selectedExperience === index 
                           ? '0 8px 32px 0 rgba(31, 38, 135, 0.2), 0 0 20px rgba(147, 51, 234, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)' 
@@ -225,11 +216,11 @@ export default function Experience() {
               transition={{ duration: 0.4, ease: "easeInOut" }}
               className="lg:w-5/6"
             >
-              <Card className="group hover:shadow-lg transition-all duration-300 min-h-[600px] backdrop-blur-md bg-white/10 border border-white/20 shadow-xl">
+              <Card className="group hover:shadow-lg transition-all duration-300 min-h-[600px] bg-white/10 border border-white/20 shadow-xl">
                 <CardHeader>
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 backdrop-blur-sm bg-white/5 border border-white/10">
+                      <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-white/5 border border-white/10">
                         <a 
                           href={experiences[selectedExperience].url} 
                           target="_blank" 
@@ -253,7 +244,7 @@ export default function Experience() {
                       </div>
                     </div>
                     <div className="text-right">
-                        <Badge variant="secondary" className={`font-bold text-sm transition-colors backdrop-blur-sm bg-white/5 border border-white/10 ${exo2.className}`} style={{ color: '#E22716' }}>
+                        <Badge variant="secondary" className={`font-bold text-sm transition-colors bg-white/5 border border-white/10 ${exo2.className}`} style={{ color: '#E22716' }}>
                           {experiences[selectedExperience].period}
                         </Badge>
                       <p className={`font-semibold text-sm text-muted-foreground mt-1 transition-colors ${exo2.className}`} style={{ color: '#E22716' }}>
@@ -269,7 +260,7 @@ export default function Experience() {
 
                   <div className="flex flex-wrap gap-2">
                     {experiences[selectedExperience].technologies.map((tech, techIndex) => (
-                      <Badge key={techIndex} variant="outline" className="text-xs backdrop-blur-sm bg-white/5 border border-white/10">
+                      <Badge key={techIndex} variant="outline" className="text-xs bg-white/5 border border-white/10">
                         {tech}
                       </Badge>
                     ))}
