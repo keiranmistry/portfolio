@@ -499,7 +499,7 @@ export default function TravelMap() {
   }
 
   return (
-    <section ref={sectionRef} id="travel" className="py-20 bg-gradient-to-b from-[#191A1A] to-[#0F0F0F]">
+    <section ref={sectionRef} id="travel" className="py-20 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('/ocean.png')" }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <motion.h2 
