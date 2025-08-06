@@ -2,9 +2,11 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { AnimatePresence, motion, useMotionValue, useTransform, useAnimation } from "framer-motion";
+import { ComposableMap, Geographies, Geography, ZoomableGroup } from "react-simple-maps";
 import { geoMercator, geoPath } from "d3-geo";
 import { Barlow, Exo_2 } from 'next/font/google';
 import { countryData, nameToCodeMap, idToCodeMap } from '../lib/countryData';
+import { travelData, getRandomColor, getTotalCountries, getTotalTrips, getTotalContinents, getAllCountriesWithColors } from '../lib/travelData';
 import Flag from 'react-flagkit';
 
 const barlow = Barlow({
@@ -26,24 +28,24 @@ const AnimatedCounter = ({ value, color, className, isVisible }) => {
   useEffect(() => {
     if (!isVisible) return;
     
-    const timer = setTimeout(() => {
-      const startTime = Date.now();
-      const duration = 2000;
-    
-      const updateValue = () => {
-        const elapsed = Date.now() - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        const currentValue = Math.round(progress * value);
+          const timer = setTimeout(() => {
+        const startTime = Date.now();
+        const duration = 2000; // 2 seconds - slower animation
       
-        setDisplayValue(currentValue);
+        const updateValue = () => {
+          const elapsed = Date.now() - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          const currentValue = Math.round(progress * value);
+        
+          setDisplayValue(currentValue);
+        
+          if (progress < 1) {
+            requestAnimationFrame(updateValue);
+          }
+        };
       
-        if (progress < 1) {
-          requestAnimationFrame(updateValue);
-        }
-      };
-    
-      updateValue();
-    }, 800);
+        updateValue();
+      }, 800); // 0.8 second delay - slower
     
     return () => clearTimeout(timer);
   }, [value, isVisible]);
@@ -61,206 +63,12 @@ const AnimatedCounter = ({ value, color, className, isVisible }) => {
   );
 };
 
-const baseCountries = {
-  "USA": {
-    name: "United States",
-    flag: "US",
-    cities: {}
-  },
-  "FRA": {
-    name: "France",
-    flag: "FR",
-    cities: {}
-  },
-  "CAN": {
-    name: "Canada",
-    flag: "CA",
-    cities: {
-      "Toronto": [
-        { month: "Present", year: "2024" }
-      ],
-      "Vancouver": [
-        { month: "Present", year: "2024" }
-      ],
-      "Calgary": [
-        { month: "Present", year: "2024" }
-      ],
-      "Edmonton": [
-        { month: "Present", year: "2024" }
-      ],
-      "Montreal": [
-        { month: "Present", year: "2024" }
-      ]
-    }
-  },
-  "NZL": {
-    name: "New Zealand",
-    flag: "NZ",
-    cities: {
-      "Auckland": [
-        { month: "Jan", year: "2023" }
-      ],
-      "Wellington": [
-        { month: "Jan", year: "2023" }
-      ],
-      "Queenstown": [
-        { month: "Jan", year: "2023" }
-      ]
-    }
-  },
-  "MEX": {
-    name: "Mexico",
-    flag: "MX",
-    cities: {}
-  },
-  "CUW": {
-    name: "Curaçao",
-    flag: "CW",
-    cities: {}
-  },
-  "ABW": {
-    name: "Aruba",
-    flag: "AW",
-    cities: {}
-  },
-  "DOM": {
-    name: "Dominican Republic",
-    flag: "DO",
-    cities: {}
-  },
-  "PRI": {
-    name: "Puerto Rico",
-    flag: "PR",
-    cities: {}
-  },
-  "JAM": {
-    name: "Jamaica",
-    flag: "JM",
-    cities: {}
-  },
-  "GBR": {
-    name: "United Kingdom",
-    flag: "GB",
-    cities: {}
-  },
-  "ESP": {
-    name: "Spain",
-    flag: "ES",
-    cities: {}
-  },
-  "DEU": {
-    name: "Germany",
-    flag: "DE",
-    cities: {}
-  },
-  "ARE": {
-    name: "United Arab Emirates",
-    flag: "AE",
-    cities: {}
-  },
-  "HTI": {
-    name: "Haiti",
-    flag: "HT",
-    cities: {}
-  },
-};
-
-// Color options
-const colorOptions = ["#0266B1", "#033E7A", "#E22716"];
-
-// Function to get random color
-const getRandomColor = () => {
-  return colorOptions[Math.floor(Math.random() * colorOptions.length)];
-};
-
-// Custom Map Component
-const CustomMap = ({ 
-  visitedCountries, 
-  hoveredCountry, 
-  setHoveredCountry, 
-  setHoveredCentroid, 
-  handleCountryClick,
-  zoom,
-  center,
-  projection,
-  getCountryCode,
-  getCentroid 
-}) => {
-  const [geographies, setGeographies] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    setIsLoading(true);
-    fetch(geoUrl)
-      .then(res => res.json())
-      .then(geoData => {
-        setGeographies(geoData.features || []);
-        setIsLoading(false);
-      })
-      .catch(error => {
-        console.error('Error loading map data:', error);
-        setIsLoading(false);
-      });
-  }, []);
-
-  if (isLoading || !geographies.length) {
-    return (
-      <div className="w-full h-full flex items-center justify-center bg-[#181e2a]">
-        <div className="text-white text-lg">Loading map...</div>
-      </div>
-    );
-  }
-
-  return (
-    <svg
-      width={1000}
-      height={600}
-      viewBox="0 0 1000 600"
-      style={{ 
-        width: "100%", 
-        height: "100%"
-      }}
-    >
-      <g transform={`translate(${center[0]}, ${center[1]}) scale(${zoom})`}>
-        {geographies.map((geo) => {
-          const code = getCountryCode(geo);
-          const isVisited = visitedCountries.hasOwnProperty(code);
-          
-          return (
-            <path
-              key={geo.id}
-              d={geoPath().projection(projection)(geo)}
-              onMouseEnter={isVisited ? () => {
-                setHoveredCountry(code);
-                setHoveredCentroid(getCentroid(geo));
-              } : undefined}
-              onMouseLeave={isVisited ? () => {
-                setHoveredCountry(null);
-                setHoveredCentroid(null);
-              } : undefined}
-              onClick={() => {
-                handleCountryClick(code);
-              }}
-              style={{
-                fill: isVisited ? visitedCountries[code].color : "#1F2937",
-                stroke: "#374151",
-                strokeWidth: 0.5,
-                cursor: isVisited ? "pointer" : "default",
-                transition: "fill 0.2s ease-out, stroke 0.2s ease-out"
-              }}
-            />
-          );
-        })}
-      </g>
-    </svg>
-  );
-};
 
 export default function TravelMap() {
   const [hoveredCountry, setHoveredCountry] = useState(null);
   const [hoveredCentroid, setHoveredCentroid] = useState(null);
   const [zoom, setZoom] = useState(1);
-  const [center, setCenter] = useState([500, 300]);
+  const [center, setCenter] = useState([0, 0]);
   const [isCitiesExpanded, setIsCitiesExpanded] = useState(false);
   const [defaultCountry, setDefaultCountry] = useState("CAN");
   const [highlightedCountries, setHighlightedCountries] = useState(new Set());
@@ -271,14 +79,13 @@ export default function TravelMap() {
   const [isInView, setIsInView] = useState(false);
   const [hasAnimated, setHasAnimated] = useState(false);
   const [visitedCountries, setVisitedCountries] = useState({});
-  const [isZooming, setIsZooming] = useState(false);
 
   // Initialize visited countries with random colors
   useEffect(() => {
     const countriesWithColors = {};
-    Object.keys(baseCountries).forEach(countryCode => {
+    Object.keys(travelData).forEach(countryCode => {
       countriesWithColors[countryCode] = {
-        ...baseCountries[countryCode],
+        ...travelData[countryCode],
         color: getRandomColor()
       };
     });
@@ -296,11 +103,12 @@ export default function TravelMap() {
         }
       },
       {
-        threshold: 0.1,
-        rootMargin: '0px 0px -200px 0px'
+        threshold: 0.1, // Trigger when just 10% of the title is visible
+        rootMargin: '0px 0px -200px 0px' // Trigger much earlier
       }
     );
 
+    // Create a ref for the title specifically
     const titleRef = document.querySelector('#travel-title');
     if (titleRef) {
       observer.observe(titleRef);
@@ -330,28 +138,6 @@ export default function TravelMap() {
     setDefaultCountry(countryCode);
   };
 
-  // Optimized zoom handlers with debouncing
-  const handleZoomIn = () => {
-    setIsZooming(true);
-    const newZoom = Math.min(zoom * 1.5, 8);
-    setZoom(newZoom);
-    setTimeout(() => setIsZooming(false), 300);
-  };
-
-  const handleZoomOut = () => {
-    setIsZooming(true);
-    const newZoom = Math.max(zoom / 1.5, 1);
-    setZoom(newZoom);
-    setTimeout(() => setIsZooming(false), 300);
-  };
-
-  const handleReset = () => {
-    setIsZooming(true);
-    setZoom(1);
-    setCenter([500, 300]);
-    setTimeout(() => setIsZooming(false), 300);
-  };
-
   // Animate countries in random order when component comes into view
   useEffect(() => {
     if (!isInView) return;
@@ -361,13 +147,14 @@ export default function TravelMap() {
     
     setHighlightedCountries(new Set());
     
+    // Start country animation after title animation
     setTimeout(() => {
       shuffledCountries.forEach((countryCode, index) => {
         setTimeout(() => {
           setHighlightedCountries(prev => new Set([...prev, countryCode]));
-        }, index * 150);
+        }, index * 150); // Slower animation - 150ms delay between each country
       });
-    }, 600);
+    }, 600); // Slower delay after title animation
   }, [isInView]);
 
   // Responsive handler
@@ -390,12 +177,23 @@ export default function TravelMap() {
     .translate([dimensions.width / 2, dimensions.height / 2]);
 
   function getCountryCode(geo) {
+    // The geography data uses numeric IDs, not ISO codes
     const countryId = geo.id;
     const countryName = geo.properties.name || geo.properties.NAME || geo.properties.ADMIN || geo.properties.ADMIN0 || 'Unknown';
     
+         // Debug: Log the country name to see what's being returned
+     if (countryName.includes('Solomon') || countryName.includes('solomon')) {
+       console.log('Found Solomon Islands with name:', countryName);
+     }
+     if (countryName.includes('Azerbaijan') || countryName.includes('azerbaijan')) {
+       console.log('Found Azerbaijan with name:', countryName);
+     }
+    
+    // Try to match by name first (more reliable)
     let finalCode = nameToCodeMap[countryName];
     
     if (!finalCode) {
+      // Fallback to numeric ID mapping
       finalCode = idToCodeMap[countryId];
     }
     
@@ -407,14 +205,193 @@ export default function TravelMap() {
     return path.centroid(geo);
   }
 
+  function getTooltipTransform(x, y, currentZoom, currentCenter) {
+    const mapWidth = 1000;
+    const mapHeight = 600;
+    const tooltipWidth = 320;
+    const tooltipHeight = 200;
+    
+    // Always position tooltip in the bottom-right corner, away from countries
+    const tooltipX = mapWidth - tooltipWidth - 30;
+    const tooltipY = mapHeight - tooltipHeight - 30;
+    
+    return `translate(${tooltipX - x}px, ${tooltipY - y}px)`;
+  }
+
+  function getArrowPosition(x, y, currentZoom) {
+    const mapWidth = 1000;
+    const mapHeight = 600;
+    const tooltipWidth = 320;
+    const tooltipHeight = 200;
+    
+    // Adjust for zoom level
+    const zoomFactor = Math.max(0.5, Math.min(2, 1 / currentZoom));
+    const adjustedTooltipWidth = tooltipWidth * zoomFactor;
+    const adjustedTooltipHeight = tooltipHeight * zoomFactor;
+    
+    // Calculate available space (same logic as getTooltipTransform)
+    const spaceOnRight = x + adjustedTooltipWidth / 2 + 120 < mapWidth;
+    const spaceOnLeft = x - adjustedTooltipWidth / 2 - 120 > 0;
+    const spaceAbove = y - adjustedTooltipHeight / 2 - 120 > 0;
+    const spaceBelow = y + adjustedTooltipHeight / 2 + 120 < mapHeight;
+    
+    // Determine arrow position based on tooltip placement
+    if (spaceOnRight && spaceOnLeft) {
+      // If both sides have space, choose the one with more room
+      const rightSpace = mapWidth - x;
+      const leftSpace = x;
+      if (rightSpace > leftSpace) {
+        // Tooltip is to the right, arrow points left
+        return {
+          top: '50%',
+          left: '-20px',
+          transform: 'translateY(-50%)',
+          borderTopColor: 'transparent',
+          borderBottomColor: 'transparent',
+          borderLeftColor: 'rgba(255,255,255,0.95)',
+          borderRightColor: 'transparent',
+          borderBottomWidth: '0px',
+          borderTopWidth: '0px',
+          borderLeftWidth: '20px',
+          borderRightWidth: '0px'
+        };
+      } else {
+        // Tooltip is to the left, arrow points right
+        return {
+          top: '50%',
+          left: '100%',
+          transform: 'translateY(-50%)',
+          borderTopColor: 'transparent',
+          borderBottomColor: 'transparent',
+          borderLeftColor: 'transparent',
+          borderRightColor: 'rgba(255,255,255,0.95)',
+          borderBottomWidth: '0px',
+          borderTopWidth: '0px',
+          borderLeftWidth: '0px',
+          borderRightWidth: '20px'
+        };
+      }
+    } else if (spaceOnRight) {
+      // Tooltip is to the right, arrow points left
+      return {
+        top: '50%',
+        left: '-20px',
+        transform: 'translateY(-50%)',
+        borderTopColor: 'transparent',
+        borderBottomColor: 'transparent',
+        borderLeftColor: 'rgba(255,255,255,0.95)',
+        borderRightColor: 'transparent',
+        borderBottomWidth: '0px',
+        borderTopWidth: '0px',
+        borderLeftWidth: '20px',
+        borderRightWidth: '0px'
+      };
+    } else if (spaceOnLeft) {
+      // Tooltip is to the left, arrow points right
+      return {
+        top: '50%',
+        left: '100%',
+        transform: 'translateY(-50%)',
+        borderTopColor: 'transparent',
+        borderBottomColor: 'transparent',
+        borderLeftColor: 'transparent',
+        borderRightColor: 'rgba(255,255,255,0.95)',
+        borderBottomWidth: '0px',
+        borderTopWidth: '0px',
+        borderLeftWidth: '0px',
+        borderRightWidth: '20px'
+      };
+          } else if (spaceAbove && spaceBelow) {
+        // If both above and below have space, choose the one with more room
+        const aboveSpace = y;
+        const belowSpace = mapHeight - y;
+        if (aboveSpace > belowSpace) {
+          // Tooltip is above, arrow points down
+          return {
+            top: '100%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            borderTopColor: 'transparent',
+            borderBottomColor: 'rgba(255,255,255,0.95)',
+            borderLeftColor: 'transparent',
+            borderRightColor: 'transparent',
+            borderBottomWidth: '12px',
+            borderTopWidth: '0px',
+            borderLeftWidth: '0px',
+            borderRightWidth: '0px'
+          };
+        } else {
+          // Tooltip is below, arrow points up
+          return {
+            top: '-20px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            borderTopColor: 'rgba(255,255,255,0.95)',
+            borderBottomColor: 'transparent',
+            borderLeftColor: 'transparent',
+            borderRightColor: 'transparent',
+            borderBottomWidth: '0px',
+            borderTopWidth: '20px',
+            borderLeftWidth: '0px',
+            borderRightWidth: '0px'
+          };
+        }
+      } else if (spaceAbove) {
+        // Tooltip is above, arrow points down
+        return {
+          top: '100%',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          borderTopColor: 'transparent',
+          borderBottomColor: 'rgba(255,255,255,0.95)',
+          borderLeftColor: 'transparent',
+          borderRightColor: 'transparent',
+          borderBottomWidth: '20px',
+          borderTopWidth: '0px',
+          borderLeftWidth: '0px',
+          borderRightWidth: '0px'
+        };
+      } else if (spaceBelow) {
+        // Tooltip is below, arrow points up
+        return {
+          top: '-20px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          borderTopColor: 'rgba(255,255,255,0.95)',
+          borderBottomColor: 'transparent',
+          borderLeftColor: 'transparent',
+          borderRightColor: 'transparent',
+          borderBottomWidth: '0px',
+          borderTopWidth: '20px',
+          borderLeftWidth: '0px',
+          borderRightWidth: '0px'
+        };
+    } else {
+      // Fallback: no arrow for corner positioning
+      return {
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        borderTopColor: 'transparent',
+        borderBottomColor: 'transparent',
+        borderLeftColor: 'transparent',
+        borderRightColor: 'transparent',
+        borderBottomWidth: '0px',
+        borderTopWidth: '0px',
+        borderLeftWidth: '0px',
+        borderRightWidth: '0px'
+      };
+    }
+  }
+
   return (
-    <section ref={sectionRef} id="travel" className="py-20 bg-gradient-to-b from-[#191A1A] to-[#0F0F0F]">
+    <section ref={sectionRef} id="travel" className="py-20 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('/ocean.png')" }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <motion.h2 
             id="travel-title"
             className="text-6xl sm:text-8xl font-bold italic mb-4" 
-            style={{ color: '#fff' }}
+            style={{ color: '#C2DDDD' }}
             initial={{ x: -1000, opacity: 0 }}
             animate={controls}
             variants={{
@@ -431,7 +408,14 @@ export default function TravelMap() {
         </div>
         <div className="relative">
           <motion.div 
-            className="w-full h-[600px] rounded-lg border border-gray-700 overflow-hidden bg-[#181e2a] relative"
+            className="w-full h-[600px] rounded-lg border border-gray-700 overflow-hidden relative backdrop-blur-md"
+            style={{ 
+              background: 'rgba(30, 58, 138, 0.1)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)'
+            }}
             initial={{ opacity: 0, y: 50 }}
             animate={controls}
             variants={{
@@ -445,58 +429,137 @@ export default function TravelMap() {
           >
             <div className="absolute z-20 top-4 right-2 flex flex-col gap-2">
               <button
-                className={`text-white px-3 py-1 rounded shadow transition-all duration-300 ease-out flex items-center justify-center ${
-                  isZooming ? 'bg-[#1a1a1a]' : 'bg-[#23272f] hover:bg-[#2d3748]'
-                }`}
-                onClick={handleZoomIn}
-                style={{ pointerEvents: 'auto' }}
+                className="text-white px-3 py-1 rounded shadow transition-all duration-300 ease-out flex items-center justify-center backdrop-blur-md cursor-pointer"
+                onClick={() => {
+                  const newZoom = Math.min(zoom * 1.5, 8);
+                  setZoom(newZoom);
+                }}
+                style={{ 
+                  pointerEvents: 'auto',
+                  background: 'rgba(35, 39, 47, 0.2)',
+                  backdropFilter: 'blur(20px)',
+                  WebkitBackdropFilter: 'blur(20px)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)'
+                }}
                 title="Zoom In"
-                disabled={isZooming}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
               </button>
               <button
-                className={`text-white px-3 py-1 rounded shadow transition-all duration-300 ease-out flex items-center justify-center ${
-                  isZooming ? 'bg-[#1a1a1a]' : 'bg-[#23272f] hover:bg-[#2d3748]'
-                }`}
-                onClick={handleZoomOut}
-                style={{ pointerEvents: 'auto' }}
+                className="text-white px-3 py-1 rounded shadow transition-all duration-300 ease-out flex items-center justify-center backdrop-blur-md cursor-pointer"
+                onClick={() => {
+                  const newZoom = Math.max(zoom / 1.5, 1);
+                  setZoom(newZoom);
+                }}
+                style={{ 
+                  pointerEvents: 'auto',
+                  background: 'rgba(35, 39, 47, 0.2)',
+                  backdropFilter: 'blur(20px)',
+                  WebkitBackdropFilter: 'blur(20px)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)'
+                }}
                 title="Zoom Out"
-                disabled={isZooming}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
                 </svg>
               </button>
               <button
-                className={`text-white px-3 py-1 rounded shadow transition-all duration-300 ease-out text-xs ${exo2.className} ${
-                  isZooming ? 'bg-[#1a1a1a]' : 'bg-[#23272f] hover:bg-[#2d3748]'
-                }`}
-                onClick={handleReset}
-                style={{ pointerEvents: 'auto' }}
+                className={`text-white px-3 py-1 rounded shadow transition-all duration-300 ease-out text-xs backdrop-blur-md cursor-pointer ${exo2.className}`}
+                onClick={() => { 
+                  setZoom(1); 
+                  setCenter([0, 0]); 
+                }}
+                style={{ 
+                  pointerEvents: 'auto',
+                  background: 'rgba(35, 39, 47, 0.2)',
+                  backdropFilter: 'blur(20px)',
+                  WebkitBackdropFilter: 'blur(20px)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)'
+                }}
                 title="Reset View"
-                disabled={isZooming}
               >
                 Reset
               </button>
             </div>
-            
-            <div ref={mapContainerRef} className="w-full h-full">
-              <CustomMap
-                visitedCountries={visitedCountries}
-                hoveredCountry={hoveredCountry}
-                setHoveredCountry={setHoveredCountry}
-                setHoveredCentroid={setHoveredCentroid}
-                handleCountryClick={handleCountryClick}
+            <ComposableMap
+              projectionConfig={{ scale: 160 }}
+              width={1000}
+              height={600}
+              style={{ 
+                width: "100%", 
+                height: "100%"
+              }}
+            >
+              <ZoomableGroup
                 zoom={zoom}
                 center={center}
-                projection={projection}
-                getCountryCode={getCountryCode}
-                getCentroid={getCentroid}
-              />
-            </div>
+                minZoom={1}
+                maxZoom={8}
+                onMoveEnd={({ zoom, coordinates }) => {
+                  setZoom(zoom);
+                  setCenter(coordinates);
+                }}
+              >
+                <Geographies geography={geoUrl}>
+                  {({ geographies }) =>
+                    geographies.map((geo) => {
+                      const code = getCountryCode(geo);
+                      const isVisited = visitedCountries.hasOwnProperty(code);
+                      
+                      return (
+                        <Geography
+                          key={geo.rsmKey}
+                          geography={geo}
+                          onMouseEnter={isVisited ? () => {
+                            setHoveredCountry(code);
+                            setHoveredCentroid(getCentroid(geo));
+                          } : undefined}
+                          onMouseLeave={isVisited ? () => {
+                            setHoveredCountry(null);
+                            setHoveredCentroid(null);
+                          } : undefined}
+                                                                                onClick={() => {
+                              console.log('Clicked country:', code, 'Name:', geo.properties.name);
+                              if (geo.properties.name && (geo.properties.name.includes('Azerbaijan') || geo.properties.name.includes('azerbaijan'))) {
+                                console.log('Azerbaijan clicked - Full properties:', geo.properties);
+                              }
+                              handleCountryClick(code);
+                            }}
+                          style={{
+                            default: {
+                              fill: isVisited ? visitedCountries[code].color : "rgba(224, 251, 252, 0.3)",
+                              outline: "none",
+                              stroke: "#374151",
+                              strokeWidth: 0.5,
+                              transition: "fill 0.2s ease-out"
+                            },
+                            hover: {
+                              fill: isVisited ? visitedCountries[code].color : "#99D5C9",
+                              outline: "none",
+                              cursor: "pointer",
+                              stroke: isVisited ? visitedCountries[code].color : "#374151",
+                              strokeWidth: isVisited ? 1 : 0.5,
+                              transition: "fill 0.2s ease-out, stroke 0.2s ease-out"
+                            },
+                            pressed: {
+                              fill: isVisited ? visitedCountries[code].color : "#a8b5a8",
+                              outline: "none"
+                            }
+                          }}
+                          tabIndex={-1}
+                        />
+                      );
+                    })
+                  }
+                </Geographies>
+              </ZoomableGroup>
+            </ComposableMap>
 
           </motion.div>
         </div>
@@ -524,26 +587,36 @@ export default function TravelMap() {
             }}
             className="lg:w-80 flex-shrink-0 order-1 lg:order-1"
           >
-            <div className="bg-white/10 border border-white/30 shadow-lg rounded-2xl p-6 h-[140px] flex flex-col justify-center">
+            <motion.div 
+              className="backdrop-blur-md bg-white/10 border border-white/30 shadow-lg rounded-2xl p-6 flex flex-col"
+              animate={{ 
+                height: visitedCountries[currentCountry] && isCitiesExpanded ? "auto" : "140px"
+              }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              style={{ 
+                minHeight: "140px",
+                maxHeight: isCitiesExpanded ? "400px" : "140px"
+              }}
+            >
               {/* Header */}
               <div className="flex items-center gap-3 mb-4">
-                <motion.div
-                  key={`flag-${currentCountry}`}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.6, ease: "easeOut" }}
-                  className="text-3xl"
-                >
-                  {visitedCountries[currentCountry] ? (
-                    <Flag country={visitedCountries[currentCountry].flag} size={32} />
-                  ) : (
-                    countryData[currentCountry] ? (
-                      <Flag country={countryData[currentCountry].flag} size={32} />
-                    ) : (
-                      <span className="text-3xl">🏳️</span>
-                    )
-                  )}
-                </motion.div>
+                                 <motion.div
+                   key={`flag-${currentCountry}`}
+                   initial={{ opacity: 0, scale: 0.8 }}
+                   animate={{ opacity: 1, scale: 1 }}
+                   transition={{ duration: 0.6, ease: "easeOut" }}
+                   className="text-3xl"
+                 >
+                   {visitedCountries[currentCountry] ? (
+                     <Flag country={visitedCountries[currentCountry].flag} size={32} />
+                   ) : (
+                     countryData[currentCountry] ? (
+                       <Flag country={countryData[currentCountry].flag} size={32} />
+                     ) : (
+                       <span className="text-3xl">🏳️</span>
+                     )
+                   )}
+                 </motion.div>
                 <motion.h3
                   key={`name-${currentCountry}`}
                   initial={{ opacity: 0, x: -10 }}
@@ -567,11 +640,11 @@ export default function TravelMap() {
                     className="text-white/60 hover:text-white transition-colors cursor-pointer"
                   >
                     <motion.div
-                      animate={{ rotate: isCitiesExpanded ? 0 : -90 }}
+                      animate={{ rotate: isCitiesExpanded ? 90 : 0 }}
                       transition={{ duration: 0.2 }}
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
                     </motion.div>
                   </button>
@@ -579,16 +652,20 @@ export default function TravelMap() {
               </div>
               
               {/* Cities or Not Visited Message */}
-              <AnimatePresence>
+              <AnimatePresence mode="wait">
                 {visitedCountries[currentCountry] ? (
-                  isCitiesExpanded && (
+                  isCitiesExpanded ? (
                     <motion.div
-                      key={currentCountry}
+                      key={`cities-${currentCountry}`}
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: "auto" }}
                       exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.6, ease: "easeOut" }}
-                      className="space-y-4 overflow-hidden max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent"
+                      transition={{ duration: 0.3, ease: "easeOut" }}
+                      className="space-y-4 overflow-y-auto max-h-64 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent"
+                      style={{
+                        scrollbarWidth: 'thin',
+                        scrollbarColor: 'rgba(255, 255, 255, 0.2) transparent'
+                      }}
                     >
                       {Object.entries(visitedCountries[currentCountry].cities).map(([cityName, dates], cityIndex) => (
                         <motion.div
@@ -631,19 +708,36 @@ export default function TravelMap() {
                         </motion.div>
                       ))}
                     </motion.div>
+                  ) : (
+                    <motion.div
+                      key={`collapsed-${currentCountry}`}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -10 }}
+                      transition={{ duration: 0.3, ease: "easeOut" }}
+                      className="flex items-center gap-2"
+                    >
+                      <span className={`text-sm text-white/70 ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>
+                        Click to expand cities
+                      </span>
+                    </motion.div>
                   )
                 ) : (
                   <motion.div
+                    key={`not-visited-${currentCountry}`}
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -10 }}
                     transition={{ duration: 0.3, ease: "easeOut" }}
                     className="flex items-center gap-2"
                   >
-                    
+                    <span className={`text-sm text-white/70 ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>
+                      Not visited yet
+                    </span>
                   </motion.div>
                 )}
               </AnimatePresence>
-            </div>
+            </motion.div>
           </motion.div>
 
           {/* Animated Stats */}
@@ -658,24 +752,24 @@ export default function TravelMap() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ 
                 opacity: 1, 
-                x: 0,
-                height: "140px"
+                x: 0
               }}
               transition={{ 
                 opacity: { duration: 0.7, delay: 0.6, ease: "easeOut" },
                 x: { duration: 0.7, delay: 0.6, ease: "easeOut" }
               }}
-              className="bg-white/10 border border-white/30 shadow-lg rounded-2xl p-6 flex-1"
+              className="backdrop-blur-md bg-white/10 border border-white/30 shadow-lg rounded-2xl p-6 flex-1 flex flex-col justify-center items-center"
+              style={{ height: "140px" }}
             >
-              <div className="text-center flex flex-col justify-center items-center h-full">
-                <AnimatedCounter 
-                  value={Object.keys(visitedCountries).length}
-                  color="#0266B1"
-                  className={`text-7xl font-bold mb-4 ${exo2.className}`}
-                  isVisible={isInView}
-                />
-                <div className={`text-white/70 text-2xl ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>Countries</div>
-              </div>
+                              <div className="text-center flex flex-col justify-center items-center h-full">
+                  <AnimatedCounter 
+                    value={getTotalCountries()}
+                    color="#0266B1"
+                    className={`text-7xl font-bold mb-4 ${exo2.className}`}
+                    isVisible={isInView}
+                  />
+                  <div className={`text-white/70 text-3xl ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>Countries</div>
+                </div>
             </motion.div>
 
             {/* Trips Stat Card */}
@@ -683,26 +777,24 @@ export default function TravelMap() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ 
                 opacity: 1, 
-                x: 0,
-                height: "140px"
+                x: 0
               }}
               transition={{ 
                 opacity: { duration: 0.7, delay: 0.7, ease: "easeOut" },
                 x: { duration: 0.7, delay: 0.7, ease: "easeOut" }
               }}
-              className="bg-white/10 border border-white/30 shadow-lg rounded-2xl p-6 flex-1"
+              className="backdrop-blur-md bg-white/10 border border-white/30 shadow-lg rounded-2xl p-6 flex-1 flex flex-col justify-center items-center"
+              style={{ height: "140px" }}
             >
-              <div className="text-center flex flex-col justify-center items-center h-full">
-                <AnimatedCounter 
-                  value={Object.values(visitedCountries).reduce((total, country) => 
-                    total + Object.values(country.cities).reduce((cityTotal, dates) => cityTotal + dates.length, 0), 0
-                  )}
-                  color="#033E7A"
-                  className={`text-7xl font-bold mb-4 ${exo2.className}`}
-                  isVisible={isInView}
-                />
-                <div className={`text-white/70 text-2xl ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>Trips</div>
-              </div>
+                              <div className="text-center flex flex-col justify-center items-center h-full">
+                  <AnimatedCounter 
+                    value={getTotalTrips()}
+                    color="#033E7A"
+                    className={`text-7xl font-bold mb-4 ${exo2.className}`}
+                    isVisible={isInView}
+                  />
+                  <div className={`text-white/70 text-3xl ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>Trips</div>
+                </div>
             </motion.div>
 
             {/* Continents Stat Card */}
@@ -710,24 +802,24 @@ export default function TravelMap() {
               initial={{ opacity: 0, x: 20 }}
               animate={{ 
                 opacity: 1, 
-                x: 0,
-                height: "140px"
+                x: 0
               }}
               transition={{ 
                 opacity: { duration: 0.7, delay: 0.8, ease: "easeOut" },
                 x: { duration: 0.7, delay: 0.8, ease: "easeOut" }
               }}
-              className="bg-white/10 border border-white/30 shadow-lg rounded-2xl p-6 flex-1"
+              className="backdrop-blur-md bg-white/10 border border-white/30 shadow-lg rounded-2xl p-6 flex-1 flex flex-col justify-center items-center"
+              style={{ height: "140px" }}
             >
-              <div className="text-center flex flex-col justify-center items-center h-full">
-                <AnimatedCounter 
-                  value={2}
-                  color="#E22716"
-                  className={`text-7xl font-bold mb-4 ${exo2.className}`}
-                  isVisible={isInView}
-                />
-                <div className={`text-white/70 text-2xl ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>Continents</div>
-              </div>
+                              <div className="text-center flex flex-col justify-center items-center h-full">
+                  <AnimatedCounter 
+                    value={getTotalContinents()}
+                    color="#E22716"
+                    className={`text-7xl font-bold mb-4 ${exo2.className}`}
+                    isVisible={isInView}
+                  />
+                  <div className={`text-white/70 text-3xl ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>Continents</div>
+                </div>
             </motion.div>
           </motion.div>
         </motion.div>

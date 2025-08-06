@@ -143,7 +143,10 @@ export default function Experience() {
           <h2 
             ref={headingRef}
             className={`text-6xl sm:text-8xl font-bold italic mb-4 ${barlow.className}`}
-            style={{ display: 'inline-block' }}
+            style={{ 
+              display: 'inline-block',
+              color: '#9ebee0'
+            }}
           >
             <em>
               {typewriterText}
