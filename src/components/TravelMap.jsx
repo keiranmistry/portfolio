@@ -522,7 +522,14 @@ export default function TravelMap() {
         </div>
         <div className="relative">
           <motion.div 
-            className="w-full h-[600px] rounded-lg border border-gray-700 overflow-hidden bg-[#181e2a] relative"
+            className="w-full h-[600px] rounded-lg border border-gray-700 overflow-hidden relative backdrop-blur-md"
+            style={{ 
+              background: 'rgba(30, 58, 138, 0.1)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255, 255, 255, 0.2)',
+              boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)'
+            }}
             initial={{ opacity: 0, y: 50 }}
             animate={controls}
             variants={{
@@ -536,12 +543,19 @@ export default function TravelMap() {
           >
             <div className="absolute z-20 top-4 right-2 flex flex-col gap-2">
               <button
-                className="bg-[#23272f] text-white px-3 py-1 rounded shadow hover:bg-[#2d3748] transition-all duration-300 ease-out flex items-center justify-center"
+                className="text-white px-3 py-1 rounded shadow transition-all duration-300 ease-out flex items-center justify-center backdrop-blur-md cursor-pointer"
                 onClick={() => {
                   const newZoom = Math.min(zoom * 1.5, 8);
                   setZoom(newZoom);
                 }}
-                style={{ pointerEvents: 'auto' }}
+                style={{ 
+                  pointerEvents: 'auto',
+                  background: 'rgba(35, 39, 47, 0.2)',
+                  backdropFilter: 'blur(20px)',
+                  WebkitBackdropFilter: 'blur(20px)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)'
+                }}
                 title="Zoom In"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -549,12 +563,19 @@ export default function TravelMap() {
                 </svg>
               </button>
               <button
-                className="bg-[#23272f] text-white px-3 py-1 rounded shadow hover:bg-[#2d3748] transition-all duration-300 ease-out flex items-center justify-center"
+                className="text-white px-3 py-1 rounded shadow transition-all duration-300 ease-out flex items-center justify-center backdrop-blur-md cursor-pointer"
                 onClick={() => {
                   const newZoom = Math.max(zoom / 1.5, 1);
                   setZoom(newZoom);
                 }}
-                style={{ pointerEvents: 'auto' }}
+                style={{ 
+                  pointerEvents: 'auto',
+                  background: 'rgba(35, 39, 47, 0.2)',
+                  backdropFilter: 'blur(20px)',
+                  WebkitBackdropFilter: 'blur(20px)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)'
+                }}
                 title="Zoom Out"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -562,12 +583,19 @@ export default function TravelMap() {
                 </svg>
               </button>
               <button
-                className={`bg-[#23272f] text-white px-3 py-1 rounded shadow hover:bg-[#2d3748] transition-all duration-300 ease-out text-xs ${exo2.className}`}
+                className={`text-white px-3 py-1 rounded shadow transition-all duration-300 ease-out text-xs backdrop-blur-md cursor-pointer ${exo2.className}`}
                 onClick={() => { 
                   setZoom(1); 
                   setCenter([0, 0]); 
                 }}
-                style={{ pointerEvents: 'auto' }}
+                style={{ 
+                  pointerEvents: 'auto',
+                  background: 'rgba(35, 39, 47, 0.2)',
+                  backdropFilter: 'blur(20px)',
+                  WebkitBackdropFilter: 'blur(20px)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)'
+                }}
                 title="Reset View"
               >
                 Reset
@@ -619,14 +647,14 @@ export default function TravelMap() {
                             }}
                           style={{
                             default: {
-                              fill: isVisited ? visitedCountries[code].color : "#1F2937",
+                              fill: isVisited ? visitedCountries[code].color : "rgba(224, 251, 252, 0.3)",
                               outline: "none",
                               stroke: "#374151",
                               strokeWidth: 0.5,
                               transition: "fill 0.2s ease-out"
                             },
                             hover: {
-                              fill: isVisited ? visitedCountries[code].color : "#1F2937",
+                              fill: isVisited ? visitedCountries[code].color : "#99D5C9",
                               outline: "none",
                               cursor: "pointer",
                               stroke: isVisited ? visitedCountries[code].color : "#374151",
@@ -634,7 +662,7 @@ export default function TravelMap() {
                               transition: "fill 0.2s ease-out, stroke 0.2s ease-out"
                             },
                             pressed: {
-                              fill: isVisited ? visitedCountries[code].color : "#1F2937",
+                              fill: isVisited ? visitedCountries[code].color : "#a8b5a8",
                               outline: "none"
                             }
                           }}
