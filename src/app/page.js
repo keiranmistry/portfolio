@@ -4,6 +4,7 @@ import Hero from "@/components/Hero";
 import Projects from "@/components/Projects";
 import Experience from "@/components/Experience";
 import TravelMap from "@/components/TravelMap";
+import Gallery from "@/components/Gallery";
 import Footer from "@/components/Footer";
 
 export default function Home() {
@@ -20,6 +21,7 @@ export default function Home() {
         <Projects />
         <Experience />
         <TravelMap />
+        <Gallery />
       </main>
       <Footer />
     </div>
