@@ -179,19 +179,22 @@ export default function Gallery() {
   const galleryItems = generateGalleryItems();
 
   return (
-    <section ref={sectionRef} id="gallery" className="py-20 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('/ocean.png')" }}>
+    <section ref={sectionRef} id="gallery" className="py-20" style={{ background: 'linear-gradient(to bottom right, #0266B1, #033E7A, #E22716)' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <motion.h2 
             className="text-6xl sm:text-8xl font-bold italic mb-4" 
             style={{ color: '#C2DDDD' }}
-            initial={{ x: -1000, opacity: 0 }}
+            initial={{ scale: 0.8, opacity: 0 }}
             animate={controls}
             variants={{
-              visible: { x: 0, opacity: 1 }
+              visible: { 
+                scale: [0.8, 1.1, 1], 
+                opacity: 1 
+              }
             }}
             transition={{ 
-              duration: 0.8, 
+              duration: 0.6, 
               ease: "easeOut",
               delay: 0.1
             }}
@@ -216,7 +219,7 @@ export default function Gallery() {
           {galleryItems.map((item) => (
             <motion.div
               key={item.id}
-              className="backdrop-blur-md bg-white/10 border border-white/30 shadow-lg rounded-2xl overflow-hidden cursor-pointer"
+              className="backdrop-blur-xl bg-white/5 border border-white/20 shadow-2xl rounded-2xl overflow-hidden cursor-pointer hover:bg-white/10 transition-all duration-300"
               initial={{ opacity: 0, y: 30 }}
               animate={controls}
               variants={{

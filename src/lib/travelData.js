@@ -4,11 +4,13 @@ export const travelData = {
     name: "United States",
     flag: "US",
     cities: {
-      "New York": [
-        { month: "Present", year: "2024" }
-      ],
-      "Los Angeles": [
+      "Orlando": [
+        { month: "Dec", year: "2018" },
+        { month: "Dec", year: "2022" },
         { month: "Dec", year: "2023" }
+      ],
+      "Philadelphia": [
+        { month: "Dec", year: "2012" }
       ],
       "San Francisco": [
         { month: "Nov", year: "2023" }
