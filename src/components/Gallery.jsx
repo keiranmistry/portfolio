@@ -5,6 +5,7 @@ import { motion, useAnimation, AnimatePresence } from "framer-motion";
 import { Exo_2 } from 'next/font/google';
 import { travelData } from '../lib/travelData';
 import { getTripPhotos } from '../lib/photoData';
+import Footer from './Footer';
 
 const exo2 = Exo_2({
   subsets: ['latin'],
@@ -301,7 +302,7 @@ export default function Gallery() {
                 {/* Left Navigation Button */}
                 <button
                   onClick={handlePreviousPhoto}
-                  className="absolute left-4 z-10 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all duration-200 backdrop-blur-sm"
+                  className="absolute left-4 z-10 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all duration-200 backdrop-blur-sm cursor-pointer"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -309,52 +310,48 @@ export default function Gallery() {
                 </button>
 
                 {/* Main Photo */}
-                <motion.div
-                  key={currentPhotoIndex}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.3, ease: "easeOut" }}
-                  className="aspect-[4/3] w-full max-w-4xl bg-gradient-to-br from-gray-400/20 to-gray-600/20 rounded-lg flex items-center justify-center border border-white/20 relative overflow-hidden"
-                >
-                  <div className="text-center">
-                    <div className="text-6xl mb-4">📸</div>
-                    {(() => {
-                      const tripPhotos = getTripPhotos(selectedTrip.countryCode, selectedTrip.city, selectedTrip.visit.month, selectedTrip.visit.year);
-                      if (tripPhotos && tripPhotos.photos) {
-                        const currentPhoto = tripPhotos.photos[currentPhotoIndex];
-                        return (
-                          <>
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={currentPhotoIndex}
+                    initial={{ opacity: 0, x: 50 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -50 }}
+                    transition={{ duration: 0.4, ease: "easeInOut" }}
+                    className="aspect-[4/3] w-full max-w-4xl relative overflow-hidden"
+                  >
+                  {(() => {
+                    const tripPhotos = getTripPhotos(selectedTrip.countryCode, selectedTrip.city, selectedTrip.visit.month, selectedTrip.visit.year);
+                    if (tripPhotos && tripPhotos.photos) {
+                      const currentPhoto = tripPhotos.photos[currentPhotoIndex];
+                      return (
+                        <div className="w-full h-full flex items-center justify-center -mt-8">
+                          <img 
+                            src={`/${currentPhoto.filename}`}
+                            alt={currentPhoto.description}
+                            className="max-w-full max-h-[80%] object-contain rounded-lg"
+                          />
+                        </div>
+                      );
+                    } else {
+                      return (
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-400/20 to-gray-600/20 rounded-lg border border-white/20">
+                          <div className="text-center">
+                            <div className="text-6xl mb-4">📸</div>
                             <p className={`text-white/60 text-lg ${exo2.className}`}>
-                              Photo {currentPhotoIndex + 1} of {tripPhotos.photos.length}
+                              No photos available
                             </p>
-                            <div className="mt-4">
-                              <p className={`text-white/80 text-base ${exo2.className} mb-2`}>
-                                {currentPhoto.filename}
-                              </p>
-                              <p className={`text-white/60 text-sm ${exo2.className}`}>
-                                {currentPhoto.description}
-                              </p>
-                            </div>
-                          </>
-                        );
-                      } else {
-                        return (
-                          <p className={`text-white/60 text-lg ${exo2.className}`}>
-                            No photos available
-                          </p>
-                        );
-                      }
-                    })()}
-                    <p className={`text-white/40 text-sm ${exo2.className} mt-4`}>
-                      {selectedTrip.city} • {selectedTrip.visit.month} {selectedTrip.visit.year}
-                    </p>
-                  </div>
-                </motion.div>
+                          </div>
+                        </div>
+                      );
+                    }
+                  })()}
+                  </motion.div>
+                </AnimatePresence>
 
                 {/* Right Navigation Button */}
                 <button
                   onClick={handleNextPhoto}
-                  className="absolute right-4 z-10 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all duration-200 backdrop-blur-sm"
+                  className="absolute right-4 z-10 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all duration-200 backdrop-blur-sm cursor-pointer"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -410,6 +407,12 @@ export default function Gallery() {
           </motion.div>
         )}
       </AnimatePresence>
+      
+      {/* Spacing between gallery and footer */}
+      <div className="h-20"></div>
+      
+      {/* Footer */}
+      <Footer />
     </section>
   );
 } 

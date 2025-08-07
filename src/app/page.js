@@ -5,7 +5,6 @@ import Projects from "@/components/Projects";
 import Experience from "@/components/Experience";
 import TravelMap from "@/components/TravelMap";
 import Gallery from "@/components/Gallery";
-import Footer from "@/components/Footer";
 
 export default function Home() {
   useEffect(() => {
@@ -23,7 +22,6 @@ export default function Home() {
         <TravelMap />
         <Gallery />
       </main>
-      <Footer />
     </div>
   );
 }
