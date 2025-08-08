@@ -1,11 +1,25 @@
 // Add trips here
 export const photoData = {
-  "USA-SAN_FRANCISCO-2023-NOV": {
+  "GBR-LONDON-2025": {
+    tripInfo: {
+      country: "United Kingdom",
+      city: "London",
+      year: "2025"
+    },
+    photos: [
+      { id: 1, filename: "test.png", description: "London" },
+      { id: 2, filename: "alcatraz.jpg", description: "London" },
+      { id: 3, filename: "fishermans-wharf.jpg", description: "London" },
+      { id: 4, filename: "painted-ladies.jpg", description: "London" },
+      { id: 5, filename: "chinatown.jpg", description: "London" },
+      { id: 6, filename: "cable-car.jpg", description: "London" }
+    ]
+  },
+  "USA-SAN_FRANCISCO-2024": {
     tripInfo: {
       country: "United States",
       city: "San Francisco",
-      month: "Nov",
-      year: "2023"
+      year: "2024"
     },
     photos: [
       { id: 1, filename: "test.png", description: "Golden Gate Bridge" },
@@ -20,14 +34,13 @@ export const photoData = {
 };
 
 // Helper function to get trip identifier
-export const getTripId = (countryCode, city, month, year) => {
+export const getTripId = (countryCode, city, year) => {
   const cityKey = city.replace(/\s+/g, '_').toUpperCase();
-  const monthKey = month === "Present" ? "PRESENT" : month.toUpperCase();
-  return `${countryCode}-${cityKey}-${year}-${monthKey}`;
+  return `${countryCode}-${cityKey}-${year}`;
 };
 
 // Helper function to get photos for a specific trip
-export const getTripPhotos = (countryCode, city, month, year) => {
-  const tripId = getTripId(countryCode, city, month, year);
+export const getTripPhotos = (countryCode, city, year) => {
+  const tripId = getTripId(countryCode, city, year);
   return photoData[tripId] || null;
 }; 

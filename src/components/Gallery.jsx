@@ -65,14 +65,14 @@ export default function Gallery() {
   // Handle photo navigation
   const handlePreviousPhoto = () => {
     if (!selectedTrip) return;
-    const tripPhotos = getTripPhotos(selectedTrip.countryCode, selectedTrip.city, selectedTrip.visit.month, selectedTrip.visit.year);
+    const tripPhotos = getTripPhotos(selectedTrip.countryCode, selectedTrip.city, selectedTrip.visit.year);
     if (!tripPhotos || !tripPhotos.photos) return;
     setCurrentPhotoIndex((prev) => (prev === 0 ? tripPhotos.photos.length - 1 : prev - 1));
   };
 
   const handleNextPhoto = () => {
     if (!selectedTrip) return;
-    const tripPhotos = getTripPhotos(selectedTrip.countryCode, selectedTrip.city, selectedTrip.visit.month, selectedTrip.visit.year);
+    const tripPhotos = getTripPhotos(selectedTrip.countryCode, selectedTrip.city, selectedTrip.visit.year);
     if (!tripPhotos || !tripPhotos.photos) return;
     setCurrentPhotoIndex((prev) => (prev === tripPhotos.photos.length - 1 ? 0 : prev + 1));
   };
@@ -105,7 +105,7 @@ export default function Gallery() {
         Object.entries(country.cities).forEach(([cityName, visits]) => {
           visits.forEach((visit, visitIndex) => {
             // Check if this trip has photos in photoData
-            const tripPhotos = getTripPhotos(countryCode, cityName, visit.month, visit.year);
+            const tripPhotos = getTripPhotos(countryCode, cityName, visit.year);
             if (tripPhotos && tripPhotos.photos && tripPhotos.photos.length > 0) {
               items.push({
                 id: `${countryCode}-${cityName}-${visitIndex}`,
@@ -122,6 +122,14 @@ export default function Gallery() {
           });
         });
       }
+    });
+
+    // Sort items by date (newest first)
+    items.sort((a, b) => {
+      const aYear = parseInt(a.visit.year);
+      const bYear = parseInt(b.visit.year);
+      
+      return bYear - aYear; // Newest year first
     });
 
     return items;
@@ -152,7 +160,8 @@ export default function Gallery() {
       'Wellington': '🌊',
       'Queenstown': '🏔️',
       'Christchurch': '⛪',
-      'Rotorua': '♨️'
+      'Rotorua': '♨️',
+      'London': '⚽️'
     };
     return cityEmojis[cityName] || '📸';
   };
@@ -180,12 +189,13 @@ export default function Gallery() {
   const galleryItems = generateGalleryItems();
 
   return (
-    <section ref={sectionRef} id="gallery" className="py-20" style={{ background: 'linear-gradient(to bottom right, #0266B1, #033E7A, #E22716)' }}>
+    <>
+      <section ref={sectionRef} id="gallery" className="py-20" style={{ background: 'linear-gradient(to bottom right, #0266B1, #033E7A, #E22716)' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <motion.h2 
             className="text-6xl sm:text-8xl font-bold italic mb-4" 
-            style={{ color: '#C2DDDD' }}
+            style={{ color: '#b7e4f7' }}
             initial={{ scale: 0.8, opacity: 0 }}
             animate={controls}
             variants={{
@@ -246,9 +256,9 @@ export default function Gallery() {
                   <p className={`text-white/70 text-sm mb-2 ${exo2.className}`}>
                     {item.country}
                   </p>
-                  <p className={`text-white/60 text-xs ${exo2.className}`}>
-                    {item.visit.month} {item.visit.year}
-                  </p>
+                                      <p className={`text-white/60 text-xs ${exo2.className}`}>
+                      {item.visit.year}
+                    </p>
                 </div>
               </div>
             </motion.div>
@@ -283,7 +293,7 @@ export default function Gallery() {
                       {selectedTrip.city}
                     </h3>
                     <p className={`text-white/70 text-lg ${exo2.className}`}>
-                      {selectedTrip.country} • {selectedTrip.visit.month} {selectedTrip.visit.year}
+                      {selectedTrip.country} • {selectedTrip.visit.year}
                     </p>
                   </div>
                 </div>
@@ -320,7 +330,7 @@ export default function Gallery() {
                     className="aspect-[4/3] w-full max-w-4xl relative overflow-hidden"
                   >
                   {(() => {
-                    const tripPhotos = getTripPhotos(selectedTrip.countryCode, selectedTrip.city, selectedTrip.visit.month, selectedTrip.visit.year);
+                    const tripPhotos = getTripPhotos(selectedTrip.countryCode, selectedTrip.city, selectedTrip.visit.year);
                     if (tripPhotos && tripPhotos.photos) {
                       const currentPhoto = tripPhotos.photos[currentPhotoIndex];
                       return (
@@ -362,7 +372,7 @@ export default function Gallery() {
               {/* Photo Thumbnails */}
               <div className="flex justify-center gap-2 mb-6">
                 {(() => {
-                  const tripPhotos = getTripPhotos(selectedTrip.countryCode, selectedTrip.city, selectedTrip.visit.month, selectedTrip.visit.year);
+                  const tripPhotos = getTripPhotos(selectedTrip.countryCode, selectedTrip.city, selectedTrip.visit.year);
                   if (tripPhotos && tripPhotos.photos) {
                     return tripPhotos.photos.map((photo, index) => (
                       <button
@@ -408,11 +418,10 @@ export default function Gallery() {
         )}
       </AnimatePresence>
       
-      {/* Spacing between gallery and footer */}
-      <div className="h-20"></div>
-      
-      {/* Footer */}
-      <Footer />
     </section>
+    
+    {/* Footer */}
+    <Footer />
+  </>
   );
 } 

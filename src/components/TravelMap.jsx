@@ -700,7 +700,7 @@ export default function TravelMap() {
                               >
                                 <div className="w-1.5 h-1.5 bg-white/60 rounded-full flex-shrink-0"></div>
                                 <span className={`text-sm text-white/70 ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>
-                                  {date.month} {date.year}
+                                  {date.year}
                                 </span>
                               </motion.div>
                             ))}
