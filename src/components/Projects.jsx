@@ -28,7 +28,7 @@ export default function Projects() {
       technologies: ["React", "Node.js", "MongoDB", "Express", "Socket.io"],
       github: "https://github.com/keiranmistry/stubook",
       live: "https://stubook.vercel.app",
-      image: "/globe.svg",
+      image: "/projects/stubookmaster.png",
       screenshots: [
         { id: 1, filename: "stubook-1.png", description: "Homepage" },
         { id: 2, filename: "stubook-2.png", description: "Event Details" },
@@ -295,8 +295,8 @@ export default function Projects() {
                 visible: { opacity: 1, y: 0 }
               }}
               transition={{ 
-                duration: 0.6, 
-                delay: 0.4 + (index * 0.1),
+                duration: 0.4, 
+                delay: 0.2 + (index * 0.05),
                 ease: "easeOut"
               }}
               whileHover={{ 
@@ -307,11 +307,11 @@ export default function Projects() {
             >
               <div className={`aspect-square bg-gradient-to-br ${getGradientForProject(project.id)} flex flex-col relative overflow-hidden`}>
                 {/* Background Image */}
-                <div className="flex-1 flex items-center justify-center p-6">
+                <div className="absolute inset-0">
                   <img 
                     src={project.image} 
                     alt={project.title}
-                    className="w-full h-full object-contain max-w-24 max-h-24"
+                    className="w-full h-full object-cover opacity-90"
                   />
                 </div>
                 
