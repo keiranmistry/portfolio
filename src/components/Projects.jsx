@@ -23,7 +23,7 @@ export default function Projects() {
     {
       id: 1,
       title: "Stubook",
-      shortDescription: "Event booking platform",
+      shortDescription: "Cross-platform student productivity app",
       fullDescription: "A comprehensive event booking and management platform built with modern web technologies. Features include user authentication, event creation, ticket management, and real-time notifications.",
       technologies: ["React", "Node.js", "MongoDB", "Express", "Socket.io"],
       github: "https://github.com/keiranmistry/stubook",
