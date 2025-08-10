@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { motion, useAnimation, AnimatePresence } from "framer-motion";
 import { Exo_2 } from 'next/font/google';
 
@@ -18,8 +18,8 @@ export default function Projects() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
 
-  // Project data
-  const projects = [
+  // Memoize project data to prevent unnecessary re-renders
+  const projects = useMemo(() => [
     {
       id: 1,
       title: "Stubook",
@@ -148,10 +148,12 @@ export default function Projects() {
       team: "Solo project",
       role: "Frontend developer"
     }
-  ];
+  ], []);
 
-  // Intersection Observer for smooth animation trigger
+  // Optimized intersection observer with throttling
   useEffect(() => {
+    if (hasAnimated) return; // Prevent re-observation
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting && !hasAnimated) {
@@ -162,7 +164,7 @@ export default function Projects() {
       },
       {
         threshold: 0.1,
-        rootMargin: '0px 0px -200px 0px'
+        rootMargin: '0px 0px -100px 0px' // Reduced margin for better performance
       }
     );
 
@@ -177,48 +179,46 @@ export default function Projects() {
     };
   }, [controls, hasAnimated]);
 
-  // Handle project selection
-  const handleProjectClick = (project) => {
+  // Memoized event handlers to prevent unnecessary re-renders
+  const handleProjectClick = useCallback((project) => {
     setSelectedProject(project);
-    setCurrentPhotoIndex(0); // Reset photo index when opening modal
+    setCurrentPhotoIndex(0);
     setIsModalOpen(true);
-  };
+  }, []);
 
-  // Handle modal close
-  const handleCloseModal = () => {
+  const handleCloseModal = useCallback(() => {
     setIsModalOpen(false);
     setSelectedProject(null);
     setCurrentPhotoIndex(0);
-  };
+  }, []);
 
-  // Carousel navigation functions
-  const nextPhoto = () => {
+  const nextPhoto = useCallback(() => {
     if (selectedProject && selectedProject.screenshots) {
       setCurrentPhotoIndex((prev) => {
         const maxIndex = Math.max(0, selectedProject.screenshots.length - 2);
         return prev >= maxIndex ? 0 : prev + 2;
       });
     }
-  };
+  }, [selectedProject]);
 
-  const prevPhoto = () => {
+  const prevPhoto = useCallback(() => {
     if (selectedProject && selectedProject.screenshots) {
       setCurrentPhotoIndex((prev) => {
         const maxIndex = Math.max(0, selectedProject.screenshots.length - 2);
         return prev <= 0 ? maxIndex : prev - 2;
       });
     }
-  };
+  }, [selectedProject]);
 
-  const goToPhoto = (index) => {
+  const goToPhoto = useCallback((index) => {
     setCurrentPhotoIndex(index);
-  };
+  }, []);
 
-  // Handle keyboard navigation
+  // Optimized keyboard navigation
   useEffect(() => {
+    if (!isModalOpen) return;
+    
     const handleKeyDown = (e) => {
-      if (!isModalOpen) return;
-      
       if (e.key === 'Escape') {
         handleCloseModal();
       }
@@ -226,10 +226,10 @@ export default function Projects() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isModalOpen]);
+  }, [isModalOpen, handleCloseModal]);
 
-  // Get gradient for project
-  const getGradientForProject = (projectId) => {
+  // Memoized gradient function
+  const getGradientForProject = useCallback((projectId) => {
     const gradients = [
       'from-blue-400/20 to-purple-500/20',
       'from-green-400/20 to-blue-500/20',
@@ -240,6 +240,29 @@ export default function Projects() {
     
     const index = projectId % gradients.length;
     return gradients[index];
+  }, []);
+
+  // Simplified animation variants for better performance
+  const containerVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { 
+        duration: 0.4,
+        staggerChildren: 0.1,
+        ease: "easeOut"
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { duration: 0.3, ease: "easeOut" }
+    }
   };
 
   return (
@@ -258,14 +281,10 @@ export default function Projects() {
             animate={controls}
             variants={{
               visible: { 
-                scale: [0.8, 1.1, 1], 
-                opacity: 1 
+                scale: 1, 
+                opacity: 1,
+                transition: { duration: 0.5, ease: "easeOut" }
               }
-            }}
-            transition={{ 
-              duration: 0.6, 
-              ease: "easeOut",
-              delay: 0.1
             }}
           >
             <em>projects</em>
@@ -274,44 +293,29 @@ export default function Projects() {
         
         <motion.div 
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-          initial={{ opacity: 0, y: 50 }}
+          variants={containerVariants}
+          initial="hidden"
           animate={controls}
-          variants={{
-            visible: { opacity: 1, y: 0 }
-          }}
-          transition={{ 
-            duration: 0.8, 
-            ease: "easeOut",
-            delay: 0.3
-          }}
         >
-          {projects.map((project, index) => (
+          {projects.map((project) => (
             <motion.div
               key={project.id}
-              className="backdrop-blur-xl bg-white/5 border border-white/20 shadow-2xl rounded-2xl overflow-hidden cursor-pointer hover:bg-white/10 transition-all duration-300"
-              initial={{ opacity: 0, y: 30 }}
-              animate={controls}
-              variants={{
-                visible: { opacity: 1, y: 0 }
-              }}
-              transition={{ 
-                duration: 0.4, 
-                delay: 0.2 + (index * 0.05),
-                ease: "easeOut"
-              }}
+              className="backdrop-blur-sm bg-white/5 border border-white/20 shadow-xl rounded-2xl overflow-hidden cursor-pointer hover:bg-white/10 transition-all duration-200"
+              variants={itemVariants}
               whileHover={{ 
-                scale: 1.02,
-                transition: { duration: 0.15, ease: "easeOut" }
+                scale: 1.01,
+                transition: { duration: 0.1, ease: "easeOut" }
               }}
               onClick={() => handleProjectClick(project)}
             >
               <div className={`aspect-square bg-gradient-to-br ${getGradientForProject(project.id)} flex flex-col relative overflow-hidden`}>
-                {/* Background Image */}
+                {/* Background Image with lazy loading */}
                 <div className="absolute inset-0">
                   <img 
                     src={project.image} 
                     alt={project.title}
                     className="w-full h-full object-cover opacity-90"
+                    loading="lazy"
                   />
                 </div>
                 
@@ -330,22 +334,22 @@ export default function Projects() {
         </motion.div>
       </div>
 
-      {/* Project Details Modal */}
+      {/* Project Details Modal - Only render when open */}
       <AnimatePresence>
         {isModalOpen && selectedProject && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/20 backdrop-blur-xl z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center p-4"
             onClick={handleCloseModal}
           >
             <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
+              initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
-              className="relative bg-white/10 backdrop-blur-md border border-white/30 rounded-2xl p-8 max-w-6xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar"
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="relative bg-white/10 backdrop-blur-sm border border-white/30 rounded-2xl p-8 max-w-6xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar"
               style={{
                 scrollbarWidth: 'thin',
                 scrollbarColor: 'rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.1)'
@@ -398,8 +402,6 @@ export default function Projects() {
                 </p>
               </div>
 
-
-
               {/* Features */}
               <div className="mt-6">
                 <h4 className={`text-lg font-semibold text-white mb-3 ${exo2.className}`}>
@@ -436,6 +438,7 @@ export default function Projects() {
                               src={`/${selectedProject.screenshots[currentPhotoIndex].filename}`}
                               alt={selectedProject.screenshots[currentPhotoIndex].description}
                               className="w-full h-full object-cover"
+                              loading="lazy"
                               onError={(e) => {
                                 e.target.style.display = 'none';
                                 e.target.nextSibling.style.display = 'flex';
@@ -453,6 +456,7 @@ export default function Projects() {
                                 src={`/${selectedProject.screenshots[currentPhotoIndex + 1].filename}`}
                                 alt={selectedProject.screenshots[currentPhotoIndex + 1].description}
                                 className="w-full h-full object-cover"
+                                loading="lazy"
                                 onError={(e) => {
                                   e.target.style.display = 'none';
                                   e.target.nextSibling.style.display = 'flex';
@@ -490,8 +494,6 @@ export default function Projects() {
                     )}
                   </div>
                   
-
-                  
                   {/* Dots Navigation */}
                   {selectedProject.screenshots && selectedProject.screenshots.length > 2 && (
                     <div className="flex justify-center gap-2">
@@ -508,8 +510,6 @@ export default function Projects() {
                   )}
                 </div>
               </div>
-
-
             </motion.div>
           </motion.div>
         )}

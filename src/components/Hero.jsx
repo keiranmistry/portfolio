@@ -4,14 +4,14 @@ import { Barlow } from 'next/font/google';
 
 const barlow = Barlow({
   subsets: ['latin'],
-  weight: ['400', '700'], // or just '700' if you only want bold
+  weight: ['400', '700'],
 });
 
 import { Exo_2 } from 'next/font/google';
 
 const exo2 = Exo_2({
   subsets: ['latin'],
-  weight: ['400', '600', '700', '900'], // choose the weights you want
+  weight: ['400', '600', '700', '900'],
   display: 'swap',
 });
 
@@ -21,7 +21,7 @@ export default function Hero() {
       id="home"
       className="relative min-h-screen flex items-center justify-center bg-[#191A1A] overflow-hidden"
     >
-      {/* Animated BMW M stripes */}
+      {/* Optimized BMW M stripes with reduced blur and better performance */}
       <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none select-none">
         {/* M Blue Stripe */}
         <div className="m-stripe m-stripe-blue animate-m-stripe-slide" />
@@ -30,51 +30,34 @@ export default function Hero() {
         {/* M Red Stripe */}
         <div className="m-stripe m-stripe-red animate-m-stripe-slide delay-300" />
       </div>
+      
       {/* Hero Content */}
       <div className="relative z-10 flex flex-col items-center justify-center w-full px-4 py-24">
         <h1
           className={`text-7xl sm:text-9xl font-extrabold tracking-tight text-center flex flex-wrap justify-center gap-x-7 ${barlow.className}`}
-          style={{
-            letterSpacing: '-0.01em',
-          }}
+          style={{ letterSpacing: '-0.01em' }}
         >
-          <span
-            className="split-left"
-            style={{
-              color: '#fff',
-              backgroundClip: undefined,
-              WebkitBackgroundClip: undefined,
-              textShadow: undefined,
-              display: 'inline-block',
-            }}
-          >
+          <span className="split-left text-white">
             <em>Keiran</em>
           </span>
-          <span
-            className="split-right"
-            style={{
-              color: '#fff',
-              backgroundClip: undefined,
-              WebkitBackgroundClip: undefined,
-              textShadow: undefined,
-              display: 'inline-block',
-            }}
-          >
+          <span className="split-right text-white">
             <em>Mistry</em>
           </span>
         </h1>
+        
         <p className="mt-6 text-lg sm:text-2xl text-white/90 text-center font-medium max-w-2xl slide-up-in">
           <strong className={`${exo2.className}`} style={{ color: '#A2D6F9' }}>
             Data Science at the <a href="https://uwaterloo.ca/" target="_blank" rel="noopener noreferrer" className="hover:text-[#fbb13c] transition-colors">University of Waterloo</a>
           </strong>
         </p>
+        
         {/* Glassmorphism Social Buttons */}
         <div className="mt-10 flex flex-col sm:flex-row gap-4 items-center">
           <a
             href="https://www.linkedin.com/in/keiranmistry/"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-8 py-3 rounded-lg backdrop-blur-md bg-white/10 border border-white/30 shadow-lg text-[#A2D6F9] font-bold text-lg transition-all transition-transform duration-400 active:scale-95 hover:scale-105 hover:bg-white/20 hover:text-white hover:border-white/15 hover:shadow focus:outline-none focus:none focus:ring-[#A2D6F9] hover:backdrop-blur-sm animate-pop-up btn-delay-1"
+            className="inline-flex items-center gap-2 px-8 py-3 rounded-lg backdrop-blur-sm bg-white/10 border border-white/30 shadow-lg text-[#A2D6F9] font-bold text-lg transition-all duration-300 active:scale-95 hover:scale-105 hover:bg-white/20 hover:text-white hover:border-white/15 hover:shadow focus:outline-none focus:ring-[#A2D6F9] hover:backdrop-blur-sm animate-pop-up btn-delay-1"
           >
             {/* LinkedIn SVG Icon */}
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24" className="inline-block align-middle">
@@ -82,11 +65,12 @@ export default function Hero() {
             </svg>
             LinkedIn
           </a>
+          
           <a
             href="https://github.com/keiranmistry"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-8 py-3 rounded-lg backdrop-blur-md bg-white/10 border border-white/30 shadow-lg text-[#A2D6F9] font-bold text-lg transition-all transition-transform duration-400 active:scale-95 hover:scale-105 hover:bg-white/20 hover:text-white hover:border-white/15 hover:shadow focus:outline-none focus:none focus:ring-[#A2D6F9] hover:backdrop-blur-sm animate-pop-up btn-delay-2"
+            className="inline-flex items-center gap-2 px-8 py-3 rounded-lg backdrop-blur-sm bg-white/10 border border-white/30 shadow-lg text-[#A2D6F9] font-bold text-lg transition-all duration-300 active:scale-95 hover:scale-105 hover:bg-white/20 hover:text-white hover:border-white/15 hover:shadow focus:outline-none focus:ring-[#A2D6F9] hover:backdrop-blur-sm animate-pop-up btn-delay-2"
           >
             {/* GitHub SVG Icon */}
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24" className="inline-block align-middle">
@@ -94,19 +78,21 @@ export default function Hero() {
             </svg>
             GitHub
           </a>
+          
           <a
             href="mailto:k3mistry@uwaterloo.ca"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-8 py-3 rounded-lg backdrop-blur-md bg-white/10 border border-white/30 shadow-lg text-[#A2D6F9] font-bold text-lg transition-all transition-transform duration-400 active:scale-95 hover:scale-105 hover:bg-white/20 hover:text-white hover:border-white/15 hover:shadow focus:outline-none focus:none focus:ring-[#A2D6F9] hover:backdrop-blur-sm animate-pop-up btn-delay-3"
+            className="inline-flex items-center gap-2 px-8 py-3 rounded-lg backdrop-blur-sm bg-white/10 border border-white/30 shadow-lg text-[#A2D6F9] font-bold text-lg transition-all duration-300 active:scale-95 hover:scale-105 hover:bg-white/20 hover:text-white hover:border-white/15 hover:shadow focus:outline-none focus:ring-[#A2D6F9] hover:backdrop-blur-sm animate-pop-up btn-delay-3"
           >
-            {/* GitHub SVG Icon */}
+            {/* Email SVG Icon */}
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24" className="inline-block align-middle">
               <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 2v.01L12 13 4 6.01V6h16zM4 18V8l8 5 8-5v10H4z"/>
             </svg>
             Email
           </a>
         </div>
+        
         {/* Downward Chevron Arrow to Projects */}
         <a
           href="#projects"
@@ -138,8 +124,9 @@ export default function Hero() {
           </svg>
         </a>
       </div>
-      {/* BMW M stripes CSS and split text animation */}
-      <style>{`
+      
+      {/* Optimized BMW M stripes CSS and animations */}
+      <style jsx>{`
         .m-stripe {
           position: absolute;
           top: 0;
@@ -153,7 +140,8 @@ export default function Hero() {
           opacity: 0.85;
           transform: rotate(-24deg) scale(1.2);
           transition: filter 0.3s;
-          filter: blur(0.5px) brightness(0.95);
+          filter: blur(0.3px) brightness(0.95);
+          will-change: transform, filter;
         }
         .m-stripe-blue {
           background: linear-gradient(90deg, #009ADA 38%, #003264 100%);
@@ -171,78 +159,72 @@ export default function Hero() {
           z-index: 3;
         }
         .animate-m-stripe-slide {
-          animation: m-stripe-slide-in 1.2s cubic-bezier(0.77,0,0.175,1) both;
+          animation: m-stripe-slide-in 1s cubic-bezier(0.77,0,0.175,1) both;
         }
         .animate-m-stripe-slide:hover {
-          filter: brightness(1.15) drop-shadow(0 0 16px #fff8);
+          filter: brightness(1.1) drop-shadow(0 0 8px #fff4);
         }
         .delay-150 { animation-delay: 0.15s; }
         .delay-300 { animation-delay: 0.3s; }
         @keyframes m-stripe-slide-in {
-          0% { transform: rotate(-24deg) scale(1.2) translateY(-80%) scaleX(0.7); opacity: 0; }
+          0% { transform: rotate(-24deg) scale(1.2) translateY(-60%) scaleX(0.8); opacity: 0; }
           60% { opacity: 1; }
           100% { transform: rotate(-24deg) scale(1.2); opacity: 0.85; }
         }
         .split-left {
-          animation: splitLeftIn 1s cubic-bezier(0.77,0,0.175,1) 0.2s both;
+          animation: splitLeftIn 0.8s cubic-bezier(0.77,0,0.175,1) 0.2s both;
         }
         .split-right {
-          animation: splitRightIn 1s cubic-bezier(0.77,0,0.175,1) 0.2s both;
+          animation: splitRightIn 0.8s cubic-bezier(0.77,0,0.175,1) 0.2s both;
         }
         @keyframes splitLeftIn {
-          0% { opacity: 0; transform: translateX(-80%) scale(0.8); }
+          0% { opacity: 0; transform: translateX(-60%) scale(0.9); }
           60% { opacity: 1; }
-          80% { opacity: 1; transform: translateX(0) scale(1.04); }
+          80% { opacity: 1; transform: translateX(0) scale(1.02); }
           100% { opacity: 1; transform: translateX(0) scale(1); }
         }
         @keyframes splitRightIn {
-          0% { opacity: 0; transform: translateX(80%) scale(0.8); }
+          0% { opacity: 0; transform: translateX(60%) scale(0.9); }
           60% { opacity: 1; }
-          80% { opacity: 1; transform: translateX(0) scale(1.04); }
+          80% { opacity: 1; transform: translateX(0) scale(1.02); }
           100% { opacity: 1; transform: translateX(0) scale(1); }
         }
         .slide-up-in {
-          animation: slideUpIn 1s cubic-bezier(0.77,0,0.175,1) 1.3s both;
+          animation: slideUpIn 0.8s cubic-bezier(0.77,0,0.175,1) 1.1s both;
         }
         @keyframes slideUpIn {
-          0% { opacity: 0; transform: translateY(60%) scale(0.92); }
+          0% { opacity: 0; transform: translateY(40%) scale(0.95); }
           60% { opacity: 1; }
-          80% { opacity: 1; transform: translateY(0) scale(1.04); }
+          80% { opacity: 1; transform: translateY(0) scale(1.02); }
           100% { opacity: 1; transform: translateY(0) scale(1); }
         }
         @keyframes popUp {
-          0% { opacity: 0; transform: translateY(40%) scale(0.92); }
+          0% { opacity: 0; transform: translateY(30%) scale(0.95); }
           60% { opacity: 1; }
-          80% { opacity: 1; transform: translateY(0) scale(1.08); }
+          80% { opacity: 1; transform: translateY(0) scale(1.05); }
           100% { opacity: 1; transform: translateY(0) scale(1); }
         }
         .animate-pop-up {
-          animation: popUp 0.8s cubic-bezier(0.77,0,0.175,1) both;
+          animation: popUp 0.6s cubic-bezier(0.77,0,0.175,1) both;
         }
-        .btn-delay-1 { animation-delay: 2.2s; }
-        .btn-delay-2 { animation-delay: 2.35s; }
-        .btn-delay-3 { animation-delay: 2.5s; }
+        .btn-delay-1 { animation-delay: 1.8s; }
+        .btn-delay-2 { animation-delay: 1.9s; }
+        .btn-delay-3 { animation-delay: 2.0s; }
         @keyframes bounceSlow {
           0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(18px); }
+          50% { transform: translateY(12px); }
         }
         .animate-bounce-slow {
-          animation: bounceSlow 1.8s infinite;
-        }
-        .chevron-delay { animation-delay: 5s !important; }
-        .chevron-fade-in {
-          opacity: 0;
-          animation: chevronFadeIn 0.6s ease forwards;
-          animation-delay: 4s;
-        }
-        @keyframes chevronFadeIn {
-          to { opacity: 1; }
+          animation: bounceSlow 1.5s infinite;
         }
         .chevron-appear-bounce {
           opacity: 0;
           animation:
-            chevronFadeIn 0.6s ease forwards 4s,
-            bounceSlow 1.8s infinite 5s;
+            chevronFadeIn 0.5s ease forwards 3.5s,
+            bounceSlow 1.5s infinite 4s;
+        }
+        @keyframes chevronFadeIn {
+          to { opacity: 1; }
         }
         html {
           scroll-behavior: smooth;
