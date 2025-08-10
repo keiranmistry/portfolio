@@ -52,7 +52,7 @@ export const travelData = {
     name: "Dominican Republic",
     flag: "DO",
     cities: {
-      "Santa Domingo": [
+      "Santo Domingo": [
         { year: "2016" }
       ]
     }

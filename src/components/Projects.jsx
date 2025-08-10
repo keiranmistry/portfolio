@@ -49,11 +49,11 @@ export default function Projects() {
     {
       id: 2,
       title: "HDI vs. Happiness Analysis",
-      shortDescription: "Data analysis project",
+      shortDescription: "Statistical analysis of HDI vs. happiness scores",
       fullDescription: "Statistical analysis exploring the relationship between Human Development Index (HDI) and happiness scores across countries. Utilized advanced statistical methods and data visualization techniques.",
       technologies: ["Python", "Pandas", "NumPy", "Matplotlib", "Seaborn", "Jupyter"],
       github: "https://github.com/keiranmistry/hdi-happiness-analysis",
-      image: "/api/placeholder/400/250",
+      image: "/projects/hdimaster.png",
       screenshots: [
         { id: 1, filename: "hdi-1.png", description: "Correlation Analysis" },
         { id: 2, filename: "hdi-2.png", description: "Regression Results" },
@@ -99,7 +99,7 @@ export default function Projects() {
     {
       id: 4,
       title: "Soccer Tiki Taka Toe",
-      shortDescription: "Soccer-themed Tic-tac-toe",
+      shortDescription: "Soccer-themed tic-tac-toe game",
       fullDescription: "A fun twist on the classic Tic-tac-toe game with soccer themes and animations. Features multiple game modes and responsive design.",
       technologies: ["React", "CSS3", "JavaScript", "Framer Motion"],
       github: "https://github.com/keiranmistry/soccer-tiki-taka-toe",
@@ -130,7 +130,7 @@ export default function Projects() {
       technologies: ["Next.js", "Tailwind CSS", "Framer Motion", "shadcn/ui"],
       github: "https://github.com/keiranmistry/portfolio",
       live: "https://keiranmistry.vercel.app",
-      image: "/api/placeholder/400/250",
+      image: "/projects/portfoliomaster.png",
       screenshots: [
         { id: 1, filename: "portfolio-1.png", description: "Homepage" },
         { id: 2, filename: "portfolio-2.png", description: "Projects" },
@@ -300,7 +300,7 @@ export default function Projects() {
           {projects.map((project) => (
             <motion.div
               key={project.id}
-              className="backdrop-blur-sm bg-white/5 border border-white/20 shadow-xl rounded-2xl overflow-hidden cursor-pointer hover:bg-white/10 transition-all duration-200"
+              className="backdrop-blur-lg bg-white/5 border border-white/20 shadow-xl rounded-2xl overflow-hidden cursor-pointer hover:bg-white/10 transition-all duration-200"
               variants={itemVariants}
               whileHover={{ 
                 scale: 1.01,
@@ -341,7 +341,7 @@ export default function Projects() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/20 backdrop-blur-lg z-50 flex items-center justify-center p-4"
             onClick={handleCloseModal}
           >
             <motion.div
@@ -349,7 +349,7 @@ export default function Projects() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="relative bg-white/10 backdrop-blur-sm border border-white/30 rounded-2xl p-8 max-w-6xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar"
+              className="relative bg-white/10 backdrop-blur-lg border border-white/30 rounded-2xl p-8 max-w-6xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar"
               style={{
                 scrollbarWidth: 'thin',
                 scrollbarColor: 'rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.1)'
