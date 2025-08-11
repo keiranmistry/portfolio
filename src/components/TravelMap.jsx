@@ -161,14 +161,35 @@ export default function TravelMap() {
   useEffect(() => {
     function handleResize() {
       if (mapContainerRef.current) {
-        const width = Math.min(mapContainerRef.current.offsetWidth, 1000);
-        const height = Math.round(width * 0.6);
-        setDimensions({ width, height });
+        const containerWidth = mapContainerRef.current.offsetWidth;
+        const containerHeight = Math.round(containerWidth * 0.6);
+        
+        // Ensure dimensions don't exceed container bounds
+        const maxWidth = Math.min(containerWidth, 1000);
+        const maxHeight = Math.min(containerHeight, 600);
+        
+        setDimensions({ 
+          width: maxWidth, 
+          height: maxHeight 
+        });
       }
     }
+    
+    // Initial resize
     handleResize();
+    
+    // Add resize listener
     window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    
+    // Add orientation change listener for mobile
+    window.addEventListener("orientationchange", () => {
+      setTimeout(handleResize, 100); // Delay to allow orientation change to complete
+    });
+    
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("orientationchange", handleResize);
+    };
   }, []);
 
   // Projection for tooltip placement
@@ -414,7 +435,12 @@ export default function TravelMap() {
               backdropFilter: 'blur(20px)',
               WebkitBackdropFilter: 'blur(20px)',
               border: '1px solid rgba(255, 255, 255, 0.2)',
-              boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)'
+              boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
+              // Mobile-specific styles
+              touchAction: 'pan-x pan-y pinch-zoom',
+              userSelect: 'none',
+              WebkitUserSelect: 'none',
+              WebkitTouchCallout: 'none'
             }}
             initial={{ opacity: 0, y: 50 }}
             animate={controls}
@@ -426,6 +452,7 @@ export default function TravelMap() {
               ease: "easeOut",
               delay: 0.25
             }}
+            ref={mapContainerRef}
           >
             <div className="absolute z-20 top-4 right-2 flex flex-col gap-2">
               <button
@@ -489,11 +516,13 @@ export default function TravelMap() {
             </div>
             <ComposableMap
               projectionConfig={{ scale: 160 }}
-              width={1000}
-              height={600}
+              width={dimensions.width}
+              height={dimensions.height}
               style={{ 
                 width: "100%", 
-                height: "100%"
+                height: "100%",
+                maxWidth: "100%",
+                maxHeight: "100%"
               }}
             >
               <ZoomableGroup
@@ -505,6 +534,11 @@ export default function TravelMap() {
                   setZoom(zoom);
                   setCenter(coordinates);
                 }}
+                // Add touch support for mobile
+                translateExtent={[
+                  [-dimensions.width / 2, -dimensions.height / 2],
+                  [dimensions.width / 2, dimensions.height / 2]
+                ]}
               >
                 <Geographies geography={geoUrl}>
                   {({ geographies }) =>
@@ -524,13 +558,21 @@ export default function TravelMap() {
                             setHoveredCountry(null);
                             setHoveredCentroid(null);
                           } : undefined}
-                                                                                onClick={() => {
-                              console.log('Clicked country:', code, 'Name:', geo.properties.name);
-                              if (geo.properties.name && (geo.properties.name.includes('Azerbaijan') || geo.properties.name.includes('azerbaijan'))) {
-                                console.log('Azerbaijan clicked - Full properties:', geo.properties);
-                              }
-                              handleCountryClick(code);
-                            }}
+                          onTouchStart={isVisited ? () => {
+                            setHoveredCountry(code);
+                            setHoveredCentroid(getCentroid(geo));
+                          } : undefined}
+                          onTouchEnd={isVisited ? () => {
+                            setHoveredCountry(null);
+                            setHoveredCentroid(null);
+                          } : undefined}
+                          onClick={() => {
+                            console.log('Clicked country:', code, 'Name:', geo.properties.name);
+                            if (geo.properties.name && (geo.properties.name.includes('Azerbaijan') || geo.properties.name.includes('azerbaijan'))) {
+                              console.log('Azerbaijan clicked - Full properties:', geo.properties);
+                            }
+                            handleCountryClick(code);
+                          }}
                           style={{
                             default: {
                               fill: isVisited ? visitedCountries[code].color : "rgba(224, 251, 252, 0.3)",
@@ -552,7 +594,9 @@ export default function TravelMap() {
                               outline: "none"
                             }
                           }}
-                          tabIndex={-1}
+                          tabIndex={0}
+                          role="button"
+                          aria-label={`${geo.properties.name || 'Country'}`}
                         />
                       );
                     })

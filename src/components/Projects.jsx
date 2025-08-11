@@ -12,6 +12,7 @@ const exo2 = Exo_2({
 export default function Projects() {
   const sectionRef = useRef(null);
   const controls = useAnimation();
+  const resizeTimeout = useRef(null);
   const [isInView, setIsInView] = useState(false);
   const [hasAnimated, setHasAnimated] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
@@ -24,27 +25,28 @@ export default function Projects() {
       id: 1,
       title: "Stubook",
       shortDescription: "Cross-platform student productivity app",
-      fullDescription: "A comprehensive event booking and management platform built with modern web technologies. Features include user authentication, event creation, ticket management, and real-time notifications.",
-      technologies: ["React", "Node.js", "MongoDB", "Express", "Socket.io"],
+      fullDescription: "A cross-platform student productivity app to house all the tools a student needs. Built as a modern alternative for outdated school portals.",
+      technologies: ["Flutter", "Dart", "Hive", "Figma"],
       github: "https://github.com/keiranmistry/stubook",
       live: "https://stubook.vercel.app",
-      image: "/projects/stubookmaster.png",
+      image: "/projects/stubook/stubookmaster.png",
       screenshots: [
-        { id: 1, filename: "stubook-1.png", description: "Homepage" },
-        { id: 2, filename: "stubook-2.png", description: "Event Details" },
-        { id: 3, filename: "stubook-3.png", description: "Booking Flow" }
+        { id: 1, filename: "/projects/stubook/home.PNG", description: "Homepage" },
+        { id: 2, filename: "/projects/stubook/assessments.PNG", description: "Grades Editor" },
+        { id: 3, filename: "/projects/stubook/marks.PNG", description: "Marks" },
+        { id: 4, filename: "/projects/stubook/calendar.PNG", description: "Calendar" },
+        { id: 5, filename: "/projects/stubook/todo.PNG", description: "To-do List" }
       ],
       features: [
-        "User authentication and authorization",
-        "Event creation and management",
-        "Real-time ticket booking",
-        "Payment integration",
-        "Email notifications",
-        "Admin dashboard"
-      ],
-      duration: "3 months",
-      team: "Solo project",
-      role: "Full-stack developer"
+        "Cross-platform app iOS/Android app",
+        "100+ downloads with a 5-star rating",
+        "Streamline daily study routines",
+        "Interactive calendar and to-do list",
+        "Dynamic grades calculator",
+        "Store past course history",
+        "Local data storage using Hive",
+        "UI created in Figma"
+      ]
     },
     {
       id: 2,
@@ -53,11 +55,11 @@ export default function Projects() {
       fullDescription: "Statistical analysis exploring the relationship between Human Development Index (HDI) and happiness scores across countries. Utilized advanced statistical methods and data visualization techniques.",
       technologies: ["Python", "Pandas", "NumPy", "Matplotlib", "Seaborn", "Jupyter"],
       github: "https://github.com/keiranmistry/hdi-happiness-analysis",
-      image: "/projects/hdimaster.png",
+      image: "/projects/hdi/hdimaster.png",
       screenshots: [
-        { id: 1, filename: "hdi-1.png", description: "Correlation Analysis" },
-        { id: 2, filename: "hdi-2.png", description: "Regression Results" },
-        { id: 3, filename: "hdi-3.png", description: "Visualization Dashboard" }
+        { id: 1, filename: "https://via.placeholder.com/400x300/1e40af/ffffff?text=Correlation+Analysis", description: "Correlation Analysis" },
+        { id: 2, filename: "https://via.placeholder.com/400x300/1e40af/ffffff?text=Regression+Results", description: "Regression Results" },
+        { id: 3, filename: "https://via.placeholder.com/400x300/1e40af/ffffff?text=Visualization+Dashboard", description: "Visualization Dashboard" }
       ],
       features: [
         "Data cleaning and preprocessing",
@@ -78,11 +80,11 @@ export default function Projects() {
       technologies: ["Next.js", "TypeScript", "Tailwind CSS", "PostgreSQL", "Vercel"],
       github: "https://github.com/keiranmistry/tracksite",
       live: "https://tracksite.vercel.app",
-      image: "/api/placeholder/400/250",
+      image: "https://via.placeholder.com/400x250/1e40af/ffffff?text=TrackSite",
       screenshots: [
-        { id: 1, filename: "tracksite-1.png", description: "Dashboard" },
-        { id: 2, filename: "tracksite-2.png", description: "Analytics" },
-        { id: 3, filename: "tracksite-3.png", description: "Settings" }
+        { id: 1, filename: "https://via.placeholder.com/400x300/1e40af/ffffff?text=Dashboard", description: "Dashboard" },
+        { id: 2, filename: "https://via.placeholder.com/400x300/1e40af/ffffff?text=Analytics", description: "Analytics" },
+        { id: 3, filename: "https://via.placeholder.com/400x300/1e40af/ffffff?text=Settings", description: "Settings" }
       ],
       features: [
         "Real-time website monitoring",
@@ -104,11 +106,11 @@ export default function Projects() {
       technologies: ["React", "CSS3", "JavaScript", "Framer Motion"],
       github: "https://github.com/keiranmistry/soccer-tiki-taka-toe",
       live: "https://soccer-tiki-taka-toe.vercel.app",
-      image: "/api/placeholder/400/250",
+      image: "https://via.placeholder.com/400x250/1e40af/ffffff?text=Soccer+Tiki+Taka+Toe",
       screenshots: [
-        { id: 1, filename: "soccer-1.png", description: "Game Board" },
-        { id: 2, filename: "soccer-2.png", description: "Victory Screen" },
-        { id: 3, filename: "soccer-3.png", description: "Settings" }
+        { id: 1, filename: "https://via.placeholder.com/400x300/1e40af/ffffff?text=Game+Board", description: "Game Board" },
+        { id: 2, filename: "https://via.placeholder.com/400x300/1e40af/ffffff?text=Victory+Screen", description: "Victory Screen" },
+        { id: 3, filename: "https://via.placeholder.com/400x300/1e40af/ffffff?text=Settings", description: "Settings" }
       ],
       features: [
         "Multiple game modes",
@@ -130,7 +132,7 @@ export default function Projects() {
       technologies: ["Next.js", "Tailwind CSS", "Framer Motion", "shadcn/ui"],
       github: "https://github.com/keiranmistry/portfolio",
       live: "https://keiranmistry.vercel.app",
-      image: "/projects/portfoliomaster.png",
+      image: "/projects/portfolio/portfoliomaster.png",
       screenshots: [
         { id: 1, filename: "portfolio-1.png", description: "Homepage" },
         { id: 2, filename: "portfolio-2.png", description: "Projects" },
@@ -189,29 +191,6 @@ export default function Projects() {
   const handleCloseModal = useCallback(() => {
     setIsModalOpen(false);
     setSelectedProject(null);
-    setCurrentPhotoIndex(0);
-  }, []);
-
-  const nextPhoto = useCallback(() => {
-    if (selectedProject && selectedProject.screenshots) {
-      setCurrentPhotoIndex((prev) => {
-        const maxIndex = Math.max(0, selectedProject.screenshots.length - 2);
-        return prev >= maxIndex ? 0 : prev + 2;
-      });
-    }
-  }, [selectedProject]);
-
-  const prevPhoto = useCallback(() => {
-    if (selectedProject && selectedProject.screenshots) {
-      setCurrentPhotoIndex((prev) => {
-        const maxIndex = Math.max(0, selectedProject.screenshots.length - 2);
-        return prev <= 0 ? maxIndex : prev - 2;
-      });
-    }
-  }, [selectedProject]);
-
-  const goToPhoto = useCallback((index) => {
-    setCurrentPhotoIndex(index);
   }, []);
 
   // Optimized keyboard navigation
@@ -264,6 +243,43 @@ export default function Projects() {
       transition: { duration: 0.3, ease: "easeOut" }
     }
   };
+
+  const getImagesPerSlide = useCallback(() => {
+    // Determine the number of images to display per slide based on screen size
+    if (typeof window !== 'undefined') {
+      if (window.innerWidth < 768) return 1; // Mobile
+      if (window.innerWidth < 1024) return 2; // Tablet
+      return 3; // Desktop
+    }
+    return 2; // Default fallback
+  }, []);
+
+  // Memoize the current images per slide to prevent recalculations
+  const currentImagesPerSlide = useMemo(() => getImagesPerSlide(), [getImagesPerSlide]);
+
+  // Handle window resize to update images per slide
+  useEffect(() => {
+    const handleResize = () => {
+      // Debounce resize events to prevent excessive updates
+      clearTimeout(resizeTimeout.current);
+      resizeTimeout.current = setTimeout(() => {
+        // Only update if the images per slide actually changed
+        const newImagesPerSlide = getImagesPerSlide();
+        if (newImagesPerSlide !== currentImagesPerSlide) {
+          // Reset to first slide when layout changes
+          setCurrentPhotoIndex(0);
+        }
+      }, 150);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (resizeTimeout.current) {
+        clearTimeout(resizeTimeout.current);
+      }
+    };
+  }, [getImagesPerSlide, currentImagesPerSlide]);
 
   return (
     <section ref={sectionRef} id="projects" className="py-20" style={{ 
@@ -405,7 +421,7 @@ export default function Projects() {
               {/* Features */}
               <div className="mt-6">
                 <h4 className={`text-lg font-semibold text-white mb-3 ${exo2.className}`}>
-                  Key Features
+                  Key Notes
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                   {selectedProject.features.map((feature, index) => (
@@ -428,34 +444,16 @@ export default function Projects() {
                 {/* Carousel Container */}
                 <div className="relative bg-white/5 rounded-lg p-6">
                   {/* Main Photo Display */}
-                  <div className="relative max-w-4xl mx-auto">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                      {selectedProject.screenshots && selectedProject.screenshots.length > 0 && (
-                        <>
-                          {/* First Photo */}
-                          <div className="aspect-video bg-white/10 rounded-lg flex items-center justify-center relative overflow-hidden">
-                            <img 
-                              src={`/${selectedProject.screenshots[currentPhotoIndex].filename}`}
-                              alt={selectedProject.screenshots[currentPhotoIndex].description}
-                              className="w-full h-full object-cover"
-                              loading="lazy"
-                              onError={(e) => {
-                                e.target.style.display = 'none';
-                                e.target.nextSibling.style.display = 'flex';
-                              }}
-                            />
-                            <div className="w-full h-full flex items-center justify-center text-white/40 text-sm" style={{display: 'none'}}>
-                              Screenshot {selectedProject.screenshots[currentPhotoIndex].id}
-                            </div>
-                          </div>
-                          
-                          {/* Second Photo (if available) */}
-                          {selectedProject.screenshots[currentPhotoIndex + 1] && (
-                            <div className="aspect-video bg-white/10 rounded-lg flex items-center justify-center relative overflow-hidden">
+                  <div className="relative max-w-6xl mx-auto">
+                    <div className="flex justify-center">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-4 justify-items-center">
+                        {selectedProject.screenshots && selectedProject.screenshots.length > 0 && 
+                          selectedProject.screenshots.map((screenshot, index) => (
+                            <div key={screenshot.id} className="bg-white/10 rounded-lg flex items-center justify-center relative overflow-hidden w-full max-w-sm">
                               <img 
-                                src={`/${selectedProject.screenshots[currentPhotoIndex + 1].filename}`}
-                                alt={selectedProject.screenshots[currentPhotoIndex + 1].description}
-                                className="w-full h-full object-cover"
+                                src={screenshot.filename}
+                                alt={screenshot.description}
+                                className="w-full h-auto object-contain max-h-[500px] rounded-lg"
                                 loading="lazy"
                                 onError={(e) => {
                                   e.target.style.display = 'none';
@@ -463,51 +461,14 @@ export default function Projects() {
                                 }}
                               />
                               <div className="w-full h-full flex items-center justify-center text-white/40 text-sm" style={{display: 'none'}}>
-                                Screenshot {selectedProject.screenshots[currentPhotoIndex + 1].id}
+                                {screenshot.description}
                               </div>
                             </div>
-                          )}
-                        </>
-                      )}
+                          ))
+                        }
+                      </div>
                     </div>
-                    
-                    {/* Navigation Arrows */}
-                    {selectedProject.screenshots && selectedProject.screenshots.length > 2 && (
-                      <>
-                        <button
-                          onClick={prevPhoto}
-                          className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors cursor-pointer"
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                          </svg>
-                        </button>
-                        <button
-                          onClick={nextPhoto}
-                          className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors cursor-pointer"
-                        >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                          </svg>
-                        </button>
-                      </>
-                    )}
                   </div>
-                  
-                  {/* Dots Navigation */}
-                  {selectedProject.screenshots && selectedProject.screenshots.length > 2 && (
-                    <div className="flex justify-center gap-2">
-                      {Array.from({ length: Math.ceil(selectedProject.screenshots.length / 2) }, (_, index) => (
-                        <button
-                          key={index}
-                          onClick={() => goToPhoto(index * 2)}
-                          className={`w-2 h-2 rounded-full transition-colors cursor-pointer ${
-                            currentPhotoIndex === index * 2 ? 'bg-white' : 'bg-white/30'
-                          }`}
-                        />
-                      ))}
-                    </div>
-                  )}
                 </div>
               </div>
             </motion.div>

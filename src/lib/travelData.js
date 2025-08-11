@@ -187,6 +187,9 @@ export const travelData = {
       ],
       "San Francisco": [
         { year: "2024" }
+      ],
+      "Tampa": [
+        { year: "2025" }
       ]
     }
   },

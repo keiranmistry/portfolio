@@ -115,215 +115,25 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+    box-sizing: border-box;
   }
   
   html {
     background-color: #ffffff;
     min-height: 100vh;
+    overflow-x: hidden;
   }
   
   body {
     @apply bg-background text-foreground;
     background-color: #ffffff;
     min-height: 100vh;
+    overflow-x: hidden;
   }
-}
-
-/* Performance optimizations */
-* {
-  box-sizing: border-box;
-}
-
-/* Optimize GPU usage for transforms */
-.transform-gpu {
-  transform: translateZ(0);
-  will-change: transform;
-  backface-visibility: hidden;
-  perspective: 1000px;
-}
-
-/* Reduce repaints during animations */
-.animate-smooth {
-  will-change: transform, opacity;
-  backface-visibility: hidden;
-}
-
-/* Optimize backdrop filters */
-.backdrop-optimized {
-  will-change: backdrop-filter;
-  transform: translateZ(0);
-}
-
-/* Reduce layout thrashing */
-.layout-stable {
-  contain: layout style paint;
-}
-
-/* Optimize images */
-img {
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: crisp-edges;
-}
-
-/* Custom 3D Glass Effects */
-.perspective-1000 {
-  perspective: 1000px;
-}
-
-.transform-gpu {
-  transform: translateZ(0);
-  will-change: transform;
-}
-
-.hover\:rotate-y-12:hover {
-  transform: rotateY(12deg) translateZ(20px);
-}
-
-.translate-z-2 {
-  transform: translateZ(2px);
-}
-
-.translate-z-4 {
-  transform: translateZ(4px);
-}
-
-.translate-z-6 {
-  transform: translateZ(6px);
-}
-
-.translate-z-8 {
-  transform: translateZ(8px);
-}
-
-.translate-z-12 {
-  transform: translateZ(12px);
-}
-
-.translate-z-16 {
-  transform: translateZ(16px);
-}
-
-.-translate-z-2 {
-  transform: translateZ(-2px);
-}
-
-.-translate-z-4 {
-  transform: translateZ(-4px);
-}
-
-.-translate-z-6 {
-  transform: translateZ(-6px);
-}
-
-.-translate-z-8 {
-  transform: translateZ(-8px);
-}
-
-/* Glass refraction animation */
-@keyframes glass-refract {
-  0%, 100% {
-    opacity: 0.8;
-    transform: translateZ(0) scale(1);
-  }
-  50% {
-    opacity: 1;
-    transform: translateZ(10px) scale(1.02);
-  }
-}
-
-.glass-refract {
-  animation: glass-refract 3s ease-in-out infinite;
-}
-
-/* Custom scrollbar styles */
-.scrollbar-thin::-webkit-scrollbar {
-  width: 6px;
-}
-
-.scrollbar-thin::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.scrollbar-thin::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 3px;
-}
-
-.scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
-}
-
-/* Firefox scrollbar */
-.scrollbar-thin {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
-}
-
-/* Modern custom scrollbar for modal */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 8px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
-  margin: 8px 0;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
-  border: 2px solid transparent;
-  background-clip: content-box;
-  transition: all 0.3s ease;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.4);
-  background-clip: content-box;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:active {
-  background: rgba(255, 255, 255, 0.6);
-  background-clip: content-box;
-}
-
-/* Firefox custom scrollbar for modal */
-.custom-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.1);
-}
-
-/* Performance optimizations for zoom operations */
-.zoom-optimized {
-  will-change: transform;
-  transform: translateZ(0);
-  backface-visibility: hidden;
-}
-
-/* Reduce GPU usage for complex backgrounds */
-.bg-optimized {
-  background-attachment: scroll;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
-/* Optimize animations during zoom */
-@media (prefers-reduced-motion: no-preference) {
-  .animate-optimized {
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-}
-
-/* Disable animations for users who prefer reduced motion */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
+  
+  /* Basic overflow prevention */
+  img {
+    max-width: 100%;
+    height: auto;
   }
 }
