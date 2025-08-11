@@ -52,8 +52,8 @@ export default function Projects() {
       id: 2,
       title: "HDI vs. Happiness Analysis",
       shortDescription: "Statistical analysis of HDI vs. happiness scores",
-      fullDescription: "Statistical analysis exploring the relationship between Human Development Index (HDI) and happiness scores across countries. Utilized advanced statistical methods and data visualization techniques.",
-      technologies: ["Python", "Pandas", "NumPy", "Matplotlib", "Seaborn", "Jupyter"],
+      fullDescription: "Statistical analysis exploring the relationship between Human Development Index (HDI) and happiness scores across countries.",
+      technologies: ["Power BI", "Python", "Pandas", "NumPy", "Jupyter"],
       github: "https://github.com/keiranmistry/hdi-happiness-analysis",
       image: "/projects/hdi/hdimaster.png",
       screenshots: [
@@ -67,16 +67,13 @@ export default function Projects() {
         "Multiple regression modeling",
         "Interactive visualizations",
         "Comprehensive reporting",
-      ],
-      duration: "2 weeks",
-      team: "Solo project",
-      role: "Data analyst"
+      ]
     },
     {
       id: 3,
       title: "TrackSite",
       shortDescription: "Website tracking tool",
-      fullDescription: "A web application for tracking website performance, uptime, and analytics. Provides real-time monitoring, alerting, and detailed performance reports.",
+      fullDescription: "All-in-one application to store and organize websites, applications, and files to segregate workspaces and workflows.",
       technologies: ["Next.js", "TypeScript", "Tailwind CSS", "PostgreSQL", "Vercel"],
       github: "https://github.com/keiranmistry/tracksite",
       live: "https://tracksite.vercel.app",
@@ -93,10 +90,7 @@ export default function Projects() {
         "Alert notifications",
         "Analytics dashboard",
         "API integration"
-      ],
-      duration: "4 months",
-      team: "Solo project",
-      role: "Full-stack developer"
+      ]
     },
     {
       id: 4,
@@ -119,17 +113,14 @@ export default function Projects() {
         "Score tracking",
         "Sound effects",
         "Local storage"
-      ],
-      duration: "1 month",
-      team: "Solo project",
-      role: "Frontend developer"
+      ]
     },
     {
       id: 5,
       title: "Portfolio",
       shortDescription: "Personal portfolio website",
-      fullDescription: "A modern, responsive portfolio website showcasing my projects, travel experiences, and professional background. Features smooth animations and optimal performance.",
-      technologies: ["Next.js", "Tailwind CSS", "Framer Motion", "shadcn/ui"],
+      fullDescription: "A modern, responsive portfolio website showcasing my personal side projects, working experiences, and travels.",
+      technologies: ["React", "Next.js", "Node.js", "Framer Motion", "shadcn/ui", "Tailwind CSS", "TypeScript"],
       github: "https://github.com/keiranmistry/portfolio",
       live: "https://keiranmistry.vercel.app",
       image: "/projects/portfolio/portfoliomaster.png",
@@ -139,16 +130,9 @@ export default function Projects() {
         { id: 3, filename: "portfolio-3.png", description: "Gallery" }
       ],
       features: [
-        "Responsive design",
-        "Smooth animations",
-        "Travel gallery",
-        "Project showcase",
-        "Performance optimized",
-        "SEO friendly"
+        "Dynamic user interface",
+        "Interactive travel map"
       ],
-      duration: "2 months",
-      team: "Solo project",
-      role: "Frontend developer"
     }
   ], []);
 
