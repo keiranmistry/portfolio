@@ -20,6 +20,26 @@ export default function Gallery() {
   const [selectedTrip, setSelectedTrip] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+  const [isImageLoading, setIsImageLoading] = useState(false);
+
+  // Preload images for smoother transitions
+  const preloadImages = useCallback((photos) => {
+    if (!photos) return;
+    photos.forEach(photo => {
+      const img = new Image();
+      img.src = `/${photo.filename}`;
+    });
+  }, []);
+
+  // Preload images when trip is selected
+  useEffect(() => {
+    if (selectedTrip) {
+      const tripPhotos = getTripPhotos(selectedTrip.countryCode, selectedTrip.city, selectedTrip.visit.year);
+      if (tripPhotos && tripPhotos.photos) {
+        preloadImages(tripPhotos.photos);
+      }
+    }
+  }, [selectedTrip, preloadImages]);
 
   // Optimized intersection observer with throttling
   useEffect(() => {
@@ -54,6 +74,7 @@ export default function Gallery() {
   const handleTripClick = useCallback((trip) => {
     setSelectedTrip(trip);
     setCurrentPhotoIndex(0);
+    setIsImageLoading(false);
     setIsModalOpen(true);
   }, []);
 
@@ -67,6 +88,7 @@ export default function Gallery() {
     if (!selectedTrip) return;
     const tripPhotos = getTripPhotos(selectedTrip.countryCode, selectedTrip.city, selectedTrip.visit.year);
     if (!tripPhotos || !tripPhotos.photos) return;
+    setIsImageLoading(true);
     setCurrentPhotoIndex((prev) => (prev === 0 ? tripPhotos.photos.length - 1 : prev - 1));
   }, [selectedTrip]);
 
@@ -74,8 +96,14 @@ export default function Gallery() {
     if (!selectedTrip) return;
     const tripPhotos = getTripPhotos(selectedTrip.countryCode, selectedTrip.city, selectedTrip.visit.year);
     if (!tripPhotos || !tripPhotos.photos) return;
+    setIsImageLoading(true);
     setCurrentPhotoIndex((prev) => (prev === tripPhotos.photos.length - 1 ? 0 : prev + 1));
   }, [selectedTrip]);
+
+  const handlePhotoIndexChange = useCallback((index) => {
+    setIsImageLoading(true);
+    setCurrentPhotoIndex(index);
+  }, []);
 
   // Optimized keyboard navigation
   useEffect(() => {
@@ -276,7 +304,7 @@ export default function Gallery() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/90 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+              className="fixed inset-0 bg-black/20 backdrop-blur-lg z-50 flex items-center justify-center p-4"
               onClick={handleCloseModal}
             >
               <motion.div
@@ -284,7 +312,7 @@ export default function Gallery() {
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.9, opacity: 0 }}
                 transition={{ duration: 0.2, ease: "easeOut" }}
-                className="relative bg-white/10 backdrop-blur-sm border border-white/30 rounded-2xl p-8 max-w-6xl w-full max-h-[90vh] overflow-hidden"
+                className="relative bg-white/10 backdrop-blur-lg border border-white/30 rounded-2xl p-8 max-w-6xl w-full max-h-[90vh] overflow-hidden"
                 onClick={(e) => e.stopPropagation()}
               >
                 {/* Header */}
@@ -329,7 +357,7 @@ export default function Gallery() {
                       initial={{ opacity: 0, x: 30 }}
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: -30 }}
-                      transition={{ duration: 0.3, ease: "easeInOut" }}
+                      transition={{ duration: 0.5, ease: "easeInOut" }}
                       className="aspect-[4/3] w-full max-w-4xl relative overflow-hidden"
                     >
                       {(() => {
@@ -338,11 +366,17 @@ export default function Gallery() {
                           const currentPhoto = tripPhotos.photos[currentPhotoIndex];
                           return (
                             <div className="w-full h-full flex items-center justify-center -mt-8">
+                              {isImageLoading && (
+                                <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-sm z-10">
+                                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
+                                </div>
+                              )}
                               <img 
                                 src={`/${currentPhoto.filename}`}
                                 alt={currentPhoto.description}
-                                className="max-w-full max-h-[80%] object-contain rounded-lg"
-                                loading="lazy"
+                                className="max-w-full max-h-[80%] object-contain rounded-lg transition-opacity duration-300"
+                                onLoad={() => setIsImageLoading(false)}
+                                onError={() => setIsImageLoading(false)}
                               />
                             </div>
                           );
@@ -381,7 +415,7 @@ export default function Gallery() {
                       return tripPhotos.photos.map((photo, index) => (
                         <button
                           key={index}
-                          onClick={() => setCurrentPhotoIndex(index)}
+                          onClick={() => handlePhotoIndexChange(index)}
                           className={`w-16 h-12 rounded-lg border-2 transition-all duration-200 ${
                             index === currentPhotoIndex
                               ? 'border-white bg-white/20'
