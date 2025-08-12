@@ -88,11 +88,14 @@ export default function Experience() {
       company: "University of Waterloo",
       period: "Sep. 2024 - Apr. 2029",
       location: "Waterloo, ON",
-      description: "Bachelor of Mathematics",
       technologies: ["C", "Linux/Unix", "Functional Programming"],
       achievements: [
-        "4.0 GPA", "Dean's List", "Data Science Club", "Relevant Coursework: Algorithm Design, Software Developer Tools, Functional Programming, Linear Algebra, Calculus",
-        "Intramural Soccer"
+        "4.0 GPA", 
+        "Dean's List", 
+        "Excellent Academic Standing",
+        "Data Science Club", 
+        "Relevant Coursework: Algorithm Design, Software Developer Tools, Functional Programming, Linear Algebra, Calculus",
+        "Intramural Soccer",
       ],
       icon: "/icons/waterloo.png",
       mono: "/icons/waterloomono.png",
@@ -103,8 +106,7 @@ export default function Experience() {
         company: "Techtronic Industries",
         period: "May 2025 - Aug. 2025",
         location: "Toronto, ON",
-        description: "description placeholder",
-        technologies: ["tech1", "tech2", "tech3"],
+        technologies: ["Javascript", "Python", "Angular", "SQL", "PowerBI", "Powershell", "Azure"],
         achievements: [
           "achievement 1",
           "achievement 2",
@@ -119,8 +121,7 @@ export default function Experience() {
         company: "Tommy Douglas Secondary School",
         period: "Sep. 2022 - Jun. 2024",
         location: "Vaughan, ON",
-        description: "description placeholder",
-        technologies: ["tech1", "tech2", "tech3"],
+        technologies: ["Python", "Java"],
         achievements: [
           "achievement 1",
           "achievement 2",
@@ -257,10 +258,6 @@ export default function Experience() {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <p className="text-muted-foreground leading-relaxed" style={{ color: '#000000' }}>
-                    {experiences[selectedExperience].description}
-                  </p>
-
                   <div className="flex flex-wrap gap-2">
                     {experiences[selectedExperience].technologies.map((tech, techIndex) => (
                       <Badge key={techIndex} variant="outline" className="text-xs bg-white/5 border border-white/10">

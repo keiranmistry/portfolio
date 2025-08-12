@@ -40,12 +40,19 @@ export const photoData = {
       year: "2024"
     },
     photos: [
-      { id: 1, filename: "test.png", description: "Golden Gate Bridge" },
-      { id: 2, filename: "alcatraz.jpg", description: "Alcatraz Island" },
-      { id: 3, filename: "fishermans-wharf.jpg", description: "Fisherman's Wharf" },
-      { id: 4, filename: "painted-ladies.jpg", description: "Painted Ladies houses" },
-      { id: 5, filename: "chinatown.jpg", description: "San Francisco Chinatown" },
-      { id: 6, filename: "cable-car.jpg", description: "Cable car on Powell Street" }
+      { id: 1, filename: "sanfrancisco2024/20240410_154209081_iOS.jpg", description: "San Francisco View" },
+      { id: 2, filename: "sanfrancisco2024/20240412_185758885_iOS.jpg", description: "San Francisco Street" },
+      { id: 3, filename: "sanfrancisco2024/20240412_193459463_iOS.jpg", description: "San Francisco Scene" },
+      { id: 4, filename: "sanfrancisco2024/20240412_194120829_iOS.jpg", description: "San Francisco Moment" },
+      { id: 5, filename: "sanfrancisco2024/20240413_005639356_iOS.jpg", description: "San Francisco Night" },
+      { id: 6, filename: "sanfrancisco2024/20240413_011018791_iOS.jpg", description: "San Francisco Evening" },
+      { id: 7, filename: "sanfrancisco2024/20240413_023456670_iOS.jpg", description: "San Francisco Early Morning" },
+      { id: 8, filename: "sanfrancisco2024/20240413_225117820_iOS.jpg", description: "San Francisco Night Scene" },
+      { id: 9, filename: "sanfrancisco2024/20240414_231345807_iOS.jpg", description: "San Francisco Evening View" },
+      { id: 10, filename: "sanfrancisco2024/20240415_011201927_iOS.jpg", description: "San Francisco Late Night" },
+      { id: 11, filename: "sanfrancisco2024/20240415_030041064_iOS.jpg", description: "San Francisco Early Hours" },
+      { id: 12, filename: "sanfrancisco2024/20240415_044041976_iOS.jpg", description: "San Francisco Dawn" },
+      { id: 13, filename: "sanfrancisco2024/20240415_044423047_iOS.jpg", description: "San Francisco Sunrise" }
     ]
   },
 
