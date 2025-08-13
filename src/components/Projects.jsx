@@ -77,11 +77,11 @@ export default function Projects() {
       technologies: ["Next.js", "TypeScript", "Tailwind CSS", "PostgreSQL", "Vercel"],
       github: "https://github.com/keiranmistry/tracksite",
       live: "https://tracksite.vercel.app",
-      image: "https://via.placeholder.com/400x250/1e40af/ffffff?text=TrackSite",
+      image: "/projects/tracksite/tracksitemaster.png",
       screenshots: [
-        { id: 1, filename: "https://via.placeholder.com/400x300/1e40af/ffffff?text=Dashboard", description: "Dashboard" },
-        { id: 2, filename: "https://via.placeholder.com/400x300/1e40af/ffffff?text=Analytics", description: "Analytics" },
-        { id: 3, filename: "https://via.placeholder.com/400x300/1e40af/ffffff?text=Settings", description: "Settings" }
+        { id: 1, filename: "/projects/tracksite/home.png", description: "Home Page" },
+        { id: 2, filename: "/projects/tracksite/edit.png", description: "Edit Mode" },
+        { id: 3, filename: "/projects/tracksite/bookmarks.png", description: "Bookmarks" }
       ],
       features: [
         "Real-time website monitoring",
