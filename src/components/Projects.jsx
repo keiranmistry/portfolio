@@ -84,12 +84,12 @@ export default function Projects() {
         { id: 3, filename: "/projects/tracksite/bookmarks.png", description: "Bookmarks" }
       ],
       features: [
-        "Real-time website monitoring",
-        "Performance metrics tracking",
-        "Uptime monitoring",
-        "Alert notifications",
-        "Analytics dashboard",
-        "API integration"
+        "Website, file, application uploads",
+        "Opens up websites, files, and applications",
+        "Folder creation",
+        "Organizational system",
+        "Responsive design",
+        "Modern user interface"
       ]
     },
     {
