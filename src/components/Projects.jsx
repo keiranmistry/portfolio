@@ -74,7 +74,7 @@ export default function Projects() {
       title: "TrackSite",
       shortDescription: "Website tracking tool",
       fullDescription: "All-in-one application to store and organize websites, applications, and files to segregate workspaces and workflows.",
-      technologies: ["React, FastAPI, SQL, Javascript, Node.js, CSS"],
+      technologies: ["React", "FastAPI", "SQL", "Javascript", "Node.js", "CSS"],
       github: "https://github.com/keiranmistry/tracksite",
       live: "https://tracksite.vercel.app",
       image: "/projects/tracksite/tracksitemaster.png",
