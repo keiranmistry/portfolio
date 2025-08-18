@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { AnimatePresence, motion, useMotionValue, useTransform, useAnimation } from "framer-motion";
-import { ComposableMap, Geographies, Geography, ZoomableGroup } from "react-simple-maps";
+import { ComposableMap, Geographies, Geography } from "react-simple-maps";
 import { geoMercator, geoPath } from "d3-geo";
 import { Barlow, Exo_2 } from 'next/font/google';
 import { countryData, nameToCodeMap, idToCodeMap } from '../lib/countryData';
@@ -79,6 +79,10 @@ export default function TravelMap() {
   const [isInView, setIsInView] = useState(false);
   const [hasAnimated, setHasAnimated] = useState(false);
   const [visitedCountries, setVisitedCountries] = useState({});
+  const [selectedCountry, setSelectedCountry] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [lastMousePos, setLastMousePos] = useState({ x: 0, y: 0 });
 
   // Initialize visited countries with random colors
   useEffect(() => {
@@ -405,6 +409,91 @@ export default function TravelMap() {
     }
   }
 
+  // Mouse event handlers for panning
+  const handleMouseDown = useCallback((e) => {
+    setIsDragging(true);
+    setLastMousePos({ x: e.clientX, y: e.clientY });
+  }, []);
+
+  const handleMouseMove = useCallback((e) => {
+    if (isDragging) {
+      const deltaX = e.clientX - lastMousePos.x;
+      const deltaY = e.clientY - lastMousePos.y;
+      setPan(prev => {
+        const newX = prev.x + deltaX;
+        const newY = prev.y + deltaY;
+        
+        // Add bounds to prevent panning too far - more restrictive
+        // Allow more panning when zoomed in
+        const zoomFactor = Math.max(0.8, zoom);
+        const maxPanX = dimensions.width * 0.3 * zoomFactor;
+        const maxPanY = dimensions.height * 0.3 * zoomFactor;
+        
+        return {
+          x: Math.max(-maxPanX, Math.min(maxPanX, newX)),
+          y: Math.max(-maxPanY, Math.min(maxPanY, newY))
+        };
+      });
+      setLastMousePos({ x: e.clientX, y: e.clientY });
+    }
+  }, [isDragging, lastMousePos, dimensions]);
+
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
+  // Mouse wheel zoom
+  const handleWheel = useCallback((e) => {
+    e.preventDefault();
+    const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
+    setZoom(prev => {
+      const newZoom = prev * zoomFactor;
+      // More restrictive zoom bounds
+      return Math.max(0.8, Math.min(2.5, newZoom));
+    });
+  }, []);
+
+  // Reset zoom and pan
+  const resetView = useCallback(() => {
+    setPan({ x: 0, y: 0 });
+    setZoom(1);
+  }, []);
+
+  // Add global mouse event listeners
+  useEffect(() => {
+    const handleGlobalMouseUp = () => setIsDragging(false);
+    const handleGlobalMouseMove = (e) => {
+      if (isDragging) {
+        const deltaX = e.clientX - lastMousePos.x;
+        const deltaY = e.clientY - lastMousePos.y;
+        setPan(prev => {
+          const newX = prev.x + deltaX;
+          const newY = prev.y + deltaY;
+          
+          // Add bounds to prevent panning too far - more restrictive
+          // Allow more panning when zoomed in
+          const zoomFactor = Math.max(0.8, zoom);
+          const maxPanX = dimensions.width * 0.3 * zoomFactor;
+          const maxPanY = dimensions.height * 0.3 * zoomFactor;
+          
+          return {
+            x: Math.max(-maxPanX, Math.min(maxPanX, newX)),
+            y: Math.max(-maxPanY, Math.min(maxPanY, newY))
+          };
+        });
+        setLastMousePos({ x: e.clientX, y: e.clientY });
+      }
+    };
+
+    document.addEventListener('mouseup', handleGlobalMouseUp);
+    document.addEventListener('mousemove', handleGlobalMouseMove);
+
+    return () => {
+      document.removeEventListener('mouseup', handleGlobalMouseUp);
+      document.removeEventListener('mousemove', handleGlobalMouseMove);
+    };
+  }, [isDragging, lastMousePos, dimensions]);
+
   return (
     <section ref={sectionRef} id="travel" className="py-20 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('/ocean.png')" }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -440,7 +529,8 @@ export default function TravelMap() {
               touchAction: 'pan-x pan-y pinch-zoom',
               userSelect: 'none',
               WebkitUserSelect: 'none',
-              WebkitTouchCallout: 'none'
+              WebkitTouchCallout: 'none',
+              cursor: isDragging ? 'grabbing' : 'grab'
             }}
             initial={{ opacity: 0, y: 50 }}
             animate={controls}
@@ -453,12 +543,46 @@ export default function TravelMap() {
               delay: 0.25
             }}
             ref={mapContainerRef}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onWheel={handleWheel}
+            onTouchStart={(e) => {
+              if (e.touches.length === 1) {
+                setIsDragging(true);
+                setLastMousePos({ x: e.touches[0].clientX, y: e.touches[0].clientY });
+              }
+            }}
+            onTouchMove={(e) => {
+              if (e.touches.length === 1 && isDragging) {
+                const touch = e.touches[0];
+                const deltaX = touch.clientX - lastMousePos.x;
+                const deltaY = touch.clientY - lastMousePos.y;
+                setPan(prev => {
+                  const newX = prev.x + deltaX;
+                  const newY = prev.y + deltaY;
+                  
+                  // Add bounds to prevent panning too far - more restrictive
+                  // Allow more panning when zoomed in
+                  const zoomFactor = Math.max(0.8, zoom);
+                  const maxPanX = dimensions.width * 0.3 * zoomFactor;
+                  const maxPanY = dimensions.height * 0.3 * zoomFactor;
+                  
+                  return {
+                    x: Math.max(-maxPanX, Math.min(maxPanX, newX)),
+                    y: Math.max(-maxPanY, Math.min(maxPanY, newY))
+                  };
+                });
+                setLastMousePos({ x: touch.clientX, y: touch.clientY });
+              }
+            }}
+            onTouchEnd={() => setIsDragging(false)}
           >
             <div className="absolute z-20 top-4 right-2 flex flex-col gap-2">
               <button
                 className="text-white px-3 py-1 rounded shadow transition-all duration-300 ease-out flex items-center justify-center backdrop-blur-md cursor-pointer"
                 onClick={() => {
-                  const newZoom = Math.min(zoom * 1.5, 8);
+                  const newZoom = Math.min(zoom * 1.2, 2.5);
                   setZoom(newZoom);
                 }}
                 style={{ 
@@ -478,7 +602,7 @@ export default function TravelMap() {
               <button
                 className="text-white px-3 py-1 rounded shadow transition-all duration-300 ease-out flex items-center justify-center backdrop-blur-md cursor-pointer"
                 onClick={() => {
-                  const newZoom = Math.max(zoom / 1.5, 1);
+                  const newZoom = Math.max(zoom / 1.2, 0.8);
                   setZoom(newZoom);
                 }}
                 style={{ 
@@ -497,10 +621,7 @@ export default function TravelMap() {
               </button>
               <button
                 className={`text-white px-3 py-1 rounded shadow transition-all duration-300 ease-out text-xs backdrop-blur-md cursor-pointer ${exo2.className}`}
-                onClick={() => { 
-                  setZoom(1); 
-                  setCenter([0, 0]); 
-                }}
+                onClick={resetView}
                 style={{ 
                   pointerEvents: 'auto',
                   background: 'rgba(35, 39, 47, 0.2)',
@@ -514,32 +635,27 @@ export default function TravelMap() {
                 Reset
               </button>
             </div>
-            <ComposableMap
-              projectionConfig={{ scale: 160 }}
-              width={dimensions.width}
-              height={dimensions.height}
-              style={{ 
-                width: "100%", 
-                height: "100%",
-                maxWidth: "100%",
-                maxHeight: "100%"
+            <div 
+              className="relative w-full h-full"
+              style={{
+                overflow: 'visible',
+                transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
+                transformOrigin: 'center center',
+                transition: isDragging ? 'none' : 'transform 0.1s ease-out'
               }}
             >
-              <ZoomableGroup
-                zoom={zoom}
-                center={center}
-                minZoom={1}
-                maxZoom={8}
-                onMoveEnd={({ zoom, coordinates }) => {
-                  setZoom(zoom);
-                  setCenter(coordinates);
+              <ComposableMap
+                projectionConfig={{ scale: 160 }}
+                width={dimensions.width}
+                height={dimensions.height}
+                style={{ 
+                  width: "100%", 
+                  height: "100%",
+                  maxWidth: "100%", 
+                  maxHeight: "100%"
                 }}
-                // Add touch support for mobile
-                translateExtent={[
-                  [-dimensions.width / 2, -dimensions.height / 2],
-                  [dimensions.width / 2, dimensions.height / 2]
-                ]}
               >
+
                 <Geographies geography={geoUrl}>
                   {({ geographies }) =>
                     geographies.map((geo) => {
@@ -602,8 +718,8 @@ export default function TravelMap() {
                     })
                   }
                 </Geographies>
-              </ZoomableGroup>
-            </ComposableMap>
+              </ComposableMap>
+            </div>
 
           </motion.div>
         </div>
@@ -776,7 +892,7 @@ export default function TravelMap() {
                     className="flex items-center gap-2"
                   >
                     <span className={`text-sm text-white/70 ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>
-                      Not visited yet
+                      None
                     </span>
                   </motion.div>
                 )}
@@ -870,4 +986,4 @@ export default function TravelMap() {
       </div>
     </section>
   );
-}       
+}
