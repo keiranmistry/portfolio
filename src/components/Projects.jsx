@@ -349,7 +349,7 @@ export default function Projects() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="relative bg-white/10 backdrop-blur-lg border border-white/30 rounded-2xl p-8 max-w-6xl w-full max-h-[90vh] overflow-y-auto custom-scrollbar"
+              className="relative bg-white/10 backdrop-blur-lg border border-white/30 rounded-2xl p-8 max-w-7xl w-full max-h-[95vh] overflow-y-auto custom-scrollbar"
               style={{
                 scrollbarWidth: 'thin',
                 scrollbarColor: 'rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.1)'
@@ -426,26 +426,34 @@ export default function Projects() {
                 </h4>
                 
                 {/* Carousel Container */}
-                <div className="relative bg-white/5 rounded-lg p-6">
+                <div className="relative bg-white/5 rounded-lg p-8">
                   {/* Main Photo Display */}
                   <div className="relative max-w-6xl mx-auto">
                     <div className="flex justify-center">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-4 justify-items-center">
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-4 justify-items-center">
                         {selectedProject.screenshots && selectedProject.screenshots.length > 0 && 
                           selectedProject.screenshots.map((screenshot, index) => (
-                            <div key={screenshot.id} className="bg-white/10 rounded-lg flex items-center justify-center relative overflow-hidden w-full max-w-sm">
-                              <img 
-                                src={screenshot.filename}
-                                alt={screenshot.description}
-                                className="w-full h-auto object-contain max-h-[500px] rounded-lg"
-                                loading="lazy"
-                                onError={(e) => {
-                                  e.target.style.display = 'none';
-                                  e.target.nextSibling.style.display = 'flex';
-                                }}
-                              />
-                              <div className="w-full h-full flex items-center justify-center text-white/40 text-sm" style={{display: 'none'}}>
-                                {screenshot.description}
+                            <div key={screenshot.id} className="bg-white/10 rounded-lg flex flex-col items-center justify-center relative overflow-hidden w-full max-w-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-[1.02]">
+                              <div className="flex-1 flex items-center justify-center w-full">
+                                <img 
+                                  src={screenshot.filename}
+                                  alt={screenshot.description}
+                                  className="w-full h-auto object-contain max-h-[700px] rounded-lg"
+                                  loading="lazy"
+                                  onError={(e) => {
+                                    e.target.style.display = 'none';
+                                    e.target.nextSibling.style.display = 'flex';
+                                  }}
+                                />
+                                <div className="w-full h-full flex items-center justify-center text-white/40 text-sm" style={{display: 'none'}}>
+                                  {screenshot.description}
+                                </div>
+                              </div>
+                              {/* Screenshot Caption */}
+                              <div className="text-center w-full py-3">
+                                <p className={`text-white/70 text-lg font-bold ${exo2.className}`}>
+                                  {screenshot.description}
+                                </p>
                               </div>
                             </div>
                           ))
