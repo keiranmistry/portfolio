@@ -54,19 +54,22 @@ export default function Projects() {
       shortDescription: "Statistical analysis of HDI vs. happiness scores",
       fullDescription: "Statistical analysis exploring the relationship between Human Development Index (HDI) and happiness scores across countries.",
       technologies: ["Power BI", "Python", "Pandas", "NumPy", "Jupyter"],
-      github: "https://github.com/keiranmistry/hdi-happiness-analysis",
+      github: "https://github.com/keiranmistry/hdi-vs.-happiness",
       image: "/projects/hdi/hdimaster.png",
       screenshots: [
-        { id: 1, filename: "https://via.placeholder.com/400x300/1e40af/ffffff?text=Correlation+Analysis", description: "Correlation Analysis" },
-        { id: 2, filename: "https://via.placeholder.com/400x300/1e40af/ffffff?text=Regression+Results", description: "Regression Results" },
-        { id: 3, filename: "https://via.placeholder.com/400x300/1e40af/ffffff?text=Visualization+Dashboard", description: "Visualization Dashboard" }
+        { id: 1, filename: "/projects/hdi/hdispread.png", description: "HDI Histogram" },
+        { id: 3, filename: "/projects/hdi/hdiboxwhisker.png", description: "Box and Whisker Plot" },
+        { id: 2, filename: "/projects/hdi/hdirelation.png", description: "HDI vs. Happiness Scatter Plot" },
       ],
       features: [
-        "Data cleaning and preprocessing",
-        "Statistical correlation analysis",
-        "Multiple regression modeling",
-        "Interactive visualizations",
-        "Comprehensive reporting",
+        "Statistical analysis of HDI across 190+ countries",
+        "Report, presentation, and data found in GitHub repository",
+        "Conducted analysis between Europe vs. Asia quality of life",
+        "Specified analysis of UK in comparison to global average",
+        "Strong positive correlation (r ≈ 0.80) between HDI & Happiness",
+        "Visualized data with histograms, box plots, and scatter plots",
+        "Highlighted limitations of self-reported happiness data",
+        "Created Power BI dashboard to visualize data",
       ]
     },
     {
