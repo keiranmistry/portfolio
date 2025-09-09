@@ -88,13 +88,13 @@ export default function Experience() {
       company: "University of Waterloo",
       period: "Sep. 2024 - Apr. 2029",
       location: "Waterloo, ON",
-      technologies: ["C", "Linux/Unix", "Functional Programming"],
+      technologies: ["C", "Linux/Unix", "Object-Oriented Programming", "Functional Programming"],
       achievements: [
         "4.0 GPA", 
         "Dean's List", 
         "Excellent Academic Standing",
         "Data Science Club", 
-        "Relevant Coursework: Algorithm Design, Software Developer Tools, Functional Programming, Linear Algebra, Calculus",
+        "Relevant Coursework: Algorithm Design, Object-Oriented Programming, Software Developer Tools, Functional Programming, Linear Algebra, Calculus",
         "Intramural Soccer",
       ],
       icon: "/icons/waterloo.png",
@@ -102,11 +102,11 @@ export default function Experience() {
       url: "https://uwaterloo.ca/future-students/programs/data-science"
     },
     {
-        title: "Technical Analyst",
+        title: "Software Analyst",
         company: "Techtronic Industries",
         period: "May 2025 - Aug. 2025",
         location: "Toronto, ON",
-        technologies: ["Javascript", "Python", "Angular", "SQL", "PowerBI", "Powershell", "Azure"],
+        technologies: ["Javascript", "Python", "SQL", "PowerBI", "Powershell", "Azure"],
         achievements: [
           "achievement 1",
           "achievement 2",
@@ -123,9 +123,12 @@ export default function Experience() {
         location: "Vaughan, ON",
         technologies: ["Python", "Java"],
         achievements: [
-          "achievement 1",
-          "achievement 2",
-          "achievement 3"
+          "Mentored 20+ peers across a variety of STEM related courses",
+          "Improved tutees' grades by 10% on average",
+          "Developed a personalized teaching approach to simplify complex concepts",
+          "Achieved a 95%+ satisfaction rating and enhanced student engagement",
+          "Worked closely with teachers to manage last-minute sign-ups",
+
         ],
         icon: "/icons/tdss.png",
         mono: "/icons/tdssmono.png",
