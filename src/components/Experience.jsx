@@ -106,7 +106,7 @@ export default function Experience() {
         company: "Techtronic Industries",
         period: "May 2025 - Aug. 2025",
         location: "Toronto, ON",
-        technologies: ["Javascript", "Python", "SQL", "PowerBI", "Powershell", "Azure"],
+        technologies: ["Javascript", "Python", "SQL", "PowerBI", "Powershell", "Azure", "Jira"],
         achievements: [
           "achievement 1",
           "achievement 2",
