@@ -110,11 +110,14 @@ export default function Experience() {
         period: "May 2025 - Aug. 2025",
         location: "Toronto, ON",
         technologies: ["Javascript", "Python", "SQL", "PowerBI", "Powershell", "Azure", "Jira"],
-        achievements: [
-          "achievement 1",
-          "achievement 2",
-          "achievement 3"
-        ],
+          achievements: [
+            "Enhanced an <strong>AI Microsoft Teams Chatbot</strong> for TTI employees with <strong>Python</strong> and <strong>Node.js</strong>, introducing automated troubleshooting workflows",
+            "Wrote <strong>Javascript API</strong> for iPad kiosks for Milwaukee Tool services centers across Canada, enabling customers to self-submit repairs",
+            "Automated laptop provisioning for new hires and other employees with <strong>PowerShell</strong>, streamlining onboarding to <strong>Windows 11</strong>",
+            "Engineered an <strong>IT intranet portal</strong> using <strong>React, Node.js, SQL, Azure, and SharePoint Online</strong>, centralizing IT files, dashboards, and maintenance calendars",
+            "Developed <strong>Power BI dashboards</strong> to visualize laptop inventory, departmental usage trends, and replacement cycles",
+            
+          ],
         icon: "/icons/tti.png",
         mono: "/icons/ttimono.png",
         url: "https://www.ttigroup.com/"
@@ -126,11 +129,11 @@ export default function Experience() {
         location: "Vaughan, ON",
         technologies: ["Python", "Java"],
         achievements: [
-          "Mentored 20+ peers across a variety of STEM related courses",
-          "Improved tutees' grades by 10% on average",
-          "Developed a personalized teaching approach to simplify complex concepts",
-          "Achieved a 95%+ satisfaction rating and enhanced student engagement",
-          "Worked closely with teachers to manage last-minute sign-ups",
+          "Mentored <strong>20+ peers</strong> across a variety of <strong>STEM related courses</strong>",
+          "Improved tutees' grades by <strong>10% on average</strong>",
+          "Developed a <strong>personalized teaching approach</strong> to simplify complex concepts",
+          "Achieved a <strong>95%+ satisfaction rating</strong> and enhanced student engagement",
+          "Worked closely with teachers to manage <strong>last-minute sign-ups</strong>",
 
         ],
         icon: "/icons/tdss.png",
@@ -144,8 +147,9 @@ export default function Experience() {
   }, []);
 
   return (
-    <section id="experience" className="py-20 bg-[url('/newest.jpg')] bg-cover bg-center bg-no-repeat">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="experience" className="py-20 bg-[url('/newest.jpg')] bg-cover bg-center bg-no-repeat relative">
+      <div className="absolute inset-0 bg-black/10 backdrop-blur-[1px]"></div>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-16">
           <h2 
             ref={headingRef}
@@ -280,11 +284,14 @@ export default function Experience() {
 
                   <div>
                     <h4 className={`font-semibold mb-2 ${exo2.className}`} style={{ color: '#033E7A' }}>Key Achievements:</h4>
-                    <ul className="space-y-1">
+                    <ul className="space-y-3">
                       {experiences[selectedExperience].achievements.map((achievement, achievementIndex) => (
-                        <li key={achievementIndex} className="text-medium flex items-center gap-4">
-                          <span className="text-primary">•</span>
-                          <span style={{ color: '#465561' }}>{achievement}</span>
+                        <li key={achievementIndex} className="text-medium flex items-start gap-4">
+                          <span className="text-primary mt-0.5 flex-shrink-0">•</span>
+                          <span 
+                            style={{ color: '#465561' }}
+                            dangerouslySetInnerHTML={{ __html: achievement }}
+                          />
                         </li>
                       ))}
                     </ul>
