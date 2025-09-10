@@ -8,6 +8,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import React from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Barlow, Exo_2 } from 'next/font/google';
+import Image from 'next/image';
 
 const barlow = Barlow({
   subsets: ['latin'],
@@ -32,7 +33,9 @@ export default function Experience() {
 
   // Intersection Observer to detect when section is visited
   useEffect(() => {
-    const observer = new window.IntersectionObserver(
+    if (typeof window === 'undefined') return; // Prevent SSR issues
+    
+    const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting && !hasAnimated) {
           setHasAnimated(true);
@@ -182,10 +185,12 @@ export default function Experience() {
                       }}
                     >
                       <div className="w-full h-full flex items-center justify-center bg-transparent">
-                        <img 
+                        <Image 
                           src={experience.icon} 
                           alt={`${experience.company} logo`}
-                          className="w-14 h-14 object-contain"
+                          width={56}
+                          height={56}
+                          className="object-contain"
                           style={{ 
                             filter: 'contrast(1.2) brightness(1.1)',
                             mixBlendMode: 'multiply'
@@ -234,9 +239,11 @@ export default function Experience() {
                           rel="noopener noreferrer"
                           className="block w-full h-full hover:opacity-80 transition-opacity cursor-pointer"
                         >
-                          <img 
+                          <Image 
                             src={experiences[selectedExperience].mono} 
                             alt={`${experiences[selectedExperience].company} logo`}
+                            width={48}
+                            height={48}
                             className="w-full h-full object-cover"
                           />
                         </a>
