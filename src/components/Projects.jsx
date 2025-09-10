@@ -29,7 +29,6 @@ export default function Projects() {
       fullDescription: "Cross-platform student productivity app to house all the tools a student needs. Built as a modern alternative for outdated school portals.",
       technologies: ["Flutter", "Dart", "Hive", "Figma"],
       github: "https://github.com/keiranmistry/stubook",
-      live: "https://stubook.vercel.app",
       image: "/projects/stubook/stubookmaster.png",
       screenshots: [
         { id: 1, filename: "/projects/stubook/home.PNG", description: "Homepage" },
@@ -130,16 +129,17 @@ export default function Projects() {
       fullDescription: "A modern, responsive portfolio website showcasing my personal side projects, working experiences, and travels.",
       technologies: ["React", "Next.js", "Node.js", "Framer Motion", "shadcn/ui", "Tailwind CSS", "TypeScript"],
       github: "https://github.com/keiranmistry/portfolio",
-      live: "https://keiranmistry.vercel.app",
       image: "/projects/portfolio/portfoliomaster.png",
-      screenshots: [
-        { id: 1, filename: "portfolio-1.png", description: "Homepage" },
-        { id: 2, filename: "portfolio-2.png", description: "Projects" },
-        { id: 3, filename: "portfolio-3.png", description: "Gallery" }
-      ],
+      screenshots: [],
       features: [
-        "Dynamic user interface",
-        "Interactive travel map"
+        "Modern, responsive design with Framer Motion animations",
+        "Interactive travel map with country highlighting and statistics",
+        "Dynamic project showcase with modal galleries and live demos",
+        "Optimized performance with Next.js Image and lazy loading",
+        "Mobile-first design with Tailwind CSS and responsive layouts",
+        "Real-time typewriter effects and smooth scroll animations",
+        "Professional experience timeline with interactive cards",
+        "Photo gallery with travel memories and trip details"
       ],
     }
   ], []);
@@ -445,35 +445,35 @@ export default function Projects() {
                 </div>
               </div>
 
-              {/* Project Screenshots Carousel */}
-              <div className="mt-6">
-                <h4 className={`text-xl font-semibold text-white mb-4 ${exo2.className}`}>
-                  Photos
-                </h4>
-                
-                {/* Carousel Container */}
-                <div className="relative bg-white/5 rounded-lg p-8">
-                  {/* Main Photo Display */}
-                  <div className="relative max-w-6xl mx-auto">
-                    <div className="flex justify-center">
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-4 justify-items-center">
-                        {selectedProject.screenshots && selectedProject.screenshots.length > 0 && 
-                          selectedProject.screenshots.map((screenshot, index) => (
+              {/* Project Screenshots Carousel - Only show if screenshots exist */}
+              {selectedProject.screenshots && selectedProject.screenshots.length > 0 && (
+                <div className="mt-6">
+                  <h4 className={`text-xl font-semibold text-white mb-4 ${exo2.className}`}>
+                    Photos
+                  </h4>
+                  
+                  {/* Carousel Container */}
+                  <div className="relative bg-white/5 rounded-lg p-8">
+                    {/* Main Photo Display */}
+                    <div className="relative max-w-6xl mx-auto">
+                      <div className="flex justify-center">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-4 justify-items-center">
+                          {selectedProject.screenshots.map((screenshot, index) => (
                             <div key={screenshot.id} className="bg-white/10 rounded-lg flex flex-col items-center justify-center relative overflow-hidden w-full max-w-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-[1.02]">
                               <div className="flex-1 flex items-center justify-center w-full">
-                              <Image 
-                                src={screenshot.filename}
-                                alt={screenshot.description}
-                                width={800}
-                                height={600}
-                                className="w-full h-auto object-contain max-h-[700px] rounded-lg"
-                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 40vw"
-                                quality={80}
-                                onError={(e) => {
-                                  e.target.style.display = 'none';
-                                  e.target.nextSibling.style.display = 'flex';
-                                }}
-                              />
+                                <Image 
+                                  src={screenshot.filename}
+                                  alt={screenshot.description}
+                                  width={800}
+                                  height={600}
+                                  className="w-full h-auto object-contain max-h-[700px] rounded-lg"
+                                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 40vw"
+                                  quality={80}
+                                  onError={(e) => {
+                                    e.target.style.display = 'none';
+                                    e.target.nextSibling.style.display = 'flex';
+                                  }}
+                                />
                                 <div className="w-full h-full flex items-center justify-center text-white/40 text-sm" style={{display: 'none'}}>
                                   {screenshot.description}
                                 </div>
@@ -485,13 +485,13 @@ export default function Projects() {
                                 </p>
                               </div>
                             </div>
-                          ))
-                        }
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              )}
             </motion.div>
           </motion.div>
         )}
