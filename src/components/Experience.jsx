@@ -88,7 +88,7 @@ export default function Experience() {
       company: "University of Waterloo",
       period: "Sep. 2024 - Apr. 2029",
       location: "Waterloo, ON",
-      technologies: ["C", "Linux/Unix", "Object-Oriented Programming", "Functional Programming"],
+      technologies: ["C", "C++", "Linux/Unix", "Functional Programming"],
       achievements: [
         "4.0 GPA", 
         "Dean's List", 

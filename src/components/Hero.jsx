@@ -159,57 +159,53 @@ export default function Hero() {
           z-index: 3;
         }
         .animate-m-stripe-slide {
-          animation: m-stripe-slide-in 1s cubic-bezier(0.77,0,0.175,1) both;
+          animation: m-stripe-slide-in 0.6s cubic-bezier(0.4,0,0.2,1) both;
         }
         .animate-m-stripe-slide:hover {
-          filter: brightness(1.1) drop-shadow(0 0 8px #fff4);
+          filter: brightness(1.05) drop-shadow(0 0 4px #fff2);
         }
-        .delay-150 { animation-delay: 0.15s; }
-        .delay-300 { animation-delay: 0.3s; }
+        .delay-150 { animation-delay: 0.1s; }
+        .delay-300 { animation-delay: 0.2s; }
         @keyframes m-stripe-slide-in {
-          0% { transform: rotate(-24deg) scale(1.2) translateY(-60%) scaleX(0.8); opacity: 0; }
-          60% { opacity: 1; }
+          0% { transform: rotate(-24deg) scale(1.2) translateY(-40%) scaleX(0.9); opacity: 0; }
+          70% { opacity: 1; }
           100% { transform: rotate(-24deg) scale(1.2); opacity: 0.85; }
         }
         .split-left {
-          animation: splitLeftIn 0.8s cubic-bezier(0.77,0,0.175,1) 0.2s both;
+          animation: splitLeftIn 0.5s cubic-bezier(0.4,0,0.2,1) 0.1s both;
         }
         .split-right {
-          animation: splitRightIn 0.8s cubic-bezier(0.77,0,0.175,1) 0.2s both;
+          animation: splitRightIn 0.5s cubic-bezier(0.4,0,0.2,1) 0.1s both;
         }
         @keyframes splitLeftIn {
-          0% { opacity: 0; transform: translateX(-60%) scale(0.9); }
-          60% { opacity: 1; }
-          80% { opacity: 1; transform: translateX(0) scale(1.02); }
+          0% { opacity: 0; transform: translateX(-30%) scale(0.95); }
+          70% { opacity: 1; }
           100% { opacity: 1; transform: translateX(0) scale(1); }
         }
         @keyframes splitRightIn {
-          0% { opacity: 0; transform: translateX(60%) scale(0.9); }
-          60% { opacity: 1; }
-          80% { opacity: 1; transform: translateX(0) scale(1.02); }
+          0% { opacity: 0; transform: translateX(30%) scale(0.95); }
+          70% { opacity: 1; }
           100% { opacity: 1; transform: translateX(0) scale(1); }
         }
         .slide-up-in {
-          animation: slideUpIn 0.8s cubic-bezier(0.77,0,0.175,1) 1.1s both;
+          animation: slideUpIn 0.5s cubic-bezier(0.4,0,0.2,1) 0.3s both;
         }
         @keyframes slideUpIn {
-          0% { opacity: 0; transform: translateY(40%) scale(0.95); }
-          60% { opacity: 1; }
-          80% { opacity: 1; transform: translateY(0) scale(1.02); }
+          0% { opacity: 0; transform: translateY(20%) scale(0.98); }
+          70% { opacity: 1; }
           100% { opacity: 1; transform: translateY(0) scale(1); }
         }
         @keyframes popUp {
-          0% { opacity: 0; transform: translateY(30%) scale(0.95); }
-          60% { opacity: 1; }
-          80% { opacity: 1; transform: translateY(0) scale(1.05); }
+          0% { opacity: 0; transform: translateY(15%) scale(0.98); }
+          70% { opacity: 1; }
           100% { opacity: 1; transform: translateY(0) scale(1); }
         }
         .animate-pop-up {
-          animation: popUp 0.6s cubic-bezier(0.77,0,0.175,1) both;
+          animation: popUp 0.4s cubic-bezier(0.4,0,0.2,1) both;
         }
-        .btn-delay-1 { animation-delay: 1.8s; }
-        .btn-delay-2 { animation-delay: 1.9s; }
-        .btn-delay-3 { animation-delay: 2.0s; }
+        .btn-delay-1 { animation-delay: 0.5s; }
+        .btn-delay-2 { animation-delay: 0.6s; }
+        .btn-delay-3 { animation-delay: 0.7s; }
         @keyframes bounceSlow {
           0%, 100% { transform: translateY(0); }
           50% { transform: translateY(12px); }
@@ -220,8 +216,8 @@ export default function Hero() {
         .chevron-appear-bounce {
           opacity: 0;
           animation:
-            chevronFadeIn 0.5s ease forwards 3.5s,
-            bounceSlow 1.5s infinite 4s;
+            chevronFadeIn 0.5s ease forwards 1.2s,
+            bounceSlow 1.5s infinite 1.7s;
         }
         @keyframes chevronFadeIn {
           to { opacity: 1; }

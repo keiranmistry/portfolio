@@ -1,10 +1,13 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, Suspense, lazy } from "react";
 import Hero from "@/components/Hero";
 import Projects from "@/components/Projects";
 import Experience from "@/components/Experience";
-import TravelMap from "@/components/TravelMap";
-import Gallery from "@/components/Gallery";
+import LoadingSpinner from "@/components/LoadingSpinner";
+
+// Lazy load heavy components
+const TravelMap = lazy(() => import("@/components/TravelMap"));
+const Gallery = lazy(() => import("@/components/Gallery"));
 
 export default function Home() {
   useEffect(() => {
@@ -19,8 +22,12 @@ export default function Home() {
         <Hero />
         <Projects />
         <Experience />
-        <TravelMap />
-        <Gallery />
+        <Suspense fallback={<div className="py-20 bg-gradient-to-br from-blue-900 to-blue-600"><LoadingSpinner message="Loading travel map..." /></div>}>
+          <TravelMap />
+        </Suspense>
+        <Suspense fallback={<div className="py-20 bg-gradient-to-br from-blue-600 to-red-600"><LoadingSpinner message="Loading gallery..." /></div>}>
+          <Gallery />
+        </Suspense>
       </main>
     </div>
   );

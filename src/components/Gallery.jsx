@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { motion, useAnimation, AnimatePresence } from "framer-motion";
 import { Exo_2 } from 'next/font/google';
+import Image from 'next/image';
 import { travelData } from '../lib/travelData';
 import { getTripPhotos } from '../lib/photoData';
 import Footer from './Footer';
@@ -51,11 +52,13 @@ export default function Gallery() {
           setIsInView(true);
           setHasAnimated(true);
           controls.start('visible');
+          // Disconnect observer after animation to save resources
+          observer.disconnect();
         }
       },
       {
-        threshold: 0.1,
-        rootMargin: '0px 0px -100px 0px' // Reduced margin for better performance
+        threshold: 0.2, // Increased threshold for better performance
+        rootMargin: '0px 0px -50px 0px' // Reduced margin for better performance
       }
     );
 
@@ -64,9 +67,7 @@ export default function Gallery() {
     }
 
     return () => {
-      if (sectionRef.current) {
-        observer.unobserve(sectionRef.current);
-      }
+      observer.disconnect();
     };
   }, [controls, hasAnimated]);
 
@@ -173,7 +174,7 @@ export default function Gallery() {
     return gradients[index];
   }, []);
 
-  // Memoized gallery items generation
+  // Memoized gallery items generation with pagination
   const generateGalleryItems = useCallback(() => {
     const items = [];
     let itemIndex = 0;
@@ -193,7 +194,7 @@ export default function Gallery() {
                 visit: visit,
                 emoji: getCityEmoji(cityName),
                 gradient: getGradientForCity(cityName),
-                delay: 0.2 + (itemIndex * 0.05) // Reduced delay for better performance
+                delay: 0.1 + (itemIndex * 0.02) // Much reduced delay for better performance
               });
               itemIndex++;
             }
@@ -218,24 +219,24 @@ export default function Gallery() {
 
   // Simplified animation variants for better performance
   const containerVariants = {
-    hidden: { opacity: 0, y: 30 },
+    hidden: { opacity: 0, y: 20 },
     visible: { 
       opacity: 1, 
       y: 0,
       transition: { 
-        duration: 0.5,
-        staggerChildren: 0.05,
+        duration: 0.3,
+        staggerChildren: 0.03,
         ease: "easeOut"
       }
     }
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, y: 10 },
     visible: { 
       opacity: 1, 
       y: 0,
-      transition: { duration: 0.3, ease: "easeOut" }
+      transition: { duration: 0.2, ease: "easeOut" }
     }
   };
 
@@ -273,7 +274,7 @@ export default function Gallery() {
                 className="backdrop-blur-sm bg-white/5 border border-white/20 shadow-xl rounded-2xl overflow-hidden cursor-pointer hover:bg-white/10 transition-all duration-200"
                 variants={itemVariants}
                 whileHover={{ 
-                  scale: 1.01,
+                  scale: 1.005,
                   transition: { duration: 0.1, ease: "easeOut" }
                 }}
                 onClick={() => handleTripClick(item)}
@@ -371,10 +372,14 @@ export default function Gallery() {
                                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white"></div>
                                 </div>
                               )}
-                              <img 
+                              <Image 
                                 src={`/${currentPhoto.filename}`}
                                 alt={currentPhoto.description}
+                                width={800}
+                                height={600}
                                 className="max-w-full max-h-[80%] object-contain rounded-lg transition-opacity duration-300"
+                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 60vw"
+                                quality={85}
                                 onLoad={() => setIsImageLoading(false)}
                                 onError={() => setIsImageLoading(false)}
                               />

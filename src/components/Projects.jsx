@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { motion, useAnimation, AnimatePresence } from "framer-motion";
 import { Exo_2 } from 'next/font/google';
+import Image from 'next/image';
 
 const exo2 = Exo_2({
   subsets: ['latin'],
@@ -153,11 +154,13 @@ export default function Projects() {
           setIsInView(true);
           setHasAnimated(true);
           controls.start('visible');
+          // Disconnect observer after animation to save resources
+          observer.disconnect();
         }
       },
       {
-        threshold: 0.1,
-        rootMargin: '0px 0px -100px 0px' // Reduced margin for better performance
+        threshold: 0.2, // Increased threshold for better performance
+        rootMargin: '0px 0px -50px 0px' // Reduced margin for better performance
       }
     );
 
@@ -166,9 +169,7 @@ export default function Projects() {
     }
 
     return () => {
-      if (sectionRef.current) {
-        observer.unobserve(sectionRef.current);
-      }
+      observer.disconnect();
     };
   }, [controls, hasAnimated]);
 
@@ -214,24 +215,24 @@ export default function Projects() {
 
   // Simplified animation variants for better performance
   const containerVariants = {
-    hidden: { opacity: 0, y: 30 },
+    hidden: { opacity: 0, y: 20 },
     visible: { 
       opacity: 1, 
       y: 0,
       transition: { 
-        duration: 0.4,
-        staggerChildren: 0.1,
+        duration: 0.3,
+        staggerChildren: 0.05,
         ease: "easeOut"
       }
     }
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: { opacity: 0, y: 10 },
     visible: { 
       opacity: 1, 
       y: 0,
-      transition: { duration: 0.3, ease: "easeOut" }
+      transition: { duration: 0.2, ease: "easeOut" }
     }
   };
 
@@ -310,19 +311,22 @@ export default function Projects() {
               className="backdrop-blur-lg bg-white/5 border border-white/20 shadow-xl rounded-2xl overflow-hidden cursor-pointer hover:bg-white/10 transition-all duration-200"
               variants={itemVariants}
               whileHover={{ 
-                scale: 1.01,
+                scale: 1.005,
                 transition: { duration: 0.1, ease: "easeOut" }
               }}
               onClick={() => handleProjectClick(project)}
             >
               <div className={`aspect-square bg-gradient-to-br ${getGradientForProject(project.id)} flex flex-col relative overflow-hidden`}>
-                {/* Background Image with lazy loading */}
+                {/* Background Image with Next.js optimization */}
                 <div className="absolute inset-0">
-                  <img 
+                  <Image 
                     src={project.image} 
                     alt={project.title}
-                    className="w-full h-full object-cover opacity-90"
-                    loading="lazy"
+                    fill
+                    className="object-cover opacity-90"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    priority={false}
+                    quality={75}
                   />
                 </div>
                 
@@ -457,16 +461,19 @@ export default function Projects() {
                           selectedProject.screenshots.map((screenshot, index) => (
                             <div key={screenshot.id} className="bg-white/10 rounded-lg flex flex-col items-center justify-center relative overflow-hidden w-full max-w-2xl shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-[1.02]">
                               <div className="flex-1 flex items-center justify-center w-full">
-                                <img 
-                                  src={screenshot.filename}
-                                  alt={screenshot.description}
-                                  className="w-full h-auto object-contain max-h-[700px] rounded-lg"
-                                  loading="lazy"
-                                  onError={(e) => {
-                                    e.target.style.display = 'none';
-                                    e.target.nextSibling.style.display = 'flex';
-                                  }}
-                                />
+                              <Image 
+                                src={screenshot.filename}
+                                alt={screenshot.description}
+                                width={800}
+                                height={600}
+                                className="w-full h-auto object-contain max-h-[700px] rounded-lg"
+                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 40vw"
+                                quality={80}
+                                onError={(e) => {
+                                  e.target.style.display = 'none';
+                                  e.target.nextSibling.style.display = 'flex';
+                                }}
+                              />
                                 <div className="w-full h-full flex items-center justify-center text-white/40 text-sm" style={{display: 'none'}}>
                                   {screenshot.description}
                                 </div>

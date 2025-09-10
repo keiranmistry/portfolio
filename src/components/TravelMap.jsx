@@ -151,14 +151,14 @@ export default function TravelMap() {
     
     setHighlightedCountries(new Set());
     
-    // Start country animation after title animation
+    // Start country animation after title animation - much faster
     setTimeout(() => {
       shuffledCountries.forEach((countryCode, index) => {
         setTimeout(() => {
           setHighlightedCountries(prev => new Set([...prev, countryCode]));
-        }, index * 150); // Slower animation - 150ms delay between each country
+        }, index * 50); // Much faster animation - 50ms delay between each country
       });
-    }, 600); // Slower delay after title animation
+    }, 200); // Much faster delay after title animation
   }, [isInView]);
 
   // Responsive handler
@@ -442,14 +442,14 @@ export default function TravelMap() {
     setIsDragging(false);
   }, []);
 
-  // Mouse wheel zoom
+  // Mouse wheel zoom with throttling
   const handleWheel = useCallback((e) => {
     e.preventDefault();
-    const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
+    const zoomFactor = e.deltaY > 0 ? 0.95 : 1.05; // Smaller zoom steps for smoother performance
     setZoom(prev => {
       const newZoom = prev * zoomFactor;
       // More restrictive zoom bounds
-      return Math.max(0.8, Math.min(2.5, newZoom));
+      return Math.max(0.8, Math.min(2.0, newZoom)); // Reduced max zoom
     });
   }, []);
 
