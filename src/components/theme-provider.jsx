@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 
 const ThemeContext = createContext(null);
 
@@ -15,22 +15,42 @@ export function ThemeProvider({ children }) {
   // effect just brings React's state in sync with that class *after* hydration,
   // which is a normal post-mount update rather than a hydration mismatch.
   const [theme, setTheme] = useState("light");
+  // Once the visitor manually flips the toggle, that choice is pinned in
+  // localStorage and we stop following the OS setting.
+  const isPinnedRef = useRef(false);
 
   useEffect(() => {
+    const stored = window.localStorage.getItem("theme");
+    isPinnedRef.current = stored === "light" || stored === "dark";
     setTheme(document.documentElement.classList.contains("dark") ? "dark" : "light");
   }, []);
 
   useEffect(() => {
     applyTheme(theme);
-    window.localStorage.setItem("theme", theme);
   }, [theme]);
 
+  // Live-follow the OS setting while nothing has been manually pinned.
+  useEffect(() => {
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    const handleChange = (e) => {
+      if (isPinnedRef.current) return;
+      setTheme(e.matches ? "dark" : "light");
+    };
+    media.addEventListener("change", handleChange);
+    return () => media.removeEventListener("change", handleChange);
+  }, []);
+
   const toggleTheme = useCallback(() => {
-    setTheme((prev) => (prev === "dark" ? "light" : "dark"));
+    setTheme((prev) => {
+      const next = prev === "dark" ? "light" : "dark";
+      window.localStorage.setItem("theme", next);
+      return next;
+    });
+    isPinnedRef.current = true;
   }, []);
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
       {children}
     </ThemeContext.Provider>
   );
