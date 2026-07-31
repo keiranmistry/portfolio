@@ -94,7 +94,8 @@ export const travelData = {
         { year: "2014" },
         { year: "2016" },
         { year: "2022" },
-        { year: "2025" }
+        { year: "2025" },
+        { year: "2026" }
       ],
       "Manchester": [
         { year: "2010" }
@@ -171,6 +172,9 @@ export const travelData = {
       "Chicago": [
         { year: "2019" }
       ],
+      "Las Vegas": [
+        { year: "2026" }
+      ],
       "New York": [
         { year: "2012" },
         { year: "2013" },
@@ -213,24 +217,21 @@ export const travelData = {
   }
 };
 
-// Color options for country highlighting
-export const colorOptions = ["#0266B1", "#033E7A", "#E22716"];
-
-// Function to get random color for country highlighting
-export const getRandomColor = () => {
-  return colorOptions[Math.floor(Math.random() * colorOptions.length)];
-};
-
 // Function to get total number of countries visited
 export const getTotalCountries = () => {
   return Object.keys(travelData).length;
 };
 
+// Function to get the number of trips made to a single country
+export const getTripCount = (countryCode) => {
+  const country = travelData[countryCode];
+  if (!country) return 0;
+  return Object.values(country.cities).reduce((total, dates) => total + dates.length, 0);
+};
+
 // Function to get total number of trips
 export const getTotalTrips = () => {
-  return Object.values(travelData).reduce((total, country) => 
-    total + Object.values(country.cities).reduce((cityTotal, dates) => cityTotal + dates.length, 0), 0
-  );
+  return Object.keys(travelData).reduce((total, code) => total + getTripCount(code), 0);
 };
 
 // Function to get total number of continents visited
@@ -238,29 +239,3 @@ export const getTotalContinents = () => {
   // Based on the countries visited: North America, Europe, Asia, Oceania
   return 4;
 };
-
-// Function to get countries with cities (visited countries)
-export const getVisitedCountries = () => {
-  const visited = {};
-  Object.keys(travelData).forEach(countryCode => {
-    if (Object.keys(travelData[countryCode].cities).length > 0) {
-      visited[countryCode] = {
-        ...travelData[countryCode],
-        color: getRandomColor()
-      };
-    }
-  });
-  return visited;
-};
-
-// Function to get all countries with random colors
-export const getAllCountriesWithColors = () => {
-  const countriesWithColors = {};
-  Object.keys(travelData).forEach(countryCode => {
-    countriesWithColors[countryCode] = {
-      ...travelData[countryCode],
-      color: getRandomColor()
-    };
-  });
-  return countriesWithColors;
-}; 

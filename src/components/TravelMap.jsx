@@ -1,989 +1,316 @@
 "use client";
 
-import React, { useState, useRef, useEffect, useCallback } from "react";
-import { AnimatePresence, motion, useMotionValue, useTransform, useAnimation } from "framer-motion";
-import { ComposableMap, Geographies, Geography } from "react-simple-maps";
-import { geoMercator, geoPath } from "d3-geo";
-import { Barlow, Exo_2 } from 'next/font/google';
-import { countryData, nameToCodeMap, idToCodeMap } from '../lib/countryData';
-import { travelData, getRandomColor, getTotalCountries, getTotalTrips, getTotalContinents, getAllCountriesWithColors } from '../lib/travelData';
-import Flag from 'react-flagkit';
-
-const barlow = Barlow({
-  subsets: ['latin'],
-  weight: ['400', '700'],
-});
-
-const exo2 = Exo_2({
-  subsets: ['latin'],
-  weight: ['400', '700'],
-});
+import { useState, useMemo, useCallback, useRef } from "react";
+import { AnimatePresence, motion, animate } from "framer-motion";
+import { ComposableMap, Geographies, Geography, ZoomableGroup } from "react-simple-maps";
+import { nameToCodeMap, idToCodeMap } from "@/lib/countryData";
+import {
+  travelData,
+  getTripCount,
+  getTotalCountries,
+  getTotalTrips,
+  getTotalContinents,
+} from "@/lib/travelData";
+import Flag from "react-flagkit";
 
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
+const MIN_ZOOM = 1;
+const MAX_ZOOM = 8;
 
-// Animated Counter Component
-const AnimatedCounter = ({ value, color, className, isVisible }) => {
-  const [displayValue, setDisplayValue] = useState(0);
+function getCountryCode(geo) {
+  const countryId = geo.id;
+  const countryName =
+    geo.properties.name || geo.properties.NAME || geo.properties.ADMIN || "Unknown";
+  return nameToCodeMap[countryName] || idToCodeMap[countryId];
+}
 
-  useEffect(() => {
-    if (!isVisible) return;
-    
-          const timer = setTimeout(() => {
-        const startTime = Date.now();
-        const duration = 2000; // 2 seconds - slower animation
-      
-        const updateValue = () => {
-          const elapsed = Date.now() - startTime;
-          const progress = Math.min(elapsed / duration, 1);
-          const currentValue = Math.round(progress * value);
-        
-          setDisplayValue(currentValue);
-        
-          if (progress < 1) {
-            requestAnimationFrame(updateValue);
-          }
-        };
-      
-        updateValue();
-      }, 800); // 0.8 second delay - slower
-    
-    return () => clearTimeout(timer);
-  }, [value, isVisible]);
-
+function ZoomButton({ onClick, label, children }) {
   return (
-    <motion.div 
-      className={className} 
-      style={{ color }}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: isVisible ? 1 : 0 }}
-      transition={{ duration: 0.7, delay: isVisible ? 0.8 : 0 }}
+    <motion.button
+      onClick={onClick}
+      aria-label={label}
+      whileHover={{ scale: 1.08 }}
+      whileTap={{ scale: 0.9 }}
+      transition={{ type: "spring", stiffness: 450, damping: 22 }}
+      className="flex h-7 w-7 items-center justify-center rounded-lg border border-border bg-card/80 text-muted-foreground backdrop-blur-sm transition-all duration-200 hover:border-primary/40 hover:text-foreground hover:shadow-[0_0_10px_-2px_var(--primary)]"
     >
-      {displayValue}
-    </motion.div>
+      {children}
+    </motion.button>
   );
-};
-
+}
 
 export default function TravelMap() {
-  const [hoveredCountry, setHoveredCountry] = useState(null);
-  const [hoveredCentroid, setHoveredCentroid] = useState(null);
-  const [zoom, setZoom] = useState(1);
-  const [center, setCenter] = useState([0, 0]);
-  const [isCitiesExpanded, setIsCitiesExpanded] = useState(false);
-  const [defaultCountry, setDefaultCountry] = useState("CAN");
-  const [highlightedCountries, setHighlightedCountries] = useState(new Set());
-  const mapContainerRef = useRef(null);
-  const [dimensions, setDimensions] = useState({ width: 1000, height: 600 });
-  const sectionRef = useRef(null);
-  const controls = useAnimation();
-  const [isInView, setIsInView] = useState(false);
-  const [hasAnimated, setHasAnimated] = useState(false);
-  const [visitedCountries, setVisitedCountries] = useState({});
-  const [selectedCountry, setSelectedCountry] = useState(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [pan, setPan] = useState({ x: 0, y: 0 });
-  const [lastMousePos, setLastMousePos] = useState({ x: 0, y: 0 });
+  const [selectedCode, setSelectedCode] = useState(null);
+  const [position, setPosition] = useState({ coordinates: [0, 0], zoom: 1 });
+  const didDrag = useRef(false);
+  const positionRef = useRef(position);
+  const zoomAnimation = useRef(null);
+  positionRef.current = position;
 
-  // Initialize visited countries with random colors
-  useEffect(() => {
-    const countriesWithColors = {};
-    Object.keys(travelData).forEach(countryCode => {
-      countriesWithColors[countryCode] = {
-        ...travelData[countryCode],
-        color: getRandomColor()
+  // Sequential single-hue ramp (brand primary) keyed by trip count — magnitude,
+  // not identity, so the fill actually encodes something instead of cycling colors.
+  const visitedCountries = useMemo(() => {
+    const codes = Object.keys(travelData);
+    const tripCounts = codes.map(getTripCount);
+    const maxTrips = Math.max(...tripCounts, 1);
+    return codes.reduce((acc, code, i) => {
+      const trips = tripCounts[i];
+      const intensity = maxTrips > 1 ? 0.35 + 0.65 * ((trips - 1) / (maxTrips - 1)) : 1;
+      acc[code] = {
+        ...travelData[code],
+        trips,
+        fill: `color-mix(in oklch, var(--primary) ${Math.round(intensity * 100)}%, var(--background))`,
       };
-    });
-    setVisitedCountries(countriesWithColors);
+      return acc;
+    }, {});
   }, []);
 
-  // Intersection Observer for smooth animation trigger
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !hasAnimated) {
-          setIsInView(true);
-          setHasAnimated(true);
-          controls.start('visible');
-        }
+  const stats = useMemo(
+    () => [
+      { label: "Countries", value: getTotalCountries() },
+      { label: "Trips", value: getTotalTrips() },
+      { label: "Continents", value: getTotalContinents() },
+    ],
+    []
+  );
+
+  const handleCountryClick = useCallback((code) => {
+    if (didDrag.current) return; // ignore the click that ends a pan drag
+    if (!code || !travelData[code]) return;
+    setSelectedCode((prev) => (prev === code ? null : code));
+  }, []);
+
+  // Smoothly tween zoom/center rather than snapping — the map's own gesture
+  // handling (wheel/drag) stays instant; only these programmatic jumps ease.
+  const animatePositionTo = useCallback((target) => {
+    zoomAnimation.current?.stop();
+    const start = positionRef.current;
+    zoomAnimation.current = animate(0, 1, {
+      duration: 0.4,
+      ease: [0.16, 1, 0.3, 1],
+      onUpdate: (t) => {
+        setPosition({
+          zoom: start.zoom + (target.zoom - start.zoom) * t,
+          coordinates: [
+            start.coordinates[0] + (target.coordinates[0] - start.coordinates[0]) * t,
+            start.coordinates[1] + (target.coordinates[1] - start.coordinates[1]) * t,
+          ],
+        });
       },
-      {
-        threshold: 0.1, // Trigger when just 10% of the title is visible
-        rootMargin: '0px 0px -200px 0px' // Trigger much earlier
-      }
-    );
-
-    // Create a ref for the title specifically
-    const titleRef = document.querySelector('#travel-title');
-    if (titleRef) {
-      observer.observe(titleRef);
-    }
-
-    return () => {
-      if (titleRef) {
-        observer.unobserve(titleRef);
-      }
-    };
-  }, [controls, hasAnimated]);
-
-  // Set a random default country after visitedCountries is initialized
-  useEffect(() => {
-    if (Object.keys(visitedCountries).length > 0) {
-      const countryCodes = Object.keys(visitedCountries);
-      const randomCountry = countryCodes[Math.floor(Math.random() * countryCodes.length)];
-      setDefaultCountry(randomCountry);
-    }
-  }, [visitedCountries]);
-
-  // Use the default country when no country is hovered
-  const currentCountry = hoveredCountry || defaultCountry;
-
-  // Handle country click to set as default
-  const handleCountryClick = (countryCode) => {
-    setDefaultCountry(countryCode);
-  };
-
-  // Animate countries in random order when component comes into view
-  useEffect(() => {
-    if (!isInView) return;
-    
-    const countryCodes = Object.keys(visitedCountries);
-    const shuffledCountries = [...countryCodes].sort(() => Math.random() - 0.5);
-    
-    setHighlightedCountries(new Set());
-    
-    // Start country animation after title animation - much faster
-    setTimeout(() => {
-      shuffledCountries.forEach((countryCode, index) => {
-        setTimeout(() => {
-          setHighlightedCountries(prev => new Set([...prev, countryCode]));
-        }, index * 50); // Much faster animation - 50ms delay between each country
-      });
-    }, 200); // Much faster delay after title animation
-  }, [isInView]);
-
-  // Responsive handler
-  useEffect(() => {
-    function handleResize() {
-      if (mapContainerRef.current) {
-        const containerWidth = mapContainerRef.current.offsetWidth;
-        const containerHeight = Math.round(containerWidth * 0.6);
-        
-        // Ensure dimensions don't exceed container bounds
-        const maxWidth = Math.min(containerWidth, 1000);
-        const maxHeight = Math.min(containerHeight, 600);
-        
-        setDimensions({ 
-          width: maxWidth, 
-          height: maxHeight 
-        });
-      }
-    }
-    
-    // Initial resize
-    handleResize();
-    
-    // Add resize listener
-    window.addEventListener("resize", handleResize);
-    
-    // Add orientation change listener for mobile
-    window.addEventListener("orientationchange", () => {
-      setTimeout(handleResize, 100); // Delay to allow orientation change to complete
-    });
-    
-    return () => {
-      window.removeEventListener("resize", handleResize);
-      window.removeEventListener("orientationchange", handleResize);
-    };
-  }, []);
-
-  // Projection for tooltip placement
-  const projection = geoMercator()
-    .scale(dimensions.width / 6.25)
-    .translate([dimensions.width / 2, dimensions.height / 2]);
-
-  function getCountryCode(geo) {
-    // The geography data uses numeric IDs, not ISO codes
-    const countryId = geo.id;
-    const countryName = geo.properties.name || geo.properties.NAME || geo.properties.ADMIN || geo.properties.ADMIN0 || 'Unknown';
-    
-         // Debug: Log the country name to see what's being returned
-     if (countryName.includes('Solomon') || countryName.includes('solomon')) {
-       console.log('Found Solomon Islands with name:', countryName);
-     }
-     if (countryName.includes('Azerbaijan') || countryName.includes('azerbaijan')) {
-       console.log('Found Azerbaijan with name:', countryName);
-     }
-    
-    // Try to match by name first (more reliable)
-    let finalCode = nameToCodeMap[countryName];
-    
-    if (!finalCode) {
-      // Fallback to numeric ID mapping
-      finalCode = idToCodeMap[countryId];
-    }
-    
-    return finalCode;
-  }
-
-  function getCentroid(geo) {
-    const path = geoPath().projection(projection);
-    return path.centroid(geo);
-  }
-
-  function getTooltipTransform(x, y, currentZoom, currentCenter) {
-    const mapWidth = 1000;
-    const mapHeight = 600;
-    const tooltipWidth = 320;
-    const tooltipHeight = 200;
-    
-    // Always position tooltip in the bottom-right corner, away from countries
-    const tooltipX = mapWidth - tooltipWidth - 30;
-    const tooltipY = mapHeight - tooltipHeight - 30;
-    
-    return `translate(${tooltipX - x}px, ${tooltipY - y}px)`;
-  }
-
-  function getArrowPosition(x, y, currentZoom) {
-    const mapWidth = 1000;
-    const mapHeight = 600;
-    const tooltipWidth = 320;
-    const tooltipHeight = 200;
-    
-    // Adjust for zoom level
-    const zoomFactor = Math.max(0.5, Math.min(2, 1 / currentZoom));
-    const adjustedTooltipWidth = tooltipWidth * zoomFactor;
-    const adjustedTooltipHeight = tooltipHeight * zoomFactor;
-    
-    // Calculate available space (same logic as getTooltipTransform)
-    const spaceOnRight = x + adjustedTooltipWidth / 2 + 120 < mapWidth;
-    const spaceOnLeft = x - adjustedTooltipWidth / 2 - 120 > 0;
-    const spaceAbove = y - adjustedTooltipHeight / 2 - 120 > 0;
-    const spaceBelow = y + adjustedTooltipHeight / 2 + 120 < mapHeight;
-    
-    // Determine arrow position based on tooltip placement
-    if (spaceOnRight && spaceOnLeft) {
-      // If both sides have space, choose the one with more room
-      const rightSpace = mapWidth - x;
-      const leftSpace = x;
-      if (rightSpace > leftSpace) {
-        // Tooltip is to the right, arrow points left
-        return {
-          top: '50%',
-          left: '-20px',
-          transform: 'translateY(-50%)',
-          borderTopColor: 'transparent',
-          borderBottomColor: 'transparent',
-          borderLeftColor: 'rgba(255,255,255,0.95)',
-          borderRightColor: 'transparent',
-          borderBottomWidth: '0px',
-          borderTopWidth: '0px',
-          borderLeftWidth: '20px',
-          borderRightWidth: '0px'
-        };
-      } else {
-        // Tooltip is to the left, arrow points right
-        return {
-          top: '50%',
-          left: '100%',
-          transform: 'translateY(-50%)',
-          borderTopColor: 'transparent',
-          borderBottomColor: 'transparent',
-          borderLeftColor: 'transparent',
-          borderRightColor: 'rgba(255,255,255,0.95)',
-          borderBottomWidth: '0px',
-          borderTopWidth: '0px',
-          borderLeftWidth: '0px',
-          borderRightWidth: '20px'
-        };
-      }
-    } else if (spaceOnRight) {
-      // Tooltip is to the right, arrow points left
-      return {
-        top: '50%',
-        left: '-20px',
-        transform: 'translateY(-50%)',
-        borderTopColor: 'transparent',
-        borderBottomColor: 'transparent',
-        borderLeftColor: 'rgba(255,255,255,0.95)',
-        borderRightColor: 'transparent',
-        borderBottomWidth: '0px',
-        borderTopWidth: '0px',
-        borderLeftWidth: '20px',
-        borderRightWidth: '0px'
-      };
-    } else if (spaceOnLeft) {
-      // Tooltip is to the left, arrow points right
-      return {
-        top: '50%',
-        left: '100%',
-        transform: 'translateY(-50%)',
-        borderTopColor: 'transparent',
-        borderBottomColor: 'transparent',
-        borderLeftColor: 'transparent',
-        borderRightColor: 'rgba(255,255,255,0.95)',
-        borderBottomWidth: '0px',
-        borderTopWidth: '0px',
-        borderLeftWidth: '0px',
-        borderRightWidth: '20px'
-      };
-          } else if (spaceAbove && spaceBelow) {
-        // If both above and below have space, choose the one with more room
-        const aboveSpace = y;
-        const belowSpace = mapHeight - y;
-        if (aboveSpace > belowSpace) {
-          // Tooltip is above, arrow points down
-          return {
-            top: '100%',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            borderTopColor: 'transparent',
-            borderBottomColor: 'rgba(255,255,255,0.95)',
-            borderLeftColor: 'transparent',
-            borderRightColor: 'transparent',
-            borderBottomWidth: '12px',
-            borderTopWidth: '0px',
-            borderLeftWidth: '0px',
-            borderRightWidth: '0px'
-          };
-        } else {
-          // Tooltip is below, arrow points up
-          return {
-            top: '-20px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            borderTopColor: 'rgba(255,255,255,0.95)',
-            borderBottomColor: 'transparent',
-            borderLeftColor: 'transparent',
-            borderRightColor: 'transparent',
-            borderBottomWidth: '0px',
-            borderTopWidth: '20px',
-            borderLeftWidth: '0px',
-            borderRightWidth: '0px'
-          };
-        }
-      } else if (spaceAbove) {
-        // Tooltip is above, arrow points down
-        return {
-          top: '100%',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          borderTopColor: 'transparent',
-          borderBottomColor: 'rgba(255,255,255,0.95)',
-          borderLeftColor: 'transparent',
-          borderRightColor: 'transparent',
-          borderBottomWidth: '20px',
-          borderTopWidth: '0px',
-          borderLeftWidth: '0px',
-          borderRightWidth: '0px'
-        };
-      } else if (spaceBelow) {
-        // Tooltip is below, arrow points up
-        return {
-          top: '-20px',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          borderTopColor: 'rgba(255,255,255,0.95)',
-          borderBottomColor: 'transparent',
-          borderLeftColor: 'transparent',
-          borderRightColor: 'transparent',
-          borderBottomWidth: '0px',
-          borderTopWidth: '20px',
-          borderLeftWidth: '0px',
-          borderRightWidth: '0px'
-        };
-    } else {
-      // Fallback: no arrow for corner positioning
-      return {
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        borderTopColor: 'transparent',
-        borderBottomColor: 'transparent',
-        borderLeftColor: 'transparent',
-        borderRightColor: 'transparent',
-        borderBottomWidth: '0px',
-        borderTopWidth: '0px',
-        borderLeftWidth: '0px',
-        borderRightWidth: '0px'
-      };
-    }
-  }
-
-  // Mouse event handlers for panning
-  const handleMouseDown = useCallback((e) => {
-    setIsDragging(true);
-    setLastMousePos({ x: e.clientX, y: e.clientY });
-  }, []);
-
-  const handleMouseMove = useCallback((e) => {
-    if (isDragging) {
-      const deltaX = e.clientX - lastMousePos.x;
-      const deltaY = e.clientY - lastMousePos.y;
-      setPan(prev => {
-        const newX = prev.x + deltaX;
-        const newY = prev.y + deltaY;
-        
-        // Add bounds to prevent panning too far - more restrictive
-        // Allow more panning when zoomed in
-        const zoomFactor = Math.max(0.8, zoom);
-        const maxPanX = dimensions.width * 0.3 * zoomFactor;
-        const maxPanY = dimensions.height * 0.3 * zoomFactor;
-        
-        return {
-          x: Math.max(-maxPanX, Math.min(maxPanX, newX)),
-          y: Math.max(-maxPanY, Math.min(maxPanY, newY))
-        };
-      });
-      setLastMousePos({ x: e.clientX, y: e.clientY });
-    }
-  }, [isDragging, lastMousePos, dimensions]);
-
-  const handleMouseUp = useCallback(() => {
-    setIsDragging(false);
-  }, []);
-
-  // Mouse wheel zoom with throttling
-  const handleWheel = useCallback((e) => {
-    e.preventDefault();
-    const zoomFactor = e.deltaY > 0 ? 0.95 : 1.05; // Smaller zoom steps for smoother performance
-    setZoom(prev => {
-      const newZoom = prev * zoomFactor;
-      // More restrictive zoom bounds
-      return Math.max(0.8, Math.min(2.0, newZoom)); // Reduced max zoom
     });
   }, []);
 
-  // Reset zoom and pan
-  const resetView = useCallback(() => {
-    setPan({ x: 0, y: 0 });
-    setZoom(1);
-  }, []);
+  const handleZoomIn = useCallback(() => {
+    const pos = positionRef.current;
+    animatePositionTo({ ...pos, zoom: Math.min(pos.zoom * 1.6, MAX_ZOOM) });
+  }, [animatePositionTo]);
 
-  // Add global mouse event listeners
-  useEffect(() => {
-    const handleGlobalMouseUp = () => setIsDragging(false);
-    const handleGlobalMouseMove = (e) => {
-      if (isDragging) {
-        const deltaX = e.clientX - lastMousePos.x;
-        const deltaY = e.clientY - lastMousePos.y;
-        setPan(prev => {
-          const newX = prev.x + deltaX;
-          const newY = prev.y + deltaY;
-          
-          // Add bounds to prevent panning too far - more restrictive
-          // Allow more panning when zoomed in
-          const zoomFactor = Math.max(0.8, zoom);
-          const maxPanX = dimensions.width * 0.3 * zoomFactor;
-          const maxPanY = dimensions.height * 0.3 * zoomFactor;
-          
-          return {
-            x: Math.max(-maxPanX, Math.min(maxPanX, newX)),
-            y: Math.max(-maxPanY, Math.min(maxPanY, newY))
-          };
-        });
-        setLastMousePos({ x: e.clientX, y: e.clientY });
-      }
-    };
+  const handleZoomOut = useCallback(() => {
+    const pos = positionRef.current;
+    animatePositionTo({ ...pos, zoom: Math.max(pos.zoom / 1.6, MIN_ZOOM) });
+  }, [animatePositionTo]);
 
-    document.addEventListener('mouseup', handleGlobalMouseUp);
-    document.addEventListener('mousemove', handleGlobalMouseMove);
+  const handleReset = useCallback(() => {
+    animatePositionTo({ coordinates: [0, 0], zoom: 1 });
+  }, [animatePositionTo]);
 
-    return () => {
-      document.removeEventListener('mouseup', handleGlobalMouseUp);
-      document.removeEventListener('mousemove', handleGlobalMouseMove);
-    };
-  }, [isDragging, lastMousePos, dimensions]);
+  const selected = selectedCode ? visitedCountries[selectedCode] : null;
 
   return (
-    <section ref={sectionRef} id="travel" className="py-20 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: "url('/ocean.png')" }}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <motion.h2 
-            id="travel-title"
-            className="text-6xl sm:text-8xl font-bold italic mb-4" 
-            style={{ color: '#C2DDDD' }}
-            initial={{ x: -1000, opacity: 0 }}
-            animate={controls}
-            variants={{
-              visible: { x: 0, opacity: 1 }
-            }}
-            transition={{ 
-              duration: 0.8, 
-              ease: "easeOut",
-              delay: 0.1
-            }}
-          >
-            <em>travel</em>
-          </motion.h2>
-        </div>
-        <div className="relative">
-          <motion.div 
-            className="w-full h-[600px] rounded-lg border border-gray-700 overflow-hidden relative backdrop-blur-md"
-            style={{ 
-              background: 'rgba(30, 58, 138, 0.1)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
-              border: '1px solid rgba(255, 255, 255, 0.2)',
-              boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
-              // Mobile-specific styles
-              touchAction: 'pan-x pan-y pinch-zoom',
-              userSelect: 'none',
-              WebkitUserSelect: 'none',
-              WebkitTouchCallout: 'none',
-              cursor: isDragging ? 'grabbing' : 'grab'
-            }}
-            initial={{ opacity: 0, y: 50 }}
-            animate={controls}
-            variants={{
-              visible: { opacity: 1, y: 0 }
-            }}
-            transition={{ 
-              duration: 0.7, 
-              ease: "easeOut",
-              delay: 0.25
-            }}
-            ref={mapContainerRef}
-            onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onWheel={handleWheel}
-            onTouchStart={(e) => {
-              if (e.touches.length === 1) {
-                setIsDragging(true);
-                setLastMousePos({ x: e.touches[0].clientX, y: e.touches[0].clientY });
-              }
-            }}
-            onTouchMove={(e) => {
-              if (e.touches.length === 1 && isDragging) {
-                const touch = e.touches[0];
-                const deltaX = touch.clientX - lastMousePos.x;
-                const deltaY = touch.clientY - lastMousePos.y;
-                setPan(prev => {
-                  const newX = prev.x + deltaX;
-                  const newY = prev.y + deltaY;
-                  
-                  // Add bounds to prevent panning too far - more restrictive
-                  // Allow more panning when zoomed in
-                  const zoomFactor = Math.max(0.8, zoom);
-                  const maxPanX = dimensions.width * 0.3 * zoomFactor;
-                  const maxPanY = dimensions.height * 0.3 * zoomFactor;
-                  
-                  return {
-                    x: Math.max(-maxPanX, Math.min(maxPanX, newX)),
-                    y: Math.max(-maxPanY, Math.min(maxPanY, newY))
-                  };
-                });
-                setLastMousePos({ x: touch.clientX, y: touch.clientY });
-              }
-            }}
-            onTouchEnd={() => setIsDragging(false)}
-          >
-            <div className="absolute z-20 top-4 right-2 flex flex-col gap-2">
-              <button
-                className="text-white px-3 py-1 rounded shadow transition-all duration-300 ease-out flex items-center justify-center backdrop-blur-md cursor-pointer"
-                onClick={() => {
-                  const newZoom = Math.min(zoom * 1.2, 2.5);
-                  setZoom(newZoom);
-                }}
-                style={{ 
-                  pointerEvents: 'auto',
-                  background: 'rgba(35, 39, 47, 0.2)',
-                  backdropFilter: 'blur(20px)',
-                  WebkitBackdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)'
-                }}
-                title="Zoom In"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-              </button>
-              <button
-                className="text-white px-3 py-1 rounded shadow transition-all duration-300 ease-out flex items-center justify-center backdrop-blur-md cursor-pointer"
-                onClick={() => {
-                  const newZoom = Math.max(zoom / 1.2, 0.8);
-                  setZoom(newZoom);
-                }}
-                style={{ 
-                  pointerEvents: 'auto',
-                  background: 'rgba(35, 39, 47, 0.2)',
-                  backdropFilter: 'blur(20px)',
-                  WebkitBackdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)'
-                }}
-                title="Zoom Out"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-                </svg>
-              </button>
-              <button
-                className={`text-white px-3 py-1 rounded shadow transition-all duration-300 ease-out text-xs backdrop-blur-md cursor-pointer ${exo2.className}`}
-                onClick={resetView}
-                style={{ 
-                  pointerEvents: 'auto',
-                  background: 'rgba(35, 39, 47, 0.2)',
-                  backdropFilter: 'blur(20px)',
-                  WebkitBackdropFilter: 'blur(20px)',
-                  border: '1px solid rgba(255, 255, 255, 0.2)',
-                  boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37)'
-                }}
-                title="Reset View"
-              >
-                Reset
-              </button>
-            </div>
-            <div 
-              className="relative w-full h-full"
-              style={{
-                overflow: 'visible',
-                transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
-                transformOrigin: 'center center',
-                transition: isDragging ? 'none' : 'transform 0.1s ease-out'
-              }}
-            >
-              <ComposableMap
-                projectionConfig={{ scale: 160 }}
-                width={dimensions.width}
-                height={dimensions.height}
-                style={{ 
-                  width: "100%", 
-                  height: "100%",
-                  maxWidth: "100%", 
-                  maxHeight: "100%"
-                }}
-              >
+    <div className="flex h-full min-h-0 flex-col">
+      <h2 className="mb-4 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+        <span className="font-mono text-primary/70">//</span> Places I&rsquo;ve Been
+      </h2>
 
-                <Geographies geography={geoUrl}>
-                  {({ geographies }) =>
-                    geographies.map((geo) => {
-                      const code = getCountryCode(geo);
-                      const isVisited = visitedCountries.hasOwnProperty(code);
-                      
-                      return (
-                        <Geography
-                          key={geo.rsmKey}
-                          geography={geo}
-                          onMouseEnter={isVisited ? () => {
-                            setHoveredCountry(code);
-                            setHoveredCentroid(getCentroid(geo));
-                          } : undefined}
-                          onMouseLeave={isVisited ? () => {
-                            setHoveredCountry(null);
-                            setHoveredCentroid(null);
-                          } : undefined}
-                          onTouchStart={isVisited ? () => {
-                            setHoveredCountry(code);
-                            setHoveredCentroid(getCentroid(geo));
-                          } : undefined}
-                          onTouchEnd={isVisited ? () => {
-                            setHoveredCountry(null);
-                            setHoveredCentroid(null);
-                          } : undefined}
-                          onClick={() => {
-                            console.log('Clicked country:', code, 'Name:', geo.properties.name);
-                            if (geo.properties.name && (geo.properties.name.includes('Azerbaijan') || geo.properties.name.includes('azerbaijan'))) {
-                              console.log('Azerbaijan clicked - Full properties:', geo.properties);
-                            }
-                            handleCountryClick(code);
-                          }}
-                          style={{
-                            default: {
-                              fill: isVisited ? visitedCountries[code].color : "rgba(224, 251, 252, 0.3)",
-                              outline: "none",
-                              stroke: "#374151",
-                              strokeWidth: 0.5,
-                              transition: "fill 0.2s ease-out"
-                            },
-                            hover: {
-                              fill: isVisited ? visitedCountries[code].color : "#99D5C9",
-                              outline: "none",
-                              cursor: "pointer",
-                              stroke: isVisited ? visitedCountries[code].color : "#374151",
-                              strokeWidth: isVisited ? 1 : 0.5,
-                              transition: "fill 0.2s ease-out, stroke 0.2s ease-out"
-                            },
-                            pressed: {
-                              fill: isVisited ? visitedCountries[code].color : "#a8b5a8",
-                              outline: "none"
-                            }
-                          }}
-                          tabIndex={0}
-                          role="button"
-                          aria-label={`${geo.properties.name || 'Country'}`}
-                        />
-                      );
-                    })
-                  }
-                </Geographies>
-              </ComposableMap>
-            </div>
-
-          </motion.div>
-        </div>
-        {/* Stats and Tooltip Section */}
-        <motion.div 
-          className="mt-12 flex flex-col lg:flex-row gap-8 items-start"
-          initial={{ opacity: 0, y: 30 }}
-          animate={controls}
-          variants={{
-            visible: { opacity: 1, y: 0 }
-          }}
-          transition={{ 
-            duration: 0.7, 
-            ease: "easeOut",
-            delay: 0.4
-          }}
+      <div
+        className="relative min-h-0 flex-1 overflow-hidden rounded-xl border border-border"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle, color-mix(in oklch, var(--foreground) 12%, transparent) 1px, transparent 1px), radial-gradient(650px circle at 50% 42%, color-mix(in oklch, var(--primary) 14%, transparent), transparent 70%)",
+          backgroundSize: "18px 18px, auto",
+          backgroundPosition: "center, center",
+          backgroundColor: "var(--secondary)",
+        }}
+      >
+        <ComposableMap
+          projectionConfig={{ scale: 155 }}
+          width={980}
+          height={551}
+          style={{ width: "100%", height: "100%", cursor: "grab" }}
         >
-          {/* Country Tooltip */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ 
-              duration: 0.3,
-              ease: "easeOut"
+          <ZoomableGroup
+            center={position.coordinates}
+            zoom={position.zoom}
+            minZoom={MIN_ZOOM}
+            maxZoom={MAX_ZOOM}
+            onMoveStart={() => {
+              didDrag.current = false;
             }}
-            className="lg:w-80 flex-shrink-0 order-1 lg:order-1"
+            onMove={() => {
+              didDrag.current = true;
+            }}
+            onMoveEnd={(pos) => {
+              setPosition(pos);
+              // Let the click handler see the flag on this same tick, then clear it.
+              setTimeout(() => {
+                didDrag.current = false;
+              }, 0);
+            }}
           >
-            <motion.div 
-              className="backdrop-blur-md bg-white/10 border border-white/30 shadow-lg rounded-2xl p-6 flex flex-col"
-              animate={{ 
-                height: visitedCountries[currentCountry] && isCitiesExpanded ? "auto" : "140px"
-              }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
-              style={{ 
-                minHeight: "140px",
-                maxHeight: isCitiesExpanded ? "400px" : "140px"
-              }}
-            >
-              {/* Header */}
-              <div className="flex items-center gap-3 mb-4">
-                                 <motion.div
-                   key={`flag-${currentCountry}`}
-                   initial={{ opacity: 0, scale: 0.8 }}
-                   animate={{ opacity: 1, scale: 1 }}
-                   transition={{ duration: 0.6, ease: "easeOut" }}
-                   className="text-3xl"
-                 >
-                   {visitedCountries[currentCountry] ? (
-                     <Flag country={visitedCountries[currentCountry].flag} size={32} />
-                   ) : (
-                     countryData[currentCountry] ? (
-                       <Flag country={countryData[currentCountry].flag} size={32} />
-                     ) : (
-                       <span className="text-3xl">🏳️</span>
-                     )
-                   )}
-                 </motion.div>
-                <motion.h3
-                  key={`name-${currentCountry}`}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.6, ease: "easeOut" }}
-                  className={`text-xl font-bold text-white ${barlow.className}`}
-                  style={{ fontFamily: 'Barlow, sans-serif' }}
-                >
-                  {visitedCountries[currentCountry] ? visitedCountries[currentCountry].name : (countryData[currentCountry] ? countryData[currentCountry].name : "Unknown Country")}
-                </motion.h3>
-              </div>
-              
-              {/* Cities Section Header */}
-              <div className="flex items-center justify-between mb-3">
-                <h4 className={`text-base font-semibold text-white/80 ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>
-                  {visitedCountries[currentCountry] ? "Cities Visited" : "Not Visited Yet"}
-                </h4>
-                {visitedCountries[currentCountry] && (
-                  <button
-                    onClick={() => setIsCitiesExpanded(!isCitiesExpanded)}
-                    className="text-white/60 hover:text-white transition-colors cursor-pointer"
-                  >
-                    <motion.div
-                      animate={{ rotate: isCitiesExpanded ? 90 : 0 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </motion.div>
-                  </button>
-                )}
-              </div>
-              
-              {/* Cities or Not Visited Message */}
-              <AnimatePresence mode="wait">
-                {visitedCountries[currentCountry] ? (
-                  isCitiesExpanded ? (
-                    <motion.div
-                      key={`cities-${currentCountry}`}
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.3, ease: "easeOut" }}
-                      className="space-y-4 overflow-y-auto max-h-64 scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent"
+            <Geographies geography={geoUrl}>
+              {({ geographies }) =>
+                geographies.map((geo) => {
+                  const code = getCountryCode(geo);
+                  const isVisited = Boolean(visitedCountries[code]);
+                  const isSelected = code === selectedCode;
+                  const fill = isVisited ? visitedCountries[code].fill : "var(--muted)";
+                  const transition =
+                    "fill 0.25s ease-out, stroke 0.2s ease-out, stroke-width 0.2s ease-out, filter 0.2s ease-out";
+
+                  return (
+                    <Geography
+                      key={geo.rsmKey}
+                      geography={geo}
+                      onClick={() => handleCountryClick(code)}
+                      tabIndex={isVisited ? 0 : -1}
+                      role={isVisited ? "button" : undefined}
+                      aria-label={isVisited ? visitedCountries[code].name : undefined}
                       style={{
-                        scrollbarWidth: 'thin',
-                        scrollbarColor: 'rgba(255, 255, 255, 0.2) transparent'
+                        default: {
+                          fill,
+                          outline: "none",
+                          stroke: isSelected ? "var(--primary)" : "var(--border)",
+                          strokeWidth: (isSelected ? 1.3 : isVisited ? 0.6 : 0.4) / position.zoom,
+                          filter: isSelected ? "drop-shadow(0 0 5px var(--primary))" : "none",
+                          animation: isSelected ? "map-pulse-glow 2s ease-in-out infinite" : "none",
+                          transition,
+                        },
+                        hover: {
+                          fill,
+                          outline: "none",
+                          cursor: isVisited ? "pointer" : "default",
+                          stroke: isVisited ? "var(--primary)" : "var(--border)",
+                          strokeWidth: (isVisited ? 1.3 : 0.4) / position.zoom,
+                          filter: isVisited ? "drop-shadow(0 0 4px var(--primary))" : "none",
+                          transition,
+                        },
+                        pressed: {
+                          fill,
+                          outline: "none",
+                          transition,
+                        },
                       }}
-                    >
-                      {Object.entries(visitedCountries[currentCountry].cities).map(([cityName, dates], cityIndex) => (
-                        <motion.div
-                          key={cityIndex}
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ 
-                            duration: 0.6, 
-                            delay: cityIndex * 0.3,
-                            ease: "easeOut"
-                          }}
-                          className="space-y-2"
-                        >
-                          {/* City Name */}
-                          <div className={`text-base font-semibold text-white ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>
-                            {cityName}
-                          </div>
-                          
-                          {/* Dates */}
-                          <div className="ml-4 space-y-1">
-                            {dates.map((date, dateIndex) => (
-                              <motion.div
-                                key={dateIndex}
-                                initial={{ opacity: 0, x: -10 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ 
-                                  duration: 0.6, 
-                                  delay: cityIndex * 0.3 + (dateIndex + 1) * 0.15,
-                                  ease: "easeOut"
-                                }}
-                                className="flex items-center gap-2"
-                              >
-                                <div className="w-1.5 h-1.5 bg-white/60 rounded-full flex-shrink-0"></div>
-                                <span className={`text-sm text-white/70 ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>
-                                  {date.year}
-                                </span>
-                              </motion.div>
-                            ))}
-                          </div>
-                        </motion.div>
-                      ))}
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      key={`collapsed-${currentCountry}`}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -10 }}
-                      transition={{ duration: 0.3, ease: "easeOut" }}
-                      className="flex items-center gap-2"
-                    >
-                      <span className={`text-sm text-white/70 ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>
-                        Click to expand cities
-                      </span>
-                    </motion.div>
-                  )
-                ) : (
-                  <motion.div
-                    key={`not-visited-${currentCountry}`}
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -10 }}
-                    transition={{ duration: 0.3, ease: "easeOut" }}
-                    className="flex items-center gap-2"
-                  >
-                    <span className={`text-sm text-white/70 ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>
-                      None
-                    </span>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
-          </motion.div>
+                    />
+                  );
+                })
+              }
+            </Geographies>
+          </ZoomableGroup>
+        </ComposableMap>
 
-          {/* Animated Stats */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.8, ease: "easeOut" }}
-            className="flex flex-row gap-4 order-2 lg:order-2 w-full"
-          >
-            {/* Countries Stat Card */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ 
-                opacity: 1, 
-                x: 0
-              }}
-              transition={{ 
-                opacity: { duration: 0.7, delay: 0.6, ease: "easeOut" },
-                x: { duration: 0.7, delay: 0.6, ease: "easeOut" }
-              }}
-              className="backdrop-blur-md bg-white/10 border border-white/30 shadow-lg rounded-2xl p-6 flex-1 flex flex-col justify-center items-center"
-              style={{ height: "140px" }}
-            >
-                              <div className="text-center flex flex-col justify-center items-center h-full">
-                  <AnimatedCounter 
-                    value={getTotalCountries()}
-                    color="#0266B1"
-                    className={`text-7xl font-bold mb-4 ${exo2.className}`}
-                    isVisible={isInView}
-                  />
-                  <div className={`text-white/70 text-3xl ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>Countries</div>
-                </div>
-            </motion.div>
+        <div className="absolute right-2 top-2 flex flex-col gap-1.5">
+          <ZoomButton onClick={handleZoomIn} label="Zoom in">
+            <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+          </ZoomButton>
+          <ZoomButton onClick={handleZoomOut} label="Zoom out">
+            <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.5 12h15" />
+            </svg>
+          </ZoomButton>
+          <ZoomButton onClick={handleReset} label="Reset view">
+            <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
+              />
+            </svg>
+          </ZoomButton>
+        </div>
 
-            {/* Trips Stat Card */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ 
-                opacity: 1, 
-                x: 0
-              }}
-              transition={{ 
-                opacity: { duration: 0.7, delay: 0.7, ease: "easeOut" },
-                x: { duration: 0.7, delay: 0.7, ease: "easeOut" }
-              }}
-              className="backdrop-blur-md bg-white/10 border border-white/30 shadow-lg rounded-2xl p-6 flex-1 flex flex-col justify-center items-center"
-              style={{ height: "140px" }}
-            >
-                              <div className="text-center flex flex-col justify-center items-center h-full">
-                  <AnimatedCounter 
-                    value={getTotalTrips()}
-                    color="#033E7A"
-                    className={`text-7xl font-bold mb-4 ${exo2.className}`}
-                    isVisible={isInView}
-                  />
-                  <div className={`text-white/70 text-3xl ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>Trips</div>
-                </div>
-            </motion.div>
-
-            {/* Continents Stat Card */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ 
-                opacity: 1, 
-                x: 0
-              }}
-              transition={{ 
-                opacity: { duration: 0.7, delay: 0.8, ease: "easeOut" },
-                x: { duration: 0.7, delay: 0.8, ease: "easeOut" }
-              }}
-              className="backdrop-blur-md bg-white/10 border border-white/30 shadow-lg rounded-2xl p-6 flex-1 flex flex-col justify-center items-center"
-              style={{ height: "140px" }}
-            >
-                              <div className="text-center flex flex-col justify-center items-center h-full">
-                  <AnimatedCounter 
-                    value={getTotalContinents()}
-                    color="#E22716"
-                    className={`text-7xl font-bold mb-4 ${exo2.className}`}
-                    isVisible={isInView}
-                  />
-                  <div className={`text-white/70 text-3xl ${exo2.className}`} style={{ fontFamily: 'Exo 2, sans-serif' }}>Continents</div>
-                </div>
-            </motion.div>
-          </motion.div>
-        </motion.div>
+        <div className="pointer-events-none absolute bottom-2 right-2 flex items-center gap-1.5 rounded-full border border-border bg-card/80 px-2.5 py-1 text-[10px] text-muted-foreground backdrop-blur-sm">
+          <span>Fewer trips</span>
+          <span className="flex h-2 w-10 overflow-hidden rounded-full">
+            <span className="flex-1" style={{ background: "color-mix(in oklch, var(--primary) 35%, var(--background))" }} />
+            <span className="flex-1" style={{ background: "color-mix(in oklch, var(--primary) 65%, var(--background))" }} />
+            <span className="flex-1" style={{ background: "var(--primary)" }} />
+          </span>
+          <span>More</span>
+        </div>
       </div>
-    </section>
+
+      {/* Fixed-height, absolutely-positioned crossfade — the map above never
+          resizes when switching between countries with different city counts. */}
+      <div className="relative mt-3 h-[104px] flex-shrink-0">
+        <AnimatePresence initial={false}>
+          {selected ? (
+            <motion.div
+              key={selectedCode}
+              initial={{ opacity: 0, y: 6, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -6, scale: 0.98 }}
+              transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+              className="absolute inset-0 flex flex-col overflow-hidden rounded-xl border border-primary/30 bg-gradient-to-br from-accent/50 to-secondary/40 p-3 shadow-[0_0_16px_-6px_var(--primary)]"
+            >
+              <div className="flex flex-shrink-0 items-center justify-between gap-2">
+                <div className="flex min-w-0 items-center gap-2">
+                  <Flag country={selected.flag} size={20} />
+                  <span className="truncate text-sm font-semibold text-foreground">
+                    {selected.name}
+                  </span>
+                  <span className="flex-shrink-0 rounded-full bg-primary/15 px-2 py-0.5 font-mono text-[10px] font-semibold text-primary">
+                    {selected.trips} {selected.trips === 1 ? "trip" : "trips"}
+                  </span>
+                </div>
+                <motion.button
+                  onClick={() => setSelectedCode(null)}
+                  aria-label="Close country details"
+                  whileHover={{ scale: 1.15, rotate: 90 }}
+                  whileTap={{ scale: 0.9 }}
+                  transition={{ type: "spring", stiffness: 450, damping: 20 }}
+                  className="flex-shrink-0 cursor-pointer text-muted-foreground/70 transition-colors hover:text-foreground"
+                >
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </motion.button>
+              </div>
+              <div className="mt-2 flex min-h-0 flex-1 flex-wrap content-start gap-1.5 overflow-y-auto custom-scrollbar">
+                {Object.entries(selected.cities).map(([city, visits]) => (
+                  <span
+                    key={city}
+                    className="rounded-full bg-background px-2 py-0.5 text-[11px] text-muted-foreground"
+                  >
+                    {city} · {visits.map((v) => v.year).join(", ")}
+                  </span>
+                ))}
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="stats"
+              initial={{ opacity: 0, y: 6, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -6, scale: 0.98 }}
+              transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+              className="absolute inset-0 grid grid-cols-3 gap-2"
+            >
+              {stats.map((stat) => (
+                <div
+                  key={stat.label}
+                  className="flex flex-col items-center justify-center rounded-xl border border-border bg-gradient-to-br from-accent/40 to-secondary/40 text-center transition-transform duration-200 hover:scale-[1.03]"
+                >
+                  <div className="font-mono text-xl font-bold text-primary">{stat.value}</div>
+                  <div className="text-[11px] text-muted-foreground">{stat.label}</div>
+                </div>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
   );
 }
