@@ -26,6 +26,10 @@ export const metadata = {
   creator: "Keiran Mistry",
   publisher: "Keiran Mistry",
   robots: "index, follow",
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
   openGraph: {
     title: "Keiran Mistry - Portfolio",
     description: "Data Science student at University of Waterloo interested in machine learning, data analysis, and full-stack development.",
