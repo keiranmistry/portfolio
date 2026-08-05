@@ -4,6 +4,13 @@ import { motion } from "framer-motion";
 
 const projects = [
   {
+    id: 0,
+    title: "Premier League Match Predictor",
+    shortDescription: "Revamped for the 2026/2027 PL season",
+    github: "https://github.com/keiranmistry/plmatchpredictor26-27",
+    live: "https://plmatchpredictor26-27.vercel.app",
+  },
+  {
     id: 1,
     title: "Stubook",
     shortDescription: "Cross-platform student productivity app",
