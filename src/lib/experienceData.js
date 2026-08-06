@@ -10,7 +10,7 @@ export const educationEntries = [
 
 export const workEntries = [
   {
-    title: "Data AI Engineer",
+    title: "Software Engineer",
     company: "Northbridge Financial Corporation",
     period: "Jan. 2026 - Aug. 2026",
     icon: "/icons/nbicon.png",
