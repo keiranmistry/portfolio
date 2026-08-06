@@ -26,7 +26,7 @@ export const workEntries = [
   {
     title: "Autonomy Software Developer",
     company: "WARG",
-    period: "Jan. 2025 - Apr. 2025",
+    period: "Oct. 2024 - Apr. 2025",
     icon: "/icons/warg.png",
     url: "https://uwarg.com",
   },
