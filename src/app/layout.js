@@ -1,5 +1,6 @@
 import { Geist, Geist_Mono, Space_Grotesk } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
+import { isDarkInToronto } from "@/lib/sunTimes";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
@@ -50,11 +51,16 @@ export const viewport = {
 };
 
 // Runs before hydration so the correct theme class is set before first paint.
+// Default theme follows the sun in Toronto (dark between sunset and sunrise)
+// rather than the OS color-scheme preference; a manual toggle overrides this
+// via localStorage. isDarkInToronto's source is embedded verbatim so this
+// stays in sync with the periodic re-check in theme-provider.jsx.
 const noFlashScript = `
 (function () {
   try {
     var stored = localStorage.getItem('theme');
-    var theme = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    var isDarkInToronto = ${isDarkInToronto.toString()};
+    var theme = stored || (isDarkInToronto() ? 'dark' : 'light');
     if (theme === 'dark') document.documentElement.classList.add('dark');
   } catch (e) {}
 })();

@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { isDarkInToronto } from "@/lib/sunTimes";
 
 const ThemeContext = createContext(null);
 
@@ -16,7 +17,7 @@ export function ThemeProvider({ children }) {
   // which is a normal post-mount update rather than a hydration mismatch.
   const [theme, setTheme] = useState("light");
   // Once the visitor manually flips the toggle, that choice is pinned in
-  // localStorage and we stop following the OS setting.
+  // localStorage and we stop following Toronto's sunrise/sunset.
   const isPinnedRef = useRef(false);
 
   useEffect(() => {
@@ -29,15 +30,14 @@ export function ThemeProvider({ children }) {
     applyTheme(theme);
   }, [theme]);
 
-  // Live-follow the OS setting while nothing has been manually pinned.
+  // Live-follow Toronto's sunrise/sunset while nothing has been manually pinned.
   useEffect(() => {
-    const media = window.matchMedia("(prefers-color-scheme: dark)");
-    const handleChange = (e) => {
+    const check = () => {
       if (isPinnedRef.current) return;
-      setTheme(e.matches ? "dark" : "light");
+      setTheme(isDarkInToronto() ? "dark" : "light");
     };
-    media.addEventListener("change", handleChange);
-    return () => media.removeEventListener("change", handleChange);
+    const id = setInterval(check, 60 * 1000);
+    return () => clearInterval(id);
   }, []);
 
   const toggleTheme = useCallback(() => {
